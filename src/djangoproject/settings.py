@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'bootstrap3',
     'mars',
 ]
 
@@ -120,3 +121,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_in_env","static_root")
+
+# Static files are sent to the root file, which could be on a different server
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static_in_pro","our_static"),
+    #os.path.join(BASE_DIR, "static_in_env")
+    #'/var/www/static/',
+]
+
+# This is for uploaded files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_in_env", "media_root")
