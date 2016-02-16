@@ -1,0 +1,135 @@
+import csv
+import sys
+import numpy as np
+
+csvFile = sys.argv[1]
+
+def get_column(A, colNum):
+    return A[:,colNum]
+
+dataArray = []
+sampArray = []
+nameArray = []
+grainArray = []
+vGeoArray = []
+resArray = []
+rangArray = []
+formArray = []
+compArray = []
+wavelens = []  #matrix of num_data_point rows by 1+num_samples columns
+#reflectance = []
+
+
+with open(csvFile, 'rb') as cf:
+    reader = csv.reader(cf)
+    origin = reader.next()[1]
+    print(origin)
+    collection = reader.next()[1]
+    desc = reader.next()[1]
+    access = reader.next()[1]
+    reader.next()
+
+    data = reader.next()
+    i = 2
+    while i < len(data):
+        #dataArray[j] = data[i]
+        dataArray.append(data[i])
+        i+=1
+
+
+    samp = reader.next()
+    i = 2
+    while i < len(samp):
+        sampArray.append(samp[i])
+        i+=1
+
+    name = reader.next()
+    i = 2
+    while i < len(name):
+        nameArray.append(name[i])
+        i+=1
+
+    scale = "nanometers"
+    size = reader.next()
+    if "??" or "micron" in size[0]:
+        scale = "microns"
+    i = 2
+    while i < len(size):
+        if "??" or "micron" in size[i]:
+            temp = size[i].split()
+            temp1 = temp[0]
+            if "<" in temp1:
+                temp1 = temp1.replace("<", "")
+                temp1 = float(temp1)*1000
+                temp1 = "<" + str(temp1)
+            elif "-" in temp1:
+                temp2 = temp1.split("-")
+                temp1 = str(float(temp2[0])*1000) + "-" + str(float(temp2[1])*1000)
+            grainArray.append(temp1)
+        else:
+            grainArray.append(size[i])
+        i+=1
+    scale = "nanometers"
+
+    vg = reader.next()
+    i = 2
+    while i < len(vg):
+        token = vg[i].split('/')
+        vGeoArray.append(token)
+        i+=1
+
+    res = reader.next()
+    i = 2
+    while i < len(res):
+        resArray.append(res[i])
+        i+=1
+
+    rang = reader.next()
+    i = 2
+    if "??" or "micron" in rang[0]:
+        scale = "microns"
+    while i < len(rang):
+        if scale == "microns":
+            temp = rang[i].split('-')
+            temp1 = str(float(temp[0])*1000) + "-" + str(float(temp[1])*1000)
+            rangArray.append(temp1)
+        else:
+            rangArray.append(rang[i])
+        i+=1
+    scale = "nanometers"
+
+    formula = reader.next()
+    i = 2
+    while i < len(formula):
+        formArray.append(formula[i])
+        i+=1
+
+    comp = reader.next()
+    i = 2
+    while i < len(comp):
+        compArray.append(comp[i])
+        i+=1
+
+    reader.next()
+    reader.next()
+    reader.next()
+    reader.next()
+    reader.next()
+
+    factor = 1
+    wl = reader.next()
+    if "microns" or "??" in wl:
+        factor = 1000
+    for row in reader:
+        #print row
+        #w = reader.next()
+        i = 0
+        tempArray = []
+        tempArray.append(str(float(row[0])*factor))
+        i = 2
+        while i < len(row):
+            tempArray.append(str(float(row[i])*factor))
+            i+=1
+        wavelens.append(tempArray)
+        #print tempArray
+    A = np.array(wavelens)
