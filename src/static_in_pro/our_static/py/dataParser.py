@@ -74,14 +74,26 @@ with open(csvFile, 'rb') as cf:
     vg = reader.next()
     i = 2
     while i < len(vg):
-        token = vg[i].split('/')
-        vGeoArray.append(token)
+        if vg[i] not "":
+            token = vg[i].split('/')
+            vGeoArray.append(token)
+        else:
+            #empty case - don't put in database
+            vGeoArray.append(vg[i])
         i+=1
 
     res = reader.next()
     i = 2
     while i < len(res):
-        resArray.append(res[i])
+        if res[i] not "":
+            tempArray = []
+            temp1 = res[i].split('-')
+            tempArray.append(temp1[0])
+            tempArray.append(temp1[1])
+            resArray.append(tempArray)
+        else:
+            #empty case- don't put in database
+            resArray.append(res[i])
         i+=1
 
     rang = reader.next()
@@ -89,11 +101,19 @@ with open(csvFile, 'rb') as cf:
     if "??" or "micron" in rang[0]:
         scale = "microns"
     while i < len(rang):
-        if scale == "microns":
-            temp = rang[i].split('-')
-            temp1 = str(float(temp[0])*1000) + "-" + str(float(temp[1])*1000)
+        if rang[i] not "":
+            temp1 = []
+            if scale == "microns":
+                temp = rang[i].split('-')
+                temp1.append(str(float(temp[0])*1000))
+                temp1.append(str(float(temp[1])*1000))
+            else:
+                temp = rang[i].split('-')
+                temp1.append(temp[0])
+                temp1.append(temp[1])
             rangArray.append(temp1)
         else:
+            #empty case - don't put in database
             rangArray.append(rang[i])
         i+=1
     scale = "nanometers"
