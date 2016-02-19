@@ -74,7 +74,7 @@ with open(csvFile, 'rb') as cf:
     vg = reader.next()
     i = 2
     while i < len(vg):
-        if vg[i] not "":
+        if vg[i] != "":
             token = vg[i].split('/')
             vGeoArray.append(token)
         else:
@@ -85,7 +85,7 @@ with open(csvFile, 'rb') as cf:
     res = reader.next()
     i = 2
     while i < len(res):
-        if res[i] not "":
+        if res[i] != "":
             tempArray = []
             temp1 = res[i].split('-')
             tempArray.append(temp1[0])
@@ -101,7 +101,7 @@ with open(csvFile, 'rb') as cf:
     if "??" or "micron" in rang[0]:
         scale = "microns"
     while i < len(rang):
-        if rang[i] not "":
+        if rang[i] != "":
             temp1 = []
             if scale == "microns":
                 temp = rang[i].split('-')
@@ -153,3 +153,15 @@ with open(csvFile, 'rb') as cf:
         wavelens.append(tempArray)
         #print tempArray
     A = np.array(wavelens)
+
+f = open('marsdb.sql', 'w')
+insert = "INSERT INTO mars_sample (data_id, sample_id, date_accessed, origin, name, grain_size, view_geom)"
+
+for i in range(len(dataArray)):
+    line = insert + " VALUES ('" + dataArray[i] + "', '" \
+    + sampArray[i] + "', '" + access + "', '" + origin + "', '" \
+    + nameArray[i] + "', '" + grainArray[i] + "', '{" + str(vGeoArray[i][0]) \
+    + ', ' + str(vGeoArray[i][1]) + "}');"
+    f.write(line + '\n')
+
+f.close()

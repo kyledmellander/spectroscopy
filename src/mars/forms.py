@@ -19,4 +19,3 @@ class SignUpForm(forms.ModelForm):
     	if not "edu" in extension:
     		raise forms.ValidationError("Please use a valid .edu email address.")
     	return cleaned
-
