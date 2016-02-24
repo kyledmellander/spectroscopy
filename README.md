@@ -21,3 +21,22 @@ Steps for installing:
           
           >rm -r bin include lib
           >virtualenv -p python3 .
+
+Database Setup:
+This was all done on my Mac, so it may be different for a Windows machine.
+1. Install postgresql if you haven't
+   >sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib
+2. In the virtualenv, install psycopg2
+   >pip install django psycopg2
+3. Set up the postgresql user, myprojectuser with CREATEDB permissions
+   >psql
+   >CREATE USER myprojectuser WITH PASSWORD 'password' CREATEDB;
+   >\q  #to exit the psql interactive terminal
+4. Run the script to create the database
+   >./marsdb.sh
+5. Migrate the database
+   >python manage.py migrate
+6. Add samples to the database
+   #Add command here once dataParser is done
+7. Create your admin user
+   >python manage.py createsuperuser

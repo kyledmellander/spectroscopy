@@ -84,8 +84,7 @@ with open(csvFile, 'rb') as cf:
                     temp4 = str(float(temp2[1])*1000)
                 arr.append(temp4)
             else:
-                for item in temp1:
-                    arr.append(item)
+                arr.append(temp1)
         else:
             #grainArray.append(size[i])
             temp = size[i].split()
@@ -107,8 +106,7 @@ with open(csvFile, 'rb') as cf:
                 else:
                     arr.append(temp2[1])
             else:
-                for item in temp1:
-                    arr.append(item)
+                arr.append(temp1)
         grainArray.append(arr)
         i+=1
     scale = "nanometers"
@@ -238,6 +236,7 @@ with open(csvFile, 'rb') as cf:
         #print tempArray
     A = np.array(wavelens)
 
+<<<<<<< HEAD
 
 # #----Database Things Happen Here----
 #
@@ -264,3 +263,16 @@ with open(csvFile, 'rb') as cf:
 #
 # conn.commit()
 # conn.close()
+=======
+f = open('marsdb.sql', 'w')
+insert = "INSERT INTO mars_sample (data_id, sample_id, date_accessed, origin, name, grain_size, view_geom)"
+
+for i in range(len(dataArray)):
+    line = insert + " VALUES ('" + dataArray[i] + "', '" \
+    + sampArray[i] + "', '" + access + "', '" + origin + "', '" \
+    + nameArray[i] + "', '" + grainArray[i] + "', '{" + str(vGeoArray[i][0]) \
+    + ', ' + str(vGeoArray[i][1]) + "}');"
+    f.write(line + '\n')
+
+f.close()
+>>>>>>> ac863813197d0d3fe5dd4edf1d04f0a347acd3a9
