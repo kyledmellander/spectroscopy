@@ -212,6 +212,8 @@ with open(csvFile, 'rb') as cf:
         print line
         line = reader.next()
 
+    if ("microns" or "um") in line:
+        factor = 1000
     # reader.next()
     # reader.next()
     # reader.next()
@@ -220,8 +222,7 @@ with open(csvFile, 'rb') as cf:
     factor = 1
     wl = reader.next()
     print "wl: " + str(wl)
-    if ("microns" or "um") in wl:
-        factor = 1000
+    
     for row in reader:
         #print row
         #w = reader.next()
