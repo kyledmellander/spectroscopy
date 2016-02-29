@@ -3,7 +3,7 @@ import sys
 import json
 import re
 import numpy as np
-import psycopg2
+#import psycopg2
 
 #Takes in the csv file
 csvFile = sys.argv[1]
@@ -126,8 +126,9 @@ with open(csvFile, 'rb') as cf:
     while i < len(vg):
         if vg[i] != "":
             token = vg[i].split('/')
-            vGeoArray.append(int(token[0]))
-            vGeoArray.append(int(token[1]))
+            vGeoArray.append(token[0])
+            if len(token) > 1:
+                vGeoArray.append(token[1])
         else:
             #empty case - don't put in database
             vGeoArray.append(vg[i])
@@ -146,22 +147,27 @@ with open(csvFile, 'rb') as cf:
             temp1 = res[i].split('-')
             first = temp1[0].split('@')
             last = temp1[1].split('@')
-            if last[1].find("nm") != -1:
-                lt = last[1].split("n")
-                scale = "nanometers"
-            else:
-                lt = last[1].split("u")
-                scale = "microns"
+            if len(last) > 1:
+                if last[1].find("nm") != -1:
+                    lt = last[1].split("n")
+                    scale = "nanometers"
+                else:
+                    lt = last[1].split("u")
+                    scale = "microns"
             if scale == "microns":
                 tempArray.append(str(float(first[0])*1000))
-                tempArray.append(str(float(first[1])*1000))
+                if len(first) > 1:
+                    tempArray.append(str(float(first[1])*1000))
                 tempArray.append(str(float(last[0])*1000))
-                tempArray.append(str(float(lt[0])*1000))
+                if len(last) > 1:
+                    tempArray.append(str(float(lt[0])*1000))
             else:
                 tempArray.append(first[0])
-                tempArray.append(first[1])
+                if len(first) > 1:
+                    tempArray.append(first[1])
                 tempArray.append(last[0])
-                tempArray.append(lt[0])
+                if len(last) > 1:
+                    tempArray.append(lt[0])
 
             resArray.append(tempArray)
         else:
@@ -172,7 +178,7 @@ with open(csvFile, 'rb') as cf:
     # Range
     rang = reader.next()
     i = 2
-    print rang[0]
+    #print rang[0]
     if ("um" or "micron") in rang[0]:
         scale = "microns"
     else:
@@ -214,14 +220,14 @@ with open(csvFile, 'rb') as cf:
     comp = reader.next()
     i = 2
     while i < len(comp):
-        print str(comp[i]) + "\n"
+        #print str(comp[i]) + "\n"
         compArray.append(comp[i])
         i+=1
 
     line = reader.next()
-    print line
+    #print line
     while ("Wavelength" not in line[0]):
-        print line
+        #print line
         line = reader.next()
 
     if ("microns" or "um") in line:
@@ -233,8 +239,8 @@ with open(csvFile, 'rb') as cf:
 
     factor = 1
     wl = reader.next()
-    print "wl: " + str(wl)
-    
+    #print "wl: " + str(wl)
+
     for row in reader:
         #print row
         #w = reader.next()
