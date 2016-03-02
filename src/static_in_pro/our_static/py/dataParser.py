@@ -40,10 +40,34 @@ with open(csvFile, 'rb') as cf:
     # Data ID
     data = reader.next()
     i = 2
+    idArray = []
+    idStringArray = []
     while i < len(data):
-        #dataArray[j] = data[i]
-        dataArray.append(data[i])
+        id_num = data[i].rsplit("_", 1)
+        idStringArray.append(id_num[0])
+        num = int(id_num[1])
+        idArray.append(num)
         i+=1
+
+    j = 1
+    sizeIdArray = len(idArray)
+    finalIdArray = []
+    finalIdArray.append(idArray[0])
+    while j < sizeIdArray:
+        if idArray[j] == idArray[j-1]:
+            newNum = idArray[j] + 1
+            idArray[j] = newNum
+            finalIdArray.append(newNum)
+        else:
+            finalIdArray.append(idArray[j])
+        j += 1
+
+    k = 0
+    while k < sizeIdArray:
+        newId = str(idStringArray[k]) + "_" + str(finalIdArray[k])
+        dataArray.append(newId)
+        k += 1
+
 
     # Sample ID
     samp = reader.next()
@@ -126,7 +150,7 @@ with open(csvFile, 'rb') as cf:
     i = 2
     while i < len(vg):
         geoArray = [None] * 4
-        if vg[i] != "" and vg[i].find("unknown") == -1:
+        if vg[i] != "" and vg[i].find("unknown") == -1 and vg[i].find("?") == -1: #Question mark check: make more robust? Will there be some ?'s and some data?
             token = vg[i].split('/')
             if token[0].find("|") != -1:
                 sl = token[0].split("|")
@@ -274,7 +298,7 @@ with open(csvFile, 'rb') as cf:
         factor = 1
 
     wl = reader.next()
-    print wl
+    #print wl
 
     row_len = len(wl)
 
@@ -285,11 +309,11 @@ with open(csvFile, 'rb') as cf:
             #row_len = len(row)
             waveDataPt[str(row[0])] = None
 
-    print row_len
+    #print row_len
 
     i = 2
     while i < row_len:
-        print i
+        #print i
         cf.seek(20)
         currDict = copy.deepcopy(waveDataPt)
         for row in reader:
