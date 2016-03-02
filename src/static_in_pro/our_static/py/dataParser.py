@@ -2,6 +2,7 @@ import csv
 import sys
 import json
 import re
+import copy
 import numpy as np
 #import psycopg2
 
@@ -23,7 +24,7 @@ resArray = []
 rangArray = []
 formArray = []
 compArray = []
-wavelens = []  #matrix of num_data_point rows by 1+num_samples columns
+dataPts = []  #matrix of num_data_point rows by 1+num_samples columns
 #reflectance = []
 A = np.array([])
 
@@ -124,14 +125,30 @@ with open(csvFile, 'rb') as cf:
     vg = reader.next()
     i = 2
     while i < len(vg):
-        if vg[i] != "":
+        geoArray = [None] * 4
+        if vg[i] != "" and vg[i].find("unknown") == -1:
             token = vg[i].split('/')
-            vGeoArray.append(token[0])
+            if token[0].find("|") != -1:
+                sl = token[0].split("|")
+                geoArray[0] = sl[0]
+                geoArray[1] = sl[1]
+            else:
+                geoArray[0] = token[0]
             if len(token) > 1:
-                vGeoArray.append(token[1])
+                if token[1].find("|") != -1:
+                    sr = token[1].split("|")
+                    if geoArray[1] != None:
+                        geoArray[2] = sr[0]
+                        geoArray[3] = sr[1]
+                    else:
+                        geoArray[1] = sr[0]
+                        geoArray[2] = sr[1]
+                else:
+                    geoArray[1] = token[1]
+            vGeoArray.append(geoArray)
         else:
             #empty case - don't put in database
-            vGeoArray.append(vg[i])
+            vGeoArray.append(geoArray)
         i+=1
 
     # Resolution
@@ -142,37 +159,61 @@ with open(csvFile, 'rb') as cf:
     else:
         scale = "nanometers"
     while i < len(res):
-        if res[i] != "":
-            tempArray = []
-            temp1 = res[i].split('-')
-            first = temp1[0].split('@')
-            last = temp1[1].split('@')
-            if len(last) > 1:
-                if last[1].find("nm") != -1:
-                    lt = last[1].split("n")
-                    scale = "nanometers"
+        tempArray = [None] * 4
+        if res[i] != "" and res[i].find("unknown") == -1:
+            if res[i].find("/") != -1:
+                slash = res[i].split('/')
+                if scale == "microns":
+                    tempArray[0] = float(slash[0]*1000)
                 else:
-                    lt = last[1].split("u")
-                    scale = "microns"
-            if scale == "microns":
-                tempArray.append(str(float(first[0])*1000))
-                if len(first) > 1:
-                    tempArray.append(str(float(first[1])*1000))
-                tempArray.append(str(float(last[0])*1000))
-                if len(last) > 1:
-                    tempArray.append(str(float(lt[0])*1000))
+                    tempArray[0] = float(slash[0])
+                dash = slash[1].split('-')
+                if len(dash) > 1:
+                    if scale == "microns":
+                        tempArray[1] = float(dash[0]*1000)
+                        tempArray[2] = float(dash[1]*1000)
+                    else:
+                        tempArray[1] = float(dash[0])
+                        tempArray[2] = float(dash[1])
             else:
-                tempArray.append(first[0])
-                if len(first) > 1:
-                    tempArray.append(first[1])
-                tempArray.append(last[0])
-                if len(last) > 1:
-                    tempArray.append(lt[0])
-
+                temp1 = res[i].split('-')
+                if len(temp1) > 1:
+                    first = temp1[0].split('@')
+                    if len(first) > 1:
+                        last = temp1[1].split('@') #Assuming 2@3500-7@3500
+                        if last[1].find("nm") != -1:
+                            lt = last[1].split("n")
+                            scale = "nanometers"
+                        else:
+                            lt = last[1].split("u")
+                            scale = "microns"
+                        if scale == "microns":
+                            tempArray[0] = float(first[0])*1000
+                            tempArray[1] = float(first[1])*1000
+                            tempArray[2] = float(last[0])*1000
+                            tempArray[3] = float(last[1])*1000
+                        else:
+                            tempArray[0] = float(first[0])
+                            tempArray[1] = float(first[1])
+                            tempArray[2] = float(last[0])
+                            tempArray[3] = float(last[1])
+                    else:
+                        if scale == "microns":
+                            tempArray[0] = float(first[0])*1000
+                            tempArray[1] = float(temp1[1])*1000
+                        else:
+                            tempArray[0] = float(first[0])
+                            tempArray[1] = float(temp1[1])
+                else:
+                    if isinstance(temp1[0], float):
+                        if scale == "microns":
+                            tempArray[0] = float(temp1[0])*1000
+                        else:
+                            tempArray[0] = float(temp1[0])
             resArray.append(tempArray)
         else:
             #empty case- don't put in database
-            resArray.append(res[i])
+            resArray.append(tempArray)
         i+=1
 
     # Range
@@ -190,20 +231,20 @@ with open(csvFile, 'rb') as cf:
                 temp = rang[i].split('-')
                 if temp[1].find("um") != -1:
                     ty = temp[1].split("u")
-                    temp1.append(str(float(temp[0])*1000))
-                    temp1.append(str(float(ty[0])*1000))
+                    temp1.append(float(temp[0])*1000)
+                    temp1.append(float(ty[0])*1000)
                 else:
-                    temp1.append(str(float(temp[0])*1000))
-                    temp1.append(str(float(temp[1])*1000))
+                    temp1.append(float(temp[0])*1000)
+                    temp1.append(float(temp[1])*1000)
             else:
                 temp = rang[i].split('-')
                 if temp[1].find("nm") != -1:
                     ty = temp[1].split("n")
-                    temp1.append(temp[0])
-                    temp1.append(ty[0])
+                    temp1.append(float(temp[0]))
+                    temp1.append(float(ty[0]))
                 else:
-                    temp1.append(temp[0])
-                    temp1.append(temp[1])
+                    temp1.append(float(temp[0]))
+                    temp1.append(float(temp[1]))
             rangArray.append(temp1)
         else:
             #empty case - don't put in database
@@ -220,40 +261,43 @@ with open(csvFile, 'rb') as cf:
     comp = reader.next()
     i = 2
     while i < len(comp):
-        #print str(comp[i]) + "\n"
         compArray.append(comp[i])
         i+=1
 
     line = reader.next()
-    #print line
     while ("Wavelength" not in line[0]):
-        #print line
         line = reader.next()
 
     if ("microns" or "um") in line:
         factor = 1000
-    # reader.next()
-    # reader.next()
-    # reader.next()
-    # reader.next()
+    else:
+        factor = 1
 
-    factor = 1
     wl = reader.next()
-    #print "wl: " + str(wl)
+    print wl
 
+    row_len = len(wl)
+
+    waveDataPt = {}
     for row in reader:
         #print row
-        #w = reader.next()
-        i = 0
-        tempArray = []
-        tempArray.append(str(float(row[0])*factor))
-        i = 2
-        while i < len(row):
-            tempArray.append(str(float(row[i])*factor))
-            i+=1
-        wavelens.append(tempArray)
-        #print tempArray
-    A = np.array(wavelens)
+        if isinstance(row[0], float):
+            #row_len = len(row)
+            waveDataPt[str(row[0])] = None
+
+    print row_len
+
+    i = 2
+    while i < row_len:
+        print i
+        cf.seek(20)
+        currDict = copy.deepcopy(waveDataPt)
+        for row in reader:
+            if isinstance(row[0], float):
+                currDict[str(row[0])] = str(float(row[i])*factor)
+
+        dataPts.append(currDict)
+        i += 1
 
 # #----Database Things Happen Here----
 # conn = None
