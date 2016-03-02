@@ -3,17 +3,15 @@ import sys
 import json
 import re
 import copy
+import itertools
 import numpy as np
-#import psycopg2
+import psycopg2
 
 #Takes in the csv file
 csvFile = sys.argv[1]
 
 def hasNumbers(inputString):
     return bool(re.search(r'/d', inputString))
-
-def get_column(A, colNum):
-    return A[:,colNum]
 
 dataArray = [] #Array of IDs
 sampArray = [] #Sample IDs
@@ -29,7 +27,7 @@ dataPts = []  #matrix of num_data_point rows by 1+num_samples columns
 A = np.array([])
 
 
-with open(csvFile, 'rb') as cf:
+with open(csvFile, 'rU') as cf:
     reader = csv.reader(cf)
     origin = reader.next()[1]
     collection = reader.next()[1]
@@ -274,57 +272,58 @@ with open(csvFile, 'rb') as cf:
         factor = 1
 
     wl = reader.next()
-    print wl
+    #print wl
 
     row_len = len(wl)
-
+    #print reader
     waveDataPt = {}
     for row in reader:
-        #print row
-        if isinstance(row[0], float):
+        if isinstance(float(row[0]), float):
             #row_len = len(row)
-            waveDataPt[str(row[0])] = None
+            waveDataPt[str(row[0])] = 'NULL'
 
-    print row_len
+    #print waveDataPt
+    #print row_len
 
     i = 2
     while i < row_len:
-        print i
+
         cf.seek(20)
         currDict = copy.deepcopy(waveDataPt)
-        for row in reader:
-            if isinstance(row[0], float):
+
+        for row in itertools.islice(reader, 21, len(currDict)):
+            if isinstance(float(row[0]), float):
                 currDict[str(row[0])] = str(float(row[i])*factor)
 
         dataPts.append(currDict)
         i += 1
 
-# #----Database Things Happen Here----
-# conn = None
-#
-# #Need to fill in with correct information
-# conn = psycopg2.connect("dbname = 'spectrodb' user = 'myprojectuser' host = localhost password = 'password'")
-# cur = conn.cursor()
-#
-# wave = get_column(A, 0)
-# size = len(dataArray)
-# for i in size:
-#     dataId = dataArray[i]
-#     sampId = sampArray[i]
-#     name = nameArray[i]
-#     gr = grainArray[i]
-#     vg = vGeoArray[i]
-#     res = resArray[i]
-#     ran = rangArray[i]
-#     form = formArray[i]
-#     comp = compArray[i]
-#     reflect = get_column(A, i+1)
-#     query = "INSERT INTO samples (DATA_ID, SAMPLE_ID, DATE_ADDED, ORIGIN, LOCALITY, NAME, SAMPLE_DESC, GRAIN_SIZE, VIEW_GEOM, RESOLUTION, RANGE, FORMULA, COMPOSITION, WAVE_LENGTH, REFLECTANCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-#     data = (dataId, sampId, access, origin, collection, name, desc, gr, vg, res, ran, form, comp, wave, reflect)
-#     cursor.execute(query, data)
-#
-# conn.commit()
-# conn.close()
+#----Database Things Happen Here----
+conn = None
+
+#Need to fill in with correct information
+conn = psycopg2.connect("dbname = 'spectrodb' user = 'myprojectuser' host = localhost password = 'password'")
+cur = conn.cursor()
+
+size = len(dataArray)
+for i in range(size):
+    dataId = dataArray[i]
+    sampId = sampArray[i]
+    name = nameArray[i]
+    gr = grainArray[i]
+    print gr
+    vg = vGeoArray[i]
+    res = resArray[i]
+    ran = rangArray[i]
+    form = formArray[i]
+    comp = compArray[i]
+    reflect = json.dumps(dataPts[i])
+    # query = "INSERT INTO samples (DATA_ID, SAMPLE_ID, DATE_ACCESSED, ORIGIN, LOCALITY, NAME, SAMPLE_DESC, GRAIN_SIZE, VIEW_GEOM, RESOLUTION, REFL_RANGE, FORMULA, COMPOSITION, REFLECTANCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+    # data = (dataId, sampId, access, origin, collection, name, desc, gr, vg, res, ran, form, comp, reflect)
+    # cur.execute(query, data)
+
+conn.commit()
+conn.close()
 
 # f = open('marsdb.sql', 'w')
 # insert = "INSERT INTO mars_sample (data_id, sample_id, date_accessed, origin, name, grain_size, view_geom)"

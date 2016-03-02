@@ -4,7 +4,6 @@
 # and there is a postgres role named 'myprojectuser' with CREATE priveleges.
 
 psql <<EOF
-DROP USER IF EXISTS myprojectuser;
 CREATE USER myprojectuser WITH PASSWORD 'password' CREATEDB;
 DROP DATABASE IF EXISTS spectrodb;
 CREATE DATABASE spectrodb OWNER myprojectuser;
@@ -12,7 +11,7 @@ EOF
 
 psql spectrodb myprojectuser <<EOF
 CREATE SCHEMA minerals;
-CREATE TABLE mars_sample (
+CREATE TABLE samples (
 ID CHAR(15),
 DATA_ID CHAR(10) PRIMARY KEY NOT NULL,
 SAMPLE_ID VARCHAR(20) NOT NULL,
@@ -25,12 +24,11 @@ SAMPLE_TYPE VARCHAR(25),
 SAMPLE_CLASS VARCHAR(25),
 SUB_CLASS VARCHAR(25),
 GRAIN_SIZE VARCHAR(25),
-VIEW_GEOM integer ARRAY[2],
-RESOLUTION integer ARRAY[2],
-REFL_RANGE integer ARRAY[2],
+VIEW_GEOM float ARRAY[4],
+RESOLUTION float ARRAY[4],
+REFL_RANGE float ARRAY[2],
 FORMULA VARCHAR(20),
 COMPOSITION VARCHAR(100),
-WAVE_LENGTH JSON,
 REFLECTANCE JSON
 );
 EOF
