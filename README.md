@@ -37,6 +37,10 @@ This was all done on my Mac, so it may be different for a Windows machine.
 5. Migrate the database
    >python manage.py migrate
 6. Add samples to the database
-   #Add command here once dataParser is done
+   >./testDataParser.sh
 7. Create your admin user
    >python manage.py createsuperuser
+8. Start up the server
+   >python manage.py runserver
+9. Login with the information you created in createsuperuser
+10. View the data!!
