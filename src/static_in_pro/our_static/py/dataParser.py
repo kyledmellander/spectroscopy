@@ -11,7 +11,7 @@ import psycopg2
 csvFile = sys.argv[1]
 
 def hasNumbers(inputString):
-    return bool(re.search(r'/d', inputString))
+    return bool(re.search(r'\d', inputString))
 
 dataArray = [] #Array of IDs
 sampArray = [] #Sample IDs
@@ -275,15 +275,11 @@ with open(csvFile, 'rU') as cf:
     #print wl
 
     row_len = len(wl)
-    #print reader
+
     waveDataPt = {}
     for row in reader:
-        if isinstance(float(row[0]), float):
-            #row_len = len(row)
-            waveDataPt[str(row[0])] = 'NULL'
-
-    #print waveDataPt
-    #print row_len
+        if hasNumbers(row[0]) == True:
+            waveDataPt[row[0]] = 'NULL'
 
     i = 2
     while i < row_len:
@@ -292,8 +288,8 @@ with open(csvFile, 'rU') as cf:
         currDict = copy.deepcopy(waveDataPt)
 
         for row in itertools.islice(reader, 21, len(currDict)):
-            if isinstance(float(row[0]), float):
-                currDict[str(row[0])] = str(float(row[i])*factor)
+            if hasNumbers(row[0]) == True:
+                currDict[row[0]] = row[i] * factor
 
         dataPts.append(currDict)
         i += 1
@@ -311,16 +307,34 @@ for i in range(size):
     sampId = sampArray[i]
     name = nameArray[i]
     gr = grainArray[i]
-    print gr
-    vg = vGeoArray[i]
-    res = resArray[i]
-    ran = rangArray[i]
+
+    tempVG = vGeoArray[i]
+    for j in range(len(tempVG)):
+        if tempVG[j] == None:
+            tempVG[j] = 'NULL'
+    vg = '{' + str(tempVG[0]).strip() + ', ' + str(tempVG[1]).strip() + ', ' + str(tempVG[2]).strip() + ', ' + str(tempVG[3]).strip() + '}'
+
+    tempRes = resArray[i]
+    for j in range(len(tempRes)):
+        if tempRes[j] == None:
+            tempRes[j] = 'NULL'
+    res = '{' + str(tempRes[0]).strip() + ', ' + str(tempRes[1]).strip() + ', ' + str(tempRes[2]).strip() + ', ' + str(tempRes[3]).strip() + '}'
+
+    tempRan = rangArray[i]
+    if len(tempRan) == 0:
+        tempRan = ['NULL', 'NULL']
+    for j in range(len(tempRan)):
+        if tempRan[j] == None:
+            tempRan[j] = 'NULL'
+    ran = '{' + str(tempRan[0]).strip() + ', ' + str(tempRan[1]).strip() + '}'
+
     form = formArray[i]
     comp = compArray[i]
+    print dataPts[i]
     reflect = json.dumps(dataPts[i])
-    # query = "INSERT INTO samples (DATA_ID, SAMPLE_ID, DATE_ACCESSED, ORIGIN, LOCALITY, NAME, SAMPLE_DESC, GRAIN_SIZE, VIEW_GEOM, RESOLUTION, REFL_RANGE, FORMULA, COMPOSITION, REFLECTANCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-    # data = (dataId, sampId, access, origin, collection, name, desc, gr, vg, res, ran, form, comp, reflect)
-    # cur.execute(query, data)
+    query = "INSERT INTO mars_sample (DATA_ID, SAMPLE_ID, DATE_ACCESSED, ORIGIN, LOCALITY, NAME, SAMPLE_DESC, GRAIN_SIZE, VIEW_GEOM, RESOLUTION, REFL_RANGE, FORMULA, COMPOSITION, REFLECTANCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+    data = (dataId, sampId, access, origin, collection, name, desc, gr, vg, res, ran, form, comp, reflect)
+    cur.execute(query, data)
 
 conn.commit()
 conn.close()

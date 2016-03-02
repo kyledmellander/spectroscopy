@@ -10,7 +10,8 @@ class SignUp(models.Model):
 	updated = models.DateTimeField(auto_now_add = False, auto_now = True)
 
 	def __str__(self):
-		return self.email
+		return self.emaills
+
 
 class Sample(models.Model):
 	data_id = models.CharField(max_length=15)
@@ -18,15 +19,14 @@ class Sample(models.Model):
 	date_accessed = models.DateTimeField(auto_now_add = False, auto_now = False)
 	origin = models.CharField(max_length=50)
 	locality = models.CharField(max_length=50, null=True, blank=True)
-	name = models.CharField(max_length=25)
-	sample_desc = models.CharField(max_length=100, null=True, blank=True)
-	sample_type = models.CharField(max_length=25, null=True, blank=True)
-	sample_class = models.CharField(max_length = 25, null=True, blank=True)
-	grain_size = models.CharField(max_length=10, null=True, blank=True)
-	view_geom = ArrayField(models.IntegerField(), size=2, null=True, blank=True)
-	resolution = ArrayField(models.IntegerField(), size=2, null=True, blank=True)
-	refl_range = ArrayField(models.IntegerField(), size=2, null=True, blank=True)
+	name = models.CharField(max_length=100)
+	sample_desc = models.CharField(max_length=500, null=True, blank=True)
+	sample_type = models.CharField(max_length=100, null=True, blank=True)
+	sample_class = models.CharField(max_length = 50, null=True, blank=True)
+	grain_size = models.CharField(max_length=100, null=True, blank=True)
+	view_geom = ArrayField(models.FloatField(), size=4, null=True, blank=True)
+	resolution = ArrayField(models.FloatField(), size=4, null=True, blank=True)
+	refl_range = ArrayField(models.FloatField(), size=2, null=True, blank=True)
 	formula = models.CharField(max_length=20, null=True, blank=True)
-	composition = models.CharField(max_length=100, null=True, blank=True)
-	wave_length = JSONField()
+	composition = models.CharField(max_length=1000, null=True, blank=True)
 	reflectance = JSONField()
