@@ -5,7 +5,7 @@ import re
 import copy
 import itertools
 import numpy as np
-import psycopg2
+#import psycopg2
 
 #Takes in the csv file
 csvFile = sys.argv[1]
@@ -37,14 +37,21 @@ with open(csvFile, 'rU') as cf:
 
     # Data ID
     data = reader.next()
-    i = 2
+    if data[1] != None:
+        i =1
+    else:
+        i = 2
+    #i = 2
     idArray = []
     idStringArray = []
     while i < len(data):
         id_num = data[i].rsplit("_", 1)
-        idStringArray.append(id_num[0])
-        num = int(id_num[1])
-        idArray.append(num)
+        #print id_num[0]
+        #idStringArray.append(id_num[0])
+        if len(id_num) > 1:
+            idStringArray.append(id_num[0])
+            num = int(id_num[1])
+            idArray.append(num)
         i+=1
 
     j = 1
@@ -61,8 +68,10 @@ with open(csvFile, 'rU') as cf:
         j += 1
 
     k = 0
+    #print idStringArray
     while k < sizeIdArray:
-        newId = str(idStringArray[k]) + "_" + str(finalIdArray[k])
+        newId = str(idStringArray[k]) + "_" + str(finalIdArray[k]).zfill(2)
+        #print newId
         dataArray.append(newId)
         k += 1
 
@@ -227,7 +236,8 @@ with open(csvFile, 'rU') as cf:
                             tempArray[0] = float(first[0])
                             tempArray[1] = float(temp1[1])
                 else:
-                    if isinstance(temp1[0], float):
+                    #if isinstance(temp1[0], float):
+                    if hasNumbers(temp1[0]) == True:
                         if scale == "microns":
                             tempArray[0] = float(temp1[0])*1000
                         else:
@@ -302,25 +312,11 @@ with open(csvFile, 'rU') as cf:
 
     waveDataPt = {}
     for row in reader:
-<<<<<<< HEAD
-        #print row
-        if isinstance(row[0], float):
-            #row_len = len(row)
-            waveDataPt[str(row[0])] = None
-
-    #print row_len
-
-    i = 2
-    while i < row_len:
-        #print i
-=======
         if hasNumbers(row[0]) == True:
             waveDataPt[row[0]] = 'NULL'
 
     i = 2
     while i < row_len:
-
->>>>>>> 04432c3fb13d5afc3af23455f33e5244f356c922
         cf.seek(20)
         currDict = copy.deepcopy(waveDataPt)
 
