@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from .forms import ContactForm, SignUpForm
+from .models import Sample
 
 # Create your views here.
 def home(request):
@@ -29,3 +30,9 @@ def contact(request):
 		"form":form,
 	}
 	return render(request,"forms.html",context)
+
+def search(request):
+	request_params = request.GET['mineral']
+	t = loader.get_template('templates/results.html')
+	c = Context({ 'query': request_params,})
+	return HttpResponse(t.render(c))

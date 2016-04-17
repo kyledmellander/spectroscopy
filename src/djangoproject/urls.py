@@ -22,7 +22,8 @@ urlpatterns = [
 	url(r'^$','mars.views.home', name='home'),
 	url(r'^contact/$','mars.views.contact', name='contact'),
     url(r'^admin/', admin.site.urls),
-] 
+    url(r'^results/$', 'search.views.search'),
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)
