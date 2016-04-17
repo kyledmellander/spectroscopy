@@ -10,6 +10,16 @@ import numpy as np
 #Takes in the csv file
 csvFile = sys.argv[1]
 
+# Grab Sample_Class (e.g. Magnetite, Sulfate)
+path = sys.argv[1]
+if "Magnetites" in path:
+    sample_cl = "Magnetite"
+elif "Oxides" in path:
+    sample_cl= "Oxide"
+elif "Sulfates" in path:
+    sample_cl = "Sulfate"
+else: sample_cl = 'NULL'
+
 def hasNumbers(inputString):
     return bool(re.search(r'\d', inputString))
 
@@ -365,8 +375,10 @@ for i in range(size):
     comp = compArray[i]
     print dataPts[i]
     reflect = json.dumps(dataPts[i])
-    query = "INSERT INTO mars_sample (DATA_ID, SAMPLE_ID, DATE_ACCESSED, ORIGIN, LOCALITY, NAME, SAMPLE_DESC, GRAIN_SIZE, VIEW_GEOM, RESOLUTION, REFL_RANGE, FORMULA, COMPOSITION, REFLECTANCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-    data = (dataId, sampId, access, origin, collection, name, desc, gr, vg, res, ran, form, comp, reflect)
+    # query = "INSERT INTO mars_sample (DATA_ID, SAMPLE_ID, DATE_ACCESSED, ORIGIN, LOCALITY, NAME, SAMPLE_DESC, GRAIN_SIZE, VIEW_GEOM, RESOLUTION, REFL_RANGE, FORMULA, COMPOSITION, REFLECTANCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+    # data = (dataId, sampId, access, origin, collection, name, desc, gr, vg, res, ran, form, comp, reflect)
+    query = "UPDATE mars_sample SET SAMPLE_CLASS = %s WHERE DATA_ID = %s"
+    data = (sample_cl, dataId)
     cur.execute(query, data)
 
 conn.commit()
