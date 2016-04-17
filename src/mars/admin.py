@@ -11,6 +11,6 @@ class SignUpAdmin(admin.ModelAdmin):
 		#model = SignUp
 
 class SampleAdmin(admin.ModelAdmin):
-	list_display = ('data_id','sample_id','date_accessed','view_geom')
+	list_display = ('data_id','sample_id','origin','sample_class','grain_size')
 
 admin.site.register(Sample,SampleAdmin)

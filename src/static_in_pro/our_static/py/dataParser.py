@@ -5,7 +5,7 @@ import re
 import copy
 import itertools
 import numpy as np
-#import psycopg2
+import psycopg2
 
 #Takes in the csv file
 csvFile = sys.argv[1]
