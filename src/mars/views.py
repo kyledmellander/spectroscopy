@@ -33,14 +33,13 @@ def contact(request):
 	return render(request,"forms.html",context)
 
 def search(request):
-	request_params = request.GET.get('mineral')
+	query = request.GET.get('mineral')
 	try:
-		query = int(query)
+		query = query
 	except ValueError:
 		query = None
 		results = None
 	if query:
-		results = Sample.objects.get(name=query)
+		results = Sample.objects.filter(name=query)
 	context = RequestContext(request)
 	return render_to_response('results.html', {"results": results,}, context_instance=context)
-	
