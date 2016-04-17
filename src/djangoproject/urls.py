@@ -22,6 +22,7 @@ urlpatterns = [
 	url(r'^$','mars.views.home', name='home'),
 	url(r'^contact/$','mars.views.contact', name='contact'),
     url(r'^admin/', admin.site.urls),
+    url(r'^home/$', 'search.views.home')
     url(r'^results/$', 'search.views.results'),
     url(r'^search/$', 'search.views.search'),
 ]
