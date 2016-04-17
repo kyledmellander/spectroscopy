@@ -1,1 +1,11 @@
-<div> You searched for: {{ query }} </div>
+{% if results %}
+  {% for result in results %}
+    {{ result.name }}
+  {% endfor %}
+{% else %}
+  <h3 class='error'>Please enter a valid mineral name</h3>
+  <form method="get" action="/search/">
+    Search Notecards:<input type="text" name="mineral" id="searchBox" value="{{ query }}"/>
+    <input type="submit" value="Search" />
+  </form>
+{% endif %}
