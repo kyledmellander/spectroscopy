@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import SignUp
+from .models import SignUp, Sample
 
 class ContactForm(forms.Form):
     full_name = forms.CharField()
@@ -19,3 +19,16 @@ class SignUpForm(forms.ModelForm):
     	if not "edu" in extension:
     		raise forms.ValidationError("Please use a valid .edu email address.")
     	return cleaned
+
+# class MineralForm(forms.form):
+#     mineral_name=forms.CharField()
+#     def clean_mineral_name(self):
+#         try:
+#             mineral_name = int(self.cleaned_data["mineral_name"])
+#         except:
+#             mineral_name = None
+#
+#         if mineral_name and Sample.objects.filter(name=mineral_name).count:
+#             return mineral_name
+#         else:
+#             raise forms.ValidationError("Please enter a valid mineral name")

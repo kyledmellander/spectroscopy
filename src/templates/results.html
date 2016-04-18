@@ -1,0 +1,14 @@
+{% if results %}
+  {% for result in results %}
+    {{ result.name }}
+    {{ result.origin }}
+    <p> </p>
+  {% endfor %}
+{% else %}
+  <h3 class='error'>Please enter a valid mineral name</h3>
+  <form action="/search/" method="get">
+    <input type="text" id="searchBox" placeholder="Enter Mineral Name..." name="mineral", value="{{ query }}"/>
+    <input type="button" value="Search"/><br>
+    <br>
+  </form>
+{% endif %}
