@@ -3,12 +3,6 @@
 # This script assumes that postgresql is downloaded on the machine
 # and there is a postgres role named 'myprojectuser' with CREATE priveleges.
 
-psql <<EOF
-CREATE USER myprojectuser WITH PASSWORD 'password' CREATEDB;
-DROP DATABASE IF EXISTS spectrodb;
-CREATE DATABASE spectrodb OWNER myprojectuser;
-EOF
-
 psql spectrodb myprojectuser <<EOF
 CREATE SCHEMA minerals;
 CREATE TABLE samples (
