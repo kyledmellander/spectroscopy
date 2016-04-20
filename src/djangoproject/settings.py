@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap3',
     'mars',
-    'mod_wsgi.server',
+    #'mod_wsgi.server',
 ]
 
 MIDDLEWARE_CLASSES = [

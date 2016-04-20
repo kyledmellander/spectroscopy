@@ -1,11 +1,9 @@
 from django.shortcuts import render, render_to_response
-<<<<<<< HEAD
 from django.http import HttpResponseRedirect, HttpResponse
-=======
-from .models import Sample
->>>>>>> dd868d592ff19c6d7e9e2ac783d4a0acd720d2a0
 from django.template import RequestContext
 from django.core.mail import send_mail
+
+from .models import Sample
 
 from .forms import ContactForm, SignUpForm
 from .models import Sample, SignUp
@@ -60,13 +58,16 @@ def sent(request):
 	return render(request, 'sent.html', context_instance=context)
 
 def search(request):
-	query = request.GET.get('mineral')
-	try:
-		query = query
-	except ValueError:
-		query = None
-		results = None
-	if query:
-		results = Sample.objects.filter(name=query)
 	context = RequestContext(request)
-	return render_to_response('results.html', {"results": results,}, context_instance=context)
+	return render(request, 'search.html', context_instance=context)
+	
+	# query = request.GET.get('mineral')
+	# try:
+	# 	query = query
+	# except ValueError:
+	# 	query = None
+	# 	results = None
+	# if query:
+	# 	results = Sample.objects.filter(name=query)
+	# context = RequestContext(request)
+	# return render_to_response('results.html', {"results": results,}, context_instance=context)
