@@ -1,5 +1,9 @@
 from django.shortcuts import render, render_to_response
+<<<<<<< HEAD
 from django.http import HttpResponseRedirect, HttpResponse
+=======
+from .models import Sample
+>>>>>>> dd868d592ff19c6d7e9e2ac783d4a0acd720d2a0
 from django.template import RequestContext
 from django.core.mail import send_mail
 
