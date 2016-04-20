@@ -146,3 +146,10 @@ STATICFILES_DIRS = [
 # This is for uploaded files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_in_env", "media_root")
+
+EMAIL_PORT = 587
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'testing@example.com'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

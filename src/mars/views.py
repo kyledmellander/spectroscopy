@@ -1,9 +1,13 @@
 from django.shortcuts import render, render_to_response
-from .forms import ContactForm, SignUpForm
-from .models import Sample
+from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
+from django.core.mail import send_mail
+
+from .forms import ContactForm, SignUpForm
+from .models import Sample, SignUp
 
 # Create your views here.
+
 def home(request):
 	title = "Welcome"
 	if request.user.is_authenticated():
@@ -23,14 +27,33 @@ def home(request):
 		context = {
 			"template_title": "Thank You"
 		}
-	return render(request,"base.html",context)
+	return render(request,"home.html",context)
 
 def contact(request):
-	form = ContactForm(request.POST or None)
-	context = {
-		"form":form,
-	}
-	return render(request,"forms.html",context)
+    form_class = ContactForm
+
+    if request.method == 'POST':
+        form = form_class(data=request.POST)
+
+        if form.is_valid():
+          try:
+            send_mail(
+                request.POST.get('subject', ''),
+                request.POST.get('message', ''),
+                request.POST.get('your_email', ''),
+                ['digren@students.wwu.edu'],
+            )
+            return HttpResponseRedirect('sent/')
+          except Exception, err:
+            return HttpResponse(str(err))
+
+    return render(request, 'contact.html', {
+        'form': form_class,
+    })
+
+def sent(request):
+	context = RequestContext(request)
+	return render(request, 'sent.html', context_instance=context)
 
 def search(request):
 	query = request.GET.get('mineral')

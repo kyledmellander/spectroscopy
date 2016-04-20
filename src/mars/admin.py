@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import Sample
 
 class SampleAdmin(admin.ModelAdmin):
-	list_display = ('data_id','sample_id','origin','sample_class','grain_size')
+	list_display = ('data_id','sample_id','name','origin','sample_class','grain_size')
+	search_fields = ('data_id', 'sample_id', 'name', 'origin', 'sample_class')
 
 admin.site.register(Sample,SampleAdmin)

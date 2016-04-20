@@ -19,12 +19,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 urlpatterns = [
-	url(r'^$','mars.views.home', name='home'),
-	url(r'^contact/$','mars.views.contact', name='contact'),
     url(r'^admin/', admin.site.urls),
+    url(r'^', include('mars.urls')),
+    # url(r'^search/$', 'mars.views.search', name='search'),
+	# url(r'^contact/$','mars.views.contact', name='contact'),
     # url(r'^home/$', 'search.views.home'),
+    #url(r'^$','mars.views.home', name='home'),
     # url(r'^results/$', 'search.views.results'),
-    url(r'^search/$', 'mars.views.search'),
 ]
 
 if settings.DEBUG:
