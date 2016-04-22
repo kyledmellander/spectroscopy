@@ -1,77 +1,95 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-<!--- Website Content -->
-<div class="container">
-  <div class="well">
-    <h4>Mineral Search</h3>
-    <div class="form-inline">
-      <form action="/search/" method="get">
-        <input type="text" class="form-control" id="searchBox" placeholder="Enter Mineral Name..." name="mineral", value="{{ query }}"/>
-        <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
-      </form>
+
+  <h1> Mineral Search</h1>
+  <div class="container">
+    <div class="well">
+      <div class="form-inline">
+        <form method="POST">{% csrf_token %}
+          {{ form.as_p}}
+          <p align="right">
+            <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
+          </p>
+        </form>
+      </div>
     </div>
   </div>
 
-</div> <!-- /container -->
-
-<!--- Website Content -->
-<div class="container">
-  <div class="well">
-    <h4>Mineral Search</h4>
-    <div class="row">
-      <form action="/search/" method="get">
-        <div class="col-xs-16 col-md-8">
-          <input type="text" class="form-control" id="searchBox" placeholder="Enter Mineral Name..." name="mineral", value="{{ query }}"/>
+  <div class="container">
+    <div class="well">
+      <h4>Mineral Search</h3>
+      <div class="form-inline">
+        <form action="/search/" method="GET">
+          <input type="text" class="form-control" id="searchBox" placeholder="Mineral Name..." name="mineral", value="{{ query }}"/>
+        </form>
+        <hr>
+        <div class="row">
+          <form action="/search/" method="GET">
+            <div class="col-xs-16 col-md-8">
+              <input type="text" class="form-control" id="searchBox" placeholder="Mineral Class..." name="minClass", value="{{ query }}"/>
+            </div>
+          </form>
         </div>
-        <div class="col-xs-">
+        <hr>
+        <div class="row">
+          <form action="/search/" method="GET">
+            <div class="col-xs-16 col-md-8">
+              <input type="text" class="form-control" id="searchBox" placeholder="Database of Origin..." name="minClass", value="{{ query }}"/>
+            </div>
+          </form>
+        </div>
+        <p align="right">
           <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
-        </div>
-      </form>
+        </p>
+      </div>
     </div>
   </div>
-</div> <!-- /container -->
 
-<div class="container">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="input-group" id="adv-search">
-        <input type="text" class="form-control" placeholder="Enter Mineral Name..."/>
-        <div class="input-group-btn">
-          <div class="btn-group" role="group">
-            <div class="dropdown dropdown-lg">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                <span class="caret"></span>
-              </button>
-              <div class="dropdown-menu dropdown-menu-right" role="menu">
-                <form class="form-horizontal" role="form">
-                  <div class="form-group">
-                    <label for="filter">Filter by</label>
-                    <select class="form-control">
-                      <option value="0" selected>All snippets</option>
-                      <option value="1">Featured</option>
-                      <option value="3">Most pupular</option>
-                    </select>
+  <div class="container">
+    <div class="well">
+      <h4>Advanced Search</h4>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="input-group" id="adv-search">
+            <input type="text" class="form-control" placeholder="Enter Mineral Name..."/>
+            <div class="input-group-btn">
+              <div class="btn-group" role="group">
+                <div class="dropdown dropdown-lg">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <span class="caret"></span>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right" role="menu">
+                    <form class="form-horizontal" role="form">
+                      <div class="form-group">
+                        <label for="filter">Filter by</label>
+                        <select class="form-control">
+                          <option value="0" selected>All snippets</option>
+                          <option value="1">Featured</option>
+                          <option value="3">Most pupular</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="contain">Author</label>
+                        <input class="form-control" type=text />
+                      </div>
+                      <div class="form-group">
+                        <label for="contain">Contains the words</label>
+                        <input class="form-control" type="text" />
+                      </div>
+                      <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
+                    </form>
                   </div>
-                  <div class="form-group">
-                    <label for="contain">Author</label>
-                    <input class="form-control" type=text />
-                  </div>
-                  <div class="form-group">
-                    <label for="contain">Contains the words</label>
-                    <input class="form-control" type="text" />
-                  </div>
-                  <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
-                </form>
+                </div>
               </div>
+              <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
             </div>
           </div>
-          <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
         </div>
       </div>
     </div>
   </div>
-</div><!--Container -->
+
 {% endblock %}
 
 <!-- <form action="/search/" method="get">
