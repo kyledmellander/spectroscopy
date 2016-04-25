@@ -6,6 +6,7 @@
 
   <div class="container">
     <div class="well">
+      <h4> Mineral Search </h4>
       <div class="form-inline">
         <form method="POST">
           {% csrf_token %}
@@ -21,7 +22,7 @@
 
   <div class="container">
     <div class="well">
-      <h4>Mineral Search</h3>
+      <h4>Mineral Search</h4>
       <div class="form-inline">
         <form action="/search/" method="GET">
           <input type="text" class="form-control" id="searchBox" placeholder="Mineral Name..." name="mineral", value="{{ query }}"/>
@@ -29,15 +30,15 @@
         <hr>
         <div class="row">
           <form action="/search/" method="GET">
-            <div class="col-xs-16 col-md-8">
+            <div class="col-xs-12 col-md-8">
               <input type="text" class="form-control" id="searchBox" placeholder="Mineral Class..." name="minClass", value="{{ query }}"/>
             </div>
           </form>
         </div>
-        <hr>
+        <hr> 
         <div class="row">
           <form action="/search/" method="GET">
-            <div class="col-xs-16 col-md-8">
+            <div class="col-xs-12 col-md-8">
               <input type="text" class="form-control" id="searchBox" placeholder="Database of Origin..." name="database", value="{{ query }}"/>
             </div>
           </form>
