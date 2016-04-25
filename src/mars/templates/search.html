@@ -2,7 +2,7 @@
 
 {% block content %}
 
-  <h1> Mineral Search</h1>
+  <h1> <center>  Mineral Search </center></h1>
 
   <div class="container">
     <div class="well">
@@ -10,7 +10,7 @@
       <div class="form-inline">
         <form method="POST">
           {% csrf_token %}
-          {{ form.as_p}}
+          {{ form.as_p }}
           <p align="right">
             <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
           </p>
@@ -19,7 +19,7 @@
     </div>
   </div>
 
-
+<!--
   <div class="container">
     <div class="well">
       <h4>Mineral Search</h4>
@@ -35,7 +35,7 @@
             </div>
           </form>
         </div>
-        <hr> 
+        <hr>
         <div class="row">
           <form action="/search/" method="GET">
             <div class="col-xs-12 col-md-8">
@@ -48,7 +48,7 @@
         </p>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <div class="container">
     <div class="well">
