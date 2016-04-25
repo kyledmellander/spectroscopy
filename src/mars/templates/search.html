@@ -3,6 +3,7 @@
 {% block content %}
 
   <h1> Mineral Search</h1>
+
   <div class="container">
     <div class="well">
       <div class="form-inline">
@@ -15,6 +16,7 @@
       </div>
     </div>
   </div>
+
 
   <div class="container">
     <div class="well">
@@ -35,7 +37,7 @@
         <div class="row">
           <form action="/search/" method="GET">
             <div class="col-xs-16 col-md-8">
-              <input type="text" class="form-control" id="searchBox" placeholder="Database of Origin..." name="minClass", value="{{ query }}"/>
+              <input type="text" class="form-control" id="searchBox" placeholder="Database of Origin..." name="database", value="{{ query }}"/>
             </div>
           </form>
         </div>
@@ -55,29 +57,29 @@
             <input type="text" class="form-control" placeholder="Enter Mineral Name..."/>
             <div class="input-group-btn">
               <div class="btn-group" role="group">
-                <div class="dropdown dropdown-lg">
+                <div class="dropdown">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     <span class="caret"></span>
                   </button>
                   <div class="dropdown-menu dropdown-menu-right" role="menu">
-                    <form class="form-horizontal" role="form">
-                      <div class="form-group">
+                    <form class="form-horizontal" style="width: 300px" role="form">
+                      <div class="form-group" style="width: 250px; margin-left: 25px">
                         <label for="filter">Filter by</label>
                         <select class="form-control">
                           <option value="0" selected>All snippets</option>
                           <option value="1">Featured</option>
-                          <option value="3">Most pupular</option>
+                          <option value="3">Most popular</option>
                         </select>
                       </div>
-                      <div class="form-group">
-                        <label for="contain">Author</label>
+                      <div class="form-group" style="width: 250px; margin-left: 25px">
+                        <label for="contain">Testing</label>
                         <input class="form-control" type=text />
                       </div>
-                      <div class="form-group">
+                      <div class="form-group" style="width: 250px; margin-left: 25px">
                         <label for="contain">Contains the words</label>
                         <input class="form-control" type="text" />
                       </div>
-                      <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
+                      <button type="submit" class="btn btn-primary" style="margin-left: 195px">Search&raquo;</button>
                     </form>
                   </div>
                 </div>
