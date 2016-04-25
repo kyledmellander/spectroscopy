@@ -7,8 +7,9 @@
   <div class="container">
     <div class="well">
       <div class="form-inline">
-        <form method="POST">{% csrf_token %}
-          {{ form.as_p}}
+        <form method="POST">
+          {% csrf_token %}
+          {{ form.as_p }}
           <p align="right">
             <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
           </p>
@@ -17,7 +18,7 @@
     </div>
   </div>
 
-
+<!-- 
   <div class="container">
     <div class="well">
       <h4>Mineral Search</h3>
@@ -46,7 +47,7 @@
         </p>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <div class="container">
     <div class="well">

@@ -63,6 +63,7 @@ def about(request):
 
 def search(request):
 	form_class = SearchForm
+	results = Sample.objects.all()
 
 	if request.method == 'POST':
 		form = form_class(data=request.POST)
@@ -73,11 +74,11 @@ def search(request):
 		mOrigin = request.POST.get('database_of_origin')
 
 		if mName:
-			results = Sample.objects.filter(name=mName)
+			results = results.filter(name=mName)
 		if mClass:
-			results = Sample.filter(sample_class=mClass)
+			results = results.filter(sample_class=mClass)
 		if mOrigin:
-			results = Sample.filter(oirgin=mOrigin)
+			results = results.filter(oirgin=mOrigin)
 
 		return render_to_response('results.html', {"results": results,}, context_instance=RequestContext(request))
 
