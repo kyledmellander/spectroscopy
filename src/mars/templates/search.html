@@ -1,0 +1,102 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+ <h1><center>  Mineral Search </center></h1>
+  <div class="container">
+    <div class="well">
+      <h4> Mineral Search </h4>
+      <div class="form-inline">
+        <form method="POST">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <p align="right">
+            <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<!--
+  <div class="container">
+    <div class="well">
+      <h4>Mineral Search</h4>
+      <div class="form-inline">
+        <form action="/search/" method="GET">
+          <input type="text" class="form-control" id="searchBox" placeholder="Mineral Name..." name="mineral", value="{{ query }}"/>
+        </form>
+        <hr>
+        <div class="row">
+          <form action="/search/" method="GET">
+            <div class="col-xs-12 col-md-8">
+              <input type="text" class="form-control" id="searchBox" placeholder="Mineral Class..." name="minClass", value="{{ query }}"/>
+            </div>
+          </form>
+        </div>
+        <hr>
+        <div class="row">
+          <form action="/search/" method="GET">
+            <div class="col-xs-12 col-md-8">
+              <input type="text" class="form-control" id="searchBox" placeholder="Database of Origin..." name="database", value="{{ query }}"/>
+            </div>
+          </form>
+        </div>
+        <p align="right">
+          <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
+        </p>
+      </div>
+    </div>
+  </div> -->
+
+  <div class="container">
+    <div class="well">
+      <h4>Advanced Search</h4>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="input-group" id="adv-search">
+            <input type="text" class="form-control" placeholder="Enter Mineral Name..."/>
+            <div class="input-group-btn">
+              <div class="btn-group" role="group">
+                <div class="dropdown">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <span class="caret"></span>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right" role="menu">
+                    <form class="form-horizontal" style="width: 300px" role="form">
+                      <div class="form-group" style="width: 250px; margin-left: 25px">
+                        <label for="filter">Filter by</label>
+                        <select class="form-control">
+                          <option value="0" selected>All snippets</option>
+                          <option value="1">Featured</option>
+                          <option value="3">Most popular</option>
+                        </select>
+                      </div>
+                      <div class="form-group" style="width: 250px; margin-left: 25px">
+                        <label for="contain">Testing</label>
+                        <input class="form-control" type=text />
+                      </div>
+                      <div class="form-group" style="width: 250px; margin-left: 25px">
+                        <label for="contain">Contains the words</label>
+                        <input class="form-control" type="text" />
+                      </div>
+                      <button type="submit" class="btn btn-primary" style="margin-left: 195px">Search&raquo;</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+<!-- <form action="/search/" method="get">
+  <input type="text" id="searchBox" placeholder="Enter Mineral Name..." name="mineral", value="{{ query }}"/>
+  <input type="button" value="Submit"/><br>
+  <br>
+</form> -->

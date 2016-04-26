@@ -26,8 +26,8 @@
   <body>
 
     <!-- Static navbar -->
-    <nav class="navbar navbar-default navbar-static-top">
-      <div class="container-fluid">
+    <nav class="navbar navbar-inverse navbar-static-top">
+      <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
             <span class="sr-only">Toggle navigation</span>
@@ -57,39 +57,84 @@
             </li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="../navbar/">Default</a></li>
-            <li class="active"><a href="./">Static top <span class="sr-only">(current)</span></a></li>
-            <li><a href="../navbar-fixed-top/">Fixed top</a></li>
+            <li><a href="admin">Admin Login</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
 
+    <!--- Website Content -->
     <div class="container">
-
-      <!-- Main component for a primary marketing message or call to action -->
-      <div class="jumbotron col-xs-12 col-md-6">
-        <h1>Potential D3 Graph ... or Search bar?</h1>
-        <p> This could possibly hold the graph or the search bar.
-        It really just depends on how we want to design it.</p>
-        <p> This is a second paragraph just for funzies.</p>
-        <!-- <form method="get" action="/search/">
-          Search Notecards:<input type="text" name="mineral" id="searchBox" value="{{ query }}"/>
-          <input type="submit" value="Search" />
-        </form> -->
-        <form action="/search/" method="get">
-          <input type="text" id="searchBox" placeholder="Enter Mineral Name..." name="mineral", value="{{ query }}"/>
-          <input type="button" value="Search"/><br>
-          <br>
-        </form>
-        <p>
-          <a class="btn btn-lg btn-primary" href="admin" role="button">Admin Login &raquo;</a>
-        </p>
+      <div class="well">
+        <h4>Mineral Search</h3>
+        <div class="form-inline">
+          <form action="/search/" method="get">
+            <input type="text" class="form-control" id="searchBox" placeholder="Enter Mineral Name..." name="mineral", value="{{ query }}"/>
+            <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
+          </form>
+        </div>
       </div>
 
     </div> <!-- /container -->
 
+    <!--- Website Content -->
+    <div class="container">
+      <div class="well">
+        <h4>Mineral Search</h4>
+        <div class="row">
+          <form action="/search/" method="get">
+            <div class="col-xs-16 col-md-8">
+              <input type="text" class="form-control" id="searchBox" placeholder="Enter Mineral Name..." name="mineral", value="{{ query }}"/>
+            </div>
+            <div class="col-xs-">
+              <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
+            </div>
+          </form>
+        </div>
+			</div>
+    </div> <!-- /container -->
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="input-group" id="adv-search">
+            <input type="text" class="form-control" placeholder="Enter Mineral Name..."/>
+            <div class="input-group-btn">
+              <div class="btn-group" role="group">
+                <div class="dropdown dropdown-lg">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <span class="caret"></span>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right" role="menu">
+                    <form class="form-horizontal" role="form">
+                      <div class="form-group">
+                        <label for="filter">Filter by</label>
+                        <select class="form-control">
+                          <option value="0" selected>All snippets</option>
+                          <option value="1">Featured</option>
+                          <option value="3">Most pupular</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="contain">Author</label>
+                        <input class="form-control" type=text />
+                      </div>
+                      <div class="form-group">
+                        <label for="contain">Contains the words</label>
+                        <input class="form-control" type="text" />
+                      </div>
+                      <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!--Container -->
 
     <!-- Bootstrap core JavaScript
     ================================================== -->

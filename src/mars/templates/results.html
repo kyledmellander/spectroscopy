@@ -1,0 +1,37 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+    {% if results %}
+      <div class = "container">
+        <table class="table table-hover">
+          <thread>
+            <th>Select</th>
+            <th>ID</th>
+            <th>Name</th>
+	    <th>Class</th>
+            <th>Origin</th>
+            <th>Grain Size</th>
+          </thread>
+          <tbody> 
+            {% for result in results %}
+              <tr>
+                <td> <input type="checkbox" name="result.data_id" value="result"> </td>
+                <td> {{ result.data_id }}</td>
+                <td> {{ result.name }} </td>
+		<td> {{ result.sample_class }} </td>
+                <td> {{ result.origin }} </td>
+                <td> {{ result.grain_size }} </td>
+              <tr>
+            {% endfor %}
+          <tbody>
+        </table>
+      </div>
+    {% else %}
+      <h3 class='error'>Your search yielded no results.</h3>
+      <!-- <form action="/search/" method="get">
+        <input type="text" id="searchBox" placeholder="Enter Mineral Name..." name="mineral", value="{{ query }}"/>
+        <input type="button" value="Search"/><br>
+        <br>
+      </form> -->
+    {% endif %}
+{% endblock %}
