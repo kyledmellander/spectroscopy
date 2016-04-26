@@ -2,13 +2,28 @@
 
 {% block content %}
     {% if results %}
-      {% for result in results %}
-        <input type="checkbox" name="result.data_id" value="result">
-        {{ result.data_id }}
-        {{ result.name }}
-        {{ result.origin }}
-        {{ result.grain_size }} <br>
-      {% endfor %}
+      <div class = "container">
+        <table class="table table-hover">
+          <thread>
+            <th>Select</th>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Origin</th>
+            <th>Grain Size</th>
+          </thread>
+          <tbody> 
+            {% for result in results %}
+              <tr>
+                <td> <input type="checkbox" name="result.data_id" value="result"> </td>
+                <td> {{ result.data_id }}</td>
+                <td> {{ result.name }} </td>
+                <td> {{ result.origin }} </td>
+                <td> {{ result.grain_size }} </td>
+              <tr>
+            {% endfor %}
+          <tbody>
+        </table>
+      </div>
     {% else %}
       <h3 class='error'>Your search yielded no results.</h3>
       <!-- <form action="/search/" method="get">
