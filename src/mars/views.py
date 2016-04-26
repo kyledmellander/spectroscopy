@@ -78,7 +78,7 @@ def search(request):
 		if mClass:
 			results = results.filter(sample_class=mClass)
 		if mOrigin:
-			results = results.filter(oirgin=mOrigin)
+			results = results.filter(origin=mOrigin)
 
 		return render_to_response('results.html', {"results": results,}, context_instance=RequestContext(request))
 
