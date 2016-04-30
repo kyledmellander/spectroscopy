@@ -3,6 +3,8 @@
 {% block content %}
     {% if results %}
       <div class = "container">
+        <input type="button" value="Graph"/><br>
+        <br>
         <table class="table table-hover">
           <thread>
             <th>Select</th>
@@ -25,6 +27,8 @@
             {% endfor %}
           <tbody>
         </table>
+        <input type="button" value="Graph"/><br>
+        <br>
       </div>
     {% else %}
       <h3 class='error'>Your search yielded no results. Please try again.</h3>
