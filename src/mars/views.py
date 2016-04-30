@@ -87,7 +87,7 @@ def search(request):
 			'form': form_class,
 		})
 
-def results(request):
+
   
 
 def graph(request):
