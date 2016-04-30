@@ -11,7 +11,7 @@
       <div class="form-inline">
           <form method="POST" name="resultsform">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary">Graph</button><br>
+            <button type="submit" name="graphForm" class="btn btn-primary">Graph</button><br>
             <br>
             <table class="table table-hover">
               <thread>
@@ -25,7 +25,7 @@
               <tbody> 
                 {% for result in results %}
                   <tr>
-                    <td> <input type="checkbox" name="resultlist" id="option{{ result.data_id }}" value={{ result }}> </td>
+                    <td> <input type="checkbox" name="resultlist[]" id="option{{ result.data_id }}" value={{ result }}> </td>
                     <td> {{ result.data_id }}</td>
                     <td> {{ result.name }} </td>
                     <td> {{ result.sample_class }} </td>
