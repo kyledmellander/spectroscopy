@@ -94,4 +94,3 @@ def graph(request):
   if request.method == 'POST':
     checked = request.POST.getlist('resultlist')
     return render_to_response('graph.html', {"results": checked,}, context_instance=RequestContext(request))
-
