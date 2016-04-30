@@ -1,7 +1,7 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-    {% if results %}
+    {% if graphResults %}
       <div class = "container">
         <table class="table table-hover">
           <thread>
@@ -12,7 +12,7 @@
             <th>Origin</th>
           </thread>
           <tbody> 
-            {% for result in results %}
+            {% for result in selections %}
               <tr>
                 <td> {{ result.data_id }}</td>
                 <td> {{ result.name }} </td>
