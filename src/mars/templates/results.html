@@ -3,6 +3,8 @@
 {% block content %}
     {% if results %}
       <div class = "container">
+        <input type="button" value="Graph"/><br>
+        <br>
         <table class="table table-hover">
           <thread>
             <th>Select</th>
@@ -14,19 +16,21 @@
           <tbody> 
             {% for result in results %}
               <tr>
-                <td> <input type="checkbox" name="result.data_id" value="result"> </td>
+                <td> <input type="checkbox" name="resultlist[]" value="result"> </td>
                 <td> {{ result.data_id }}</td>
                 <td> {{ result.name }} </td>
                 <td> {{ result.origin }} </td>
-                <td> {{ result.grain_size }} </td>
+                <td> {{ result.grain_size }} </t>
               <tr>
             {% endfor %}
           <tbody>
         </table>
+        <input type="button" value="Graph"/><br>
+        <br>
       </div>
     {% else %}
       <h3 class='error'>Your search yielded no results.</h3>
-      <!-- <form action="/search/" method="get">
+      <!--<form action="/search/" method="get">
         <input type="text" id="searchBox" placeholder="Enter Mineral Name..." name="mineral", value="{{ query }}"/>
         <input type="button" value="Search"/><br>
         <br>
