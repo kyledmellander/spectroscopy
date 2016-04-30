@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 
 from .models import Sample
 
-from .forms import ContactForm, SignUpForm, SearchForm
+from .forms import ContactForm, SignUpForm, SearchForm, GraphForm
 from .models import Sample, SignUp
 
 # Create your views here.
@@ -80,14 +80,22 @@ def search(request):
 		if mOrigin:
 			results = results.filter(origin=mOrigin)
 
-		return render_to_response('results.html', {"results": results,}, context_instance=RequestContext(request))
+                toGraph = GraphForm(queryset=results, fields=('name',
+                                                              'sample_class',
+                                                              'origin'))
+
+                return render(request, 'tograph.html', {
+                        'form': toGraph,
+                 }) 
+		#return render_to_response('tograph.html', {"results": results,}, context_instance=RequestContext(request))
 
 	else:
 		return render(request, 'search.html', {
 			'form': form_class,
 		})
 
-def graph(request):
-  if request.method == 'POST':
-    checked = request.POST.getlist('resultlist')
-    return render_to_response('graph.html', {"results": checked,}, context_instance=RequestContext(request))
+#def graph(request):
+#        toGraph =  GraphForm(querset=
+#  if request.method == 'POST':
+#    checked = request.POST.getlist('resultlist')
+#    return render_to_response('graph.html', {"results": checked,}, context_instance=RequestContext(request))

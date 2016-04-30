@@ -32,8 +32,49 @@ class SearchForm(forms.Form):
     database_of_origin = forms.CharField(
         widget=forms.TextInput(attrs={'placeholder': 'Database of origin'}))
 
-# class GraphForm(forms.Form):
+class GraphForm(forms.Form):
 
+    def __init__(self, queryset, fields):
+         if not fields:
+             raise Exception('A GraphForm must be supplied both queryset and fields')
+         self.queryset = queryset
+         self.fields = fields
+
+    def __unicode__(self):
+
+        if not self.queryset: return '<tr><td>No data...<td></tr>'
+        colcount = 0
+        res = ""
+        res += "<tr>"
+        for f in self.fields:
+            res += "<th>"+self.queryset[0]._meta.get_field_by_name(f)[0].verbose_name+"</th>"
+        res += "</tr>\n"
+        for obj in self.queryset:
+            res += '<tr onclick="selectRow(this)">'
+            res += '<td><input  style="display:none;" type="checkbox" name="graphing" id="%s" value="%s"/>'%(obj.pk,obj.pk)
+
+            vals = [getattr(obj, x) for x in self.fields]
+            colcount = len(vals)
+            for x in vals:
+                res += '%s<t/td><td>'%(str(x))
+            res = res[:-4]
+            res += '</tr>\n'
+
+        res += '''\
+        <script>
+        function selectRow(row)
+        {
+            var chk = row.getElementsByTagName('input')[0];
+            chk.checked = !chk.checked;
+
+            if (chk.checked) {
+                row.style.backgroundColor = 'gray';
+            } else {
+                row.style.backgroundColor = 'white';
+            }
+        }
+        </script>'''
+        return res
 
     # mineral_name = forms.ModelChoiceField(queryset=Sample.objects.all(),empty_label='Mineral Name')
     # mineral_class = forms.ModelChoiceField(queryset=Sample.objects.all(),empty_label='Mineral Class')

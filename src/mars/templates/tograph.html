@@ -1,0 +1,11 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<form action="/graph/" method="POST">
+  {% csrf_token %}
+  <table>
+    {{ form|safe }}
+  </table>
+  <input type="submit" name="graphing" value="Graph" />
+</form>
+{% endblock %}
