@@ -10,6 +10,7 @@
             <th>Select</th>
             <th>ID</th>
             <th>Name</th>
+	    <th>Class</th>
             <th>Origin</th>
             <th>Grain Size</th>
           </thread>
@@ -19,6 +20,7 @@
                 <td> <input type="checkbox" name="resultlist[]" value="result"> </td>
                 <td> {{ result.data_id }}</td>
                 <td> {{ result.name }} </td>
+		<td> {{ result.sample_class }} </td>
                 <td> {{ result.origin }} </td>
                 <td> {{ result.grain_size }} </t>
               <tr>
@@ -29,8 +31,8 @@
         <br>
       </div>
     {% else %}
-      <h3 class='error'>Your search yielded no results.</h3>
-      <!--<form action="/search/" method="get">
+      <h3 class='error'>Your search yielded no results. Please try again.</h3>
+      <!-- <form action="/search/" method="get">
         <input type="text" id="searchBox" placeholder="Enter Mineral Name..." name="mineral", value="{{ query }}"/>
         <input type="button" value="Search"/><br>
         <br>
