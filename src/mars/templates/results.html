@@ -3,7 +3,9 @@
 {% block content %}
     {% if results %}
       <div class = "container">
-        <input type="button" value="Graph"/><br>
+        <p align="right">
+          <button type="submit" class="btn btn-primary"/>Graph&raquo;</button><br>
+        </p>
         <br>
         <table class="table table-hover">
           <thread>
@@ -27,7 +29,9 @@
             {% endfor %}
           <tbody>
         </table>
-        <input type="button" value="Graph"/><br>
+        <p align="right">
+          <button type="submit" class="btn btn-primary"/>Graph&raquo;</button><br>
+        </p>
         <br>
       </div>
     {% else %}
