@@ -17,12 +17,12 @@
           <tbody> 
             {% for result in results %}
               <tr>
-                <td> <input type="checkbox" name="result.data_id" value="result"> </td>
+                <td> <input type="checkbox" name="resultlist[]" value="result"> </td>
                 <td> {{ result.data_id }}</td>
                 <td> {{ result.name }} </td>
 		<td> {{ result.sample_class }} </td>
                 <td> {{ result.origin }} </td>
-                <td> {{ result.grain_size }} </td>
+                <td> {{ result.grain_size }} </t>
               <tr>
             {% endfor %}
           <tbody>

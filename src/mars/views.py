@@ -90,4 +90,4 @@ def search(request):
 def graph(request):
   if request.method == 'POST':
     checked = request.POST.getlist('resultlist')
-    return rendor_to_response('graph.html', {"results": checked}. context_instance=RequestContext(request))
+    return render_to_response('graph.html', {"results": checked,}, context_instance=RequestContext(request))
