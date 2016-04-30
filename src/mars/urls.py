@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^contact/sent/$', views.sent, name='sent'),
     url(r'^contact/$', views.contact, name='contact'),
     url(r'^about/$', views.about, name='about'),
+    url(r'^graph/$', views.graph, name='graph'),
     url(r'^$', views.home, name='home'),
 ]
