@@ -3,28 +3,54 @@
 {% block content %}
     {% if results %}
       <div class = "container">
-        <table class="table table-hover">
-          <thread>
-            <th>Select</th>
-            <th>ID</th>
-            <th>Name</th>
-	    <th>Class</th>
-            <th>Origin</th>
-            <th>Grain Size</th>
-          </thread>
-          <tbody> 
-            {% for result in results %}
-              <tr>
-                <td> <input type="checkbox" name="result.data_id" value="result"> </td>
-                <td> {{ result.data_id }}</td>
-                <td> {{ result.name }} </td>
-		<td> {{ result.sample_class }} </td>
-                <td> {{ result.origin }} </td>
-                <td> {{ result.grain_size }} </td>
-              <tr>
-            {% endfor %}
-          <tbody>
-        </table>
+        <!--- 
+        <form method="POST">
+          {% csrf_token %}
+          <button type="submit" value="resultlist">Graph</button>
+        </form> -->
+      <div class="form-inline">
+          <form method="POST" name="resultsform">
+            {% csrf_token %}
+            <button type="submit" name="graphForm" class="btn btn-primary">Graph</button><br>
+            <br>
+            <table class="table table-hover">
+              <thread>
+                <th>Select</th>
+                <th>ID</th>
+                <th>Name</th>
+	              <th>Class</th>
+                <th>Origin</th>
+                <th>Grain Size</th>
+              </thread>
+              <tbody> 
+                {% for result in results %}
+                  <tr>
+                    <td> <input type="checkbox" name="resultlist[]" id="option{{ result.data_id }}" value={{ result }}> </td>
+                    <td> {{ result.data_id }}</td>
+                    <td> {{ result.name }} </td>
+                    <td> {{ result.sample_class }} </td>
+                    <td> {{ result.origin }} </td>
+                    <td> {{ result.grain_size }} </t>
+                  <tr>
+                {% endfor %}
+              <tbody>
+            </table>
+            <button type="submit" name="graphForm" class="btn btn-primary">Graph</button>
+            <br>
+            <p>
+            <br>
+            </p>
+         </form>
+       </div> 
+        <!--<div class="form-inline">
+          <form method="POST" action="/graph/">
+            {% csrf_token %}
+            <button type="submit" value="resultlist">Graph</button>
+          </form>
+        </div>-->
+        
+        <!--<input type="button" value="Graph"/><br>
+        <br> -->
       </div>
     {% else %}
       <h3 class='error'>Your search yielded no results. Please try again.</h3>
