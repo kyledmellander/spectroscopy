@@ -51,7 +51,7 @@ class GraphForm(forms.Form):
         res += "</tr>\n"
         for obj in self.queryset:
             res += '<tr onclick="selectRow(this)">'
-            res += '<td><input  style="display:none;" type="checkbox" name="graphing" id="%s" value="%s"/>'%(obj.pk,obj.pk)
+            res += '<td><input type="checkbox" name="graphing" id="%s" value="{{obj}}"/>'%(obj.data_id)
 
             vals = [getattr(obj, x) for x in self.fields]
             colcount = len(vals)
@@ -59,7 +59,8 @@ class GraphForm(forms.Form):
                 res += '%s<t/td><td>'%(str(x))
             res = res[:-4]
             res += '</tr>\n'
-
+      
+        
         res += '''\
         <script>
         function selectRow(row)
@@ -73,7 +74,7 @@ class GraphForm(forms.Form):
                 row.style.backgroundColor = 'white';
             }
         }
-        </script>'''
+        </script>''' 
         return res
 
     # mineral_name = forms.ModelChoiceField(queryset=Sample.objects.all(),empty_label='Mineral Name')
