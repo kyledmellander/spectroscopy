@@ -4,15 +4,16 @@
     {% if graphResults %}
       <div class = "container">
         <table class="table table-hover">
+          <!--
           <thread>
-            <th>Select</th>
             <th>ID</th>
             <th>Name</th>
 	          <th>Class</th>
             <th>Origin</th>
           </thread>
           <tbody>
-            {% for result in selections %}
+          -->
+            {% for result in graphResults %}
               <tr>
                 <td> {{ result.data_id }}</td>
                 <td> {{ result.name }} </td>
