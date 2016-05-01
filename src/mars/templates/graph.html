@@ -2,13 +2,13 @@
 {% block content %}
 <body>
 <p> The graph should be here </p>
-<!-- load the d3.js library -->    
+<!-- load the d3.js library -->
 	<div class="container">
   	<div class="jumbotron">
     	<svg id="visualisation" width="1000" height="500"></svg>
       	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
         <script>
-        	function InitChart() {   
+        	function InitChart() {
             var data = [{
                 "Client": "ABC",
                 "sale": "20",
@@ -47,11 +47,11 @@
             var dataGroup = d3.nest()
                 .key(function(d) {return d.Client;})
                 .entries(data);
-            
+
 						console.log(JSON.stringify(dataGroup));
             console.log(JSON.stringify(data2));
             var color = d3.scale.category10();
-            
+
             var vis = d3.select("#visualisation"),
                 WIDTH = 1000,
                 HEIGHT = 500,
@@ -60,7 +60,7 @@
                     right: 20,
                     bottom: 50,
                     left: 50
-                }, 
+                },
 								lSpace = WIDTH/dataGroup.length;
 
                 var minX = d3.min(d3.keys(data2));
@@ -76,7 +76,7 @@
                 yAxis = d3.svg.axis()
                 .scale(yScale)
                 .orient("left");
-            
+
             vis.append("svg:g")
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
@@ -94,7 +94,7 @@
                     return yScale(d.value);
                 })
                 .interpolate("linear");
-                
+
             var lineGen = d3.svg.line()
                 .x(function(d) {
                     return xScale(d.year);
@@ -103,13 +103,13 @@
                     return yScale(d.sale);
                 })
                 .interpolate("linear");
-            
+
             dataGroup.forEach(function(d,i) {
                 console.log(d.values);
                 console.log(d3.entries(data2));
                 vis.append('svg:path')
                 .attr('d', lineGenTwo(d3.entries(data2)))
-                .attr('stroke', function(d,j) { 
+                .attr('stroke', function(d,j) {
                         return "hsl(" + Math.random() * 360 + ",50%,50%)";
                 })
                 .attr('stroke-width', 2)
@@ -127,8 +127,8 @@
                         d.active = active;
                     })
                     .text(d.key);
-            }); 
-            
+            });
+
           }
 
           InitChart();

@@ -90,4 +90,5 @@ def search(request):
 def graph(request):
 	if request.method == 'POST':
 		selections = request.POST.getlist('graphing')
-                return render_to_response('graph.html', {"graphResults": selections,}, context_instance=RequestContext(request))
+		samples = Sample.objects.filter(data_id__in=selections)
+    	return render_to_response('graph.html', {"graphResults": samples,}, context_instance=RequestContext(request))
