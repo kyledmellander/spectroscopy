@@ -86,3 +86,7 @@ def search(request):
 		return render(request, 'search.html', {
 			'form': form_class,
 		})
+
+def graph(request):
+  context = RequestContext(request)
+  return render(request, 'origgraph.html', context)
