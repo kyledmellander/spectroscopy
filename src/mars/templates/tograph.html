@@ -4,8 +4,13 @@
 <form action="/graph/" method="POST">
   {% csrf_token %}
   <table class='table table-hover'>
+  <input type="submit" name="graphing" class="btn btn-primary" value="Graph" /><br>
+  <br>
+  <table>
     {{ form|safe }}
   </table>
-  <input type="submit" name="graphing" value="Graph" />
+  <br>
+  <input type="submit" name="graphing" class="btn btn-primary" value="Graph" /><br>
+  <br>
 </form>
 {% endblock %}
