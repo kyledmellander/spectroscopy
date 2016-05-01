@@ -95,10 +95,8 @@ def search(request):
 		})
 
 def graph(request):
-  if 'graphForm' in request.POST:
-    selections = request.POST.getlist('resultlist')
-    return render_to_response('graph.html', {"graphResults": selections,}, context_instance=RequestContext(request))
-    
+   context = RequestContext(request)
+   return render(request, 'graph.html', context_instance=context)
   ##if request.method == 'POST':
    ## checked = request.POST.getlist('resultlist')
     ##return render_to_response('graph.html', {"results": checked,}, context_instance=RequestContext(request))
