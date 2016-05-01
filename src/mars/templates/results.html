@@ -3,13 +3,8 @@
 {% block content %}
     {% if results %}
       <div class = "container">
-        <!--- 
-        <form method="POST">
-          {% csrf_token %}
-          <button type="submit" value="resultlist">Graph</button>
-        </form> -->
-      <div class="form-inline">
-          <form method="POST" name="resultsform">
+	<div class="form-inline">
+          <form method="POST" action="/graph/" name="resultsform">
             {% csrf_token %}
             <button type="submit" name="graphForm" class="btn btn-primary">Graph</button><br>
             <br>
@@ -25,7 +20,7 @@
               <tbody> 
                 {% for result in results %}
                   <tr>
-                    <td> <input type="checkbox" name="resultlist[]" id="option{{ result.data_id }}" value={{ result }}> </td>
+                    <td> <input type="checkbox" name="graphing" id="option{{ result.data_id }}" value={{result}}> </td>
                     <td> {{ result.data_id }}</td>
                     <td> {{ result.name }} </td>
                     <td> {{ result.sample_class }} </td>
