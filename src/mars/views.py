@@ -85,8 +85,8 @@ def search(request):
                                                               'origin'))
 
                 return render(request, 'tograph.html', {
-                        'form': toGraph,
-                 })
+                                        'form': toGraph,
+    })
 		#return render_to_response('tograph.html', {"results": results,}, context_instance=RequestContext(request))
 
 	else:
@@ -99,4 +99,4 @@ def graph(request):
 		selections = request.POST.getlist('graphing')
 		print selections
 
-    	return render_to_response('graph.html', {"graphResults": selections,}, context_instance=RequestContext(request))
+        return render_to_response('graph.html', {"graphResults": selections,}, context_instance=RequestContext(request))
