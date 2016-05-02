@@ -1,12 +1,14 @@
 <!DOCTYPE html>
+
+{% load staticfiles %}
 <meta charset="utf-8">
 <style> /* set the CSS */
 
 body { font: 12px Arial;}
 
-path { 
-    stroke: steelblue;
+path {
     stroke-width: 2;
+    opacity:.40;
     fill: none;
 }
 
@@ -20,205 +22,139 @@ path {
 
 </style>
 <body>
+<p> The graph should be here </p>
+<!-- load the d3.js library -->
+	<div class="container">
+  	<div class="jumbotron">
+    	<svg id="visualisation" width="1000" height="500"></svg>
+      	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script>
+        	function InitChart() {
+            var data = [{
+                "Client": "ABC",
+                "sale": "20",
+                "year": "10"
+            }, {
+                "Client": "ABC",
+                "sale": "30",
+                "year": "15"
+            }, {
+                "Client": "ABC",
+                "sale": "40",
+                "year": "20"
+            }, {
+                "Client": "XYZ",
+                "sale": "50",
+                "year": "25"
+            }, {
+                "Client": "XYZ",
+                "sale": "60",
+                "year": "30"
+            }, {
+                "Client": "XYZ",
+                "sale": "70",
+                "year": "35"
+            }];
 
-<!-- load the d3.js library -->    
-<script src="http://d3js.org/d3.v3.min.js"></script>
+            var data2 = {
+              "10":"20",
+              "15":"30",
+              "20":"40",
+              "25":"50",
+              "30":"60",
+              "35":"70"
+            }
 
-<script>
+            var dataGroup = d3.nest()
+                .key(function(d) {return d.Client;})
+                .entries(data);
 
-// Set the dimensions of the canvas / graph
-var margin = {top: 30, right: 20, bottom: 45, left: 70},
-    width = 600 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
+						console.log(JSON.stringify(dataGroup));
+            console.log(JSON.stringify(data2));
+            var color = d3.scale.category10();
 
-// Parse the date / time
-var parseDate = d3.time.format("%d-%b-%y").parse,
-    formatDate = d3.time.format("%d-%b"),
-    bisectDate = d3.bisector(function(d) { return d.date; }).left;
+            var vis = d3.select("#visualisation"),
+                WIDTH = 1000,
+                HEIGHT = 500,
+                MARGINS = {
+                    top: 50,
+                    right: 20,
+                    bottom: 50,
+                    left: 50
+                },
+								lSpace = WIDTH/dataGroup.length;
 
-// Set the ranges
-var x = d3.time.scale().range([0, width]);
-var y = d3.scale.linear().range([height, 0]);
+                var minX = d3.min(d3.keys(data2));
+                var maxX = d3.max(d3.keys(data2));
+                var minY = d3.min(d3.values(data2));
+                var maxY = d3.max(d3.values(data2));
 
-// Define the axes
-var xAxis = d3.svg.axis().scale(x)
-    .orient("bottom").ticks(5);
 
-var yAxis = d3.svg.axis().scale(y)
-    .orient("left").ticks(5);
+                xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([minX,maxX]),
+                yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([minY,maxY]),
+                xAxis = d3.svg.axis()
+                .scale(xScale),
+                yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left");
 
-// Define the line
-var valueline = d3.svg.line()
-    .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.close); });
-    
-// Adds the svg canvas
-var svg = d3.select("body")
-    .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-        .attr("transform", 
-              "translate(" + margin.left + "," + margin.top + ")");
+            vis.append("svg:g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+                .call(xAxis);
+            vis.append("svg:g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+                .call(yAxis);
 
-var lineSvg = svg.append("g"); 
+            var lineGenTwo = d3.svg.line()
+                .x(function(d) {
+                    return xScale(d.key);
+                })
+                .y(function(d) {
+                    return yScale(d.value);
+                })
+                .interpolate("linear");
 
-var focus = svg.append("g") 
-    .style("display", "none");
+            var lineGen = d3.svg.line()
+                .x(function(d) {
+                    return xScale(d.year);
+                })
+                .y(function(d) {
+                    return yScale(d.sale);
+                })
+                .interpolate("linear");
 
-// Get the data
-d3.csv("atade.csv", function(error, data) {
-    data.forEach(function(d) {
-        d.date = d.date;
-        d.close = +d.close;
-    });
+            dataGroup.forEach(function(d,i) {
+                console.log(d.values);
+                console.log(d3.entries(data2));
+                vis.append('svg:path')
+                .attr('d', lineGenTwo(d3.entries(data2)))
+                .attr('stroke', function(d,j) {
+                        return "hsl(" + Math.random() * 360 + ",50%,50%)";
+                })
+                .attr('stroke-width', 2)
+                .attr('id', 'line_'+d.key)
+                .attr('fill', 'none');
+                vis.append("text")
+                    .attr("x", (lSpace/2)+i*lSpace)
+                    .attr("y", HEIGHT)
+                    .style("fill", "black")
+                    .attr("class","legend")
+                    .on('click',function(){
+                        var active   = d.active ? false : true;
+                        var opacity = active ? 0 : 1;
+                        d3.select("#line_" + d.key).style("opacity", opacity);
+                        d.active = active;
+                    })
+                    .text(d.key);
+            });
 
-    // Scale the range of the data
-    x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([0, d3.max(data, function(d) { return d.close; })]);
+          }
 
-    // Add the valueline path.
-    lineSvg.append("path")
-        .attr("class", "line")
-        .attr("d", valueline(data));
+          InitChart();
 
-    // Add the X Axis
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
-
-    // Add the Y Axis
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis);
-
-	svg.append("text")
-		.attr("class", "x label")
-		.attr("text-anchor", "end")
-		.attr("x", width)
-		.attr("y", height + 35)
-		.text("Wavelength");
-		
-	svg.append("text")
-		.attr("class", "y label")
-		.attr("text-anchor", "end")
-		.attr("y", 6)
-		.attr("dy", "-4em")
-		.attr("transform", "rotate(-90)")
-		.text("Reflectance");
-		
-   // append the x line
-    focus.append("line")
-        .attr("class", "x")
-        .style("stroke", "blue")
-        .style("stroke-dasharray", "3,3")
-        .style("opacity", 0.5)
-        .attr("y1", 0)
-        .attr("y2", height);
-
-    // append the y line
-    focus.append("line")
-        .attr("class", "y")
-        .style("stroke", "blue")
-        .style("stroke-dasharray", "3,3")
-        .style("opacity", 0.5)
-        .attr("x1", width)
-        .attr("x2", width);
-
-    // append the circle at the intersection
-    focus.append("circle")
-        .attr("class", "y")
-        .style("fill", "none")
-        .style("stroke", "blue")
-        .attr("r", 4);
-
-    // place the value at the intersection
-    focus.append("text")
-        .attr("class", "y1")
-        .style("stroke", "white")
-        .style("stroke-width", "3.5px")
-        .style("opacity", 0.8)
-        .attr("dx", 8)
-        .attr("dy", "-.3em");
-    focus.append("text")
-        .attr("class", "y2")
-        .attr("dx", 8)
-        .attr("dy", "-.3em");
-
-    // place the date at the intersection
-    focus.append("text")
-        .attr("class", "y3")
-        .style("stroke", "white")
-        .style("stroke-width", "3.5px")
-        .style("opacity", 0.8)
-        .attr("dx", 8)
-        .attr("dy", "1em");
-    focus.append("text")
-        .attr("class", "y4")
-        .attr("dx", 8)
-        .attr("dy", "1em");
-    
-    // append the rectangle to capture mouse
-    svg.append("rect")
-        .attr("width", width)
-        .attr("height", height)
-        .style("fill", "none")
-        .style("pointer-events", "all")
-        .on("mouseover", function() { focus.style("display", null); })
-        .on("mouseout", function() { focus.style("display", "none"); })
-        .on("mousemove", mousemove);
-
-    function mousemove() {
-		var x0 = x.invert(d3.mouse(this)[0]),
-		    i = bisectDate(data, x0, 1),
-		    d0 = data[i - 1],
-		    d1 = data[i],
-		    d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-
-		focus.select("circle.y")
-		    .attr("transform",
-		          "translate(" + x(d.date) + "," +
-		                         y(d.close) + ")");
-
-		focus.select("text.y1")
-		    .attr("transform",
-		          "translate(" + x(d.date) + "," +
-		                         y(d.close) + ")")
-		    .text(d.close);
-
-		focus.select("text.y2")
-		    .attr("transform",
-		          "translate(" + x(d.date) + "," +
-		                         y(d.close) + ")")
-		    .text(d.close);
-
-		focus.select("text.y3")
-		    .attr("transform",
-		          "translate(" + x(d.date) + "," +
-		                         y(d.close) + ")")
-		    .text(d.date);
-
-		focus.select("text.y4")
-		    .attr("transform",
-		          "translate(" + x(d.date) + "," +
-		                         y(d.close) + ")")
-		    .text(d.date);
-
-		focus.select(".x")
-		    .attr("transform",
-		          "translate(" + x(d.date) + "," +
-		                         y(d.close) + ")")
-		               .attr("y2", height - y(d.close));
-
-		focus.select(".y")
-		    .attr("transform",
-		          "translate(" + width * -1 + "," +
-		                         y(d.close) + ")")
-		               .attr("x2", width + width);
-	}
-
-});
-
-</script>
+          </script>
+      </div>
+  </div>
 </body>
