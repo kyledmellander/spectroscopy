@@ -2,6 +2,12 @@
 {% block content %}
 <body>
 <p> The graph should be here </p>
+{% if graphResults %}
+  {% for gr in graphResults %}
+    <td> {{gr.data_id}} </td>
+    <!-- Data right here! -->
+    <td> {{gr.reflectance}}</td>
+  {% endfor %}
 <!-- load the d3.js library -->
 	<div class="container">
   	<div class="jumbotron">
@@ -136,5 +142,6 @@
           </script>
       </div>
   </div>
+{% endif %}
 </body>
 {% endblock %}
