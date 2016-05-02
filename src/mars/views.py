@@ -74,11 +74,11 @@ def search(request):
 		mOrigin = request.POST.get('database_of_origin')
 
 		if mName:
-			results = results.filter(name=mName)
+		  results = results.filter(name__icontains=mName)
 		if mClass:
-			results = results.filter(sample_class=mClass)
+			results = results.filter(sample_class__icontains=mClass)
 		if mOrigin:
-			results = results.filter(origin=mOrigin)
+			results = results.filter(origin__icontains=mOrigin)
 
 		return render_to_response('results.html', {"results": results,}, context_instance=RequestContext(request))
 
@@ -88,7 +88,7 @@ def search(request):
 		})
 
 def graph(request):
-	if request.method == 'POST':
+  if request.method == 'POST':
 		selections = request.POST.getlist('graphing')
 		samples = Sample.objects.filter(data_id__in=selections)
       
