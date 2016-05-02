@@ -88,14 +88,8 @@ def search(request):
 		})
 
 def graph(request):
-	if request.method == 'POST':
+  if request.method == 'POST':
 		selections = request.POST.getlist('graphing')
 		samples = Sample.objects.filter(data_id__in=selections)
-    graphSamples = Sample.objects.all()
-
-    for s in samples:
-      PgraphSamples.append(graphSamples.filter(data_id=s.data_id))
-      
-      
-      return render_to_response('graph.html', {"graphResults": PgraphSamples,}, context_instance=RequestContext(request))
+    return render_to_response('graph.html', {"graphResults": samples,}, context_instance=RequestContext(request))
 
