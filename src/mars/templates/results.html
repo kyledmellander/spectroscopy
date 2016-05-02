@@ -16,6 +16,7 @@
 	               <th>Class</th>
                  <th>Origin</th>
                  <th>Grain Size</th>
+                 <th>Reflectance Range</th>
                </thread>
                <tbody>
                 {% for result in results %}
@@ -25,6 +26,7 @@
                   <td> {{ result.sample_class }} </td>
                   <td> {{ result.origin }} </td>
                   <td> {{ result.grain_size }} </td>
+                  <td> {{ result.refl_range }} </td>
                   </tr>
                 {% endfor %}
               <tbody>

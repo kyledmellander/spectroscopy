@@ -74,9 +74,9 @@ def search(request):
 		mOrigin = request.POST.get('database_of_origin')
 
 		if mName:
-		  results = results.filter(name__iexact=mName)
+		  results = results.filter(name__icontains=mName)
 		if mClass:
-			results = results.filter(sample_class__iexact=mClass)
+			results = results.filter(sample_class__icontains=mClass)
 		if mOrigin:
 			results = results.filter(origin__icontains=mOrigin)
 
