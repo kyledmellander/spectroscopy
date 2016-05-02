@@ -31,20 +31,3 @@ class SearchForm(forms.Form):
         widget=forms.TextInput(attrs={'placeholder': 'Mineral Class'}))
     database_of_origin = forms.CharField(
         widget=forms.TextInput(attrs={'placeholder': 'Database of origin'}))
-
-# class GraphForm(forms.Form):
-
-
-    # mineral_name = forms.ModelChoiceField(queryset=Sample.objects.all(),empty_label='Mineral Name')
-    # mineral_class = forms.ModelChoiceField(queryset=Sample.objects.all(),empty_label='Mineral Class')
-    # database_of_origin = forms.ModelChoiceField(queryset=Sample.objects.all(),empty_label='Database of origin')
-
-    # def clean_fields(self):
-    #     mineral_name = self.cleaned_data.get["mineral_name"]
-    #     mineral_class = self.cleaned_data["mineral_class"]
-    #     database_of_origin = self.cleaned_data["database_of_origin"]
-    #
-    #     return cleaned
-
-# def get_my_choices():
-#     return choices_list
