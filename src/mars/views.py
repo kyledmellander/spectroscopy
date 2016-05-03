@@ -104,7 +104,8 @@ def graph(request):
       # Create the HttpResponse object with the appropriate CSV header
       response = HttpResponse(content_type='text/csv')
       response['Content-Disposition'] = 'attachment; filename="metadatafile.csv"'
-
+      
+      # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
       writer = csv.writer(response)
       writer.writerow([
         smart_str("Data ID"),
