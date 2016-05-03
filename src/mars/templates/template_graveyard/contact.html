@@ -1,0 +1,16 @@
+{% extends 'layouts/base.html' %}
+{% block title %}<h1>Questions? Comments? Contact us!</h1>{% endblock %}
+
+{% block content %}
+<form role="form" action="" method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Submit</button>
+</form>
+
+<!-- Or just display a simple html page by uncommenting section below
+and changing the href of contact on base.html to 'contact.html' -->
+
+<!-- <p> Email: spectroscopy@wwu.edu </p> -->
+
+{% endblock %}

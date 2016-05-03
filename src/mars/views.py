@@ -13,56 +13,64 @@ import csv
 
 # Create your views here.
 
-def home(request):
-	title = "Welcome"
-	if request.user.is_authenticated():
-		title = "Hello again, %s" %(request.user)
-	form = SignUpForm(request.POST or None)
+# def home(request):
+# 	title = "Welcome"
+# 	if request.user.is_authenticated():
+# 		title = "Hello again, %s" %(request.user)
+# 	form = SignUpForm(request.POST or None)
+#
+# 	context = {
+# 		"template_title": title,
+# 		"form": form,
+# 	}
+#
+# 	if form.is_valid():
+# 		instance = form.save(commit=False)
+# 		instance.save()
+# 		print(instance)
+#
+# 		context = {
+# 			"template_title": "Thank You"
+# 		}
+# 	return render(request,"home.html",context)
 
-	context = {
-		"template_title": title,
-		"form": form,
-	}
+# def contact(request):
+#     form_class = ContactForm
+#
+#     if request.method == 'POST':
+#         form = form_class(data=request.POST)
+#
+#         if form.is_valid():
+#           try:
+#             send_mail(
+#                 request.POST.get('subject', ''),
+#                 request.POST.get('message', ''),
+#                 request.POST.get('your_email', ''),
+#                 ['digren@students.wwu.edu'],
+#             )
+#             return HttpResponseRedirect('sent/')
+#           except Exception, err:
+#             return HttpResponse(str(err))
+#
+#     return render(request, 'contact.html', {
+#         'form': form_class,
+#     })
 
-	if form.is_valid():
-		instance = form.save(commit=False)
-		instance.save()
-		print(instance)
+# def sent(request):
+# 	context = RequestContext(request)
+# 	return render(request, 'sent.html', context_instance=context)
+#
+# def about(request):
+# 	context = RequestContext(request)
+# 	return render(request, 'about.html', context_instance=context)
 
-		context = {
-			"template_title": "Thank You"
-		}
-	return render(request,"home.html",context)
+def meta(request):
+	if request.method == 'POST':
+		if 'meta' in request.POST:
+			selections = request.POST.getlist('selection')
+	        samples = Sample.objects.filter(data_id__in=selections)
 
-def contact(request):
-    form_class = ContactForm
-
-    if request.method == 'POST':
-        form = form_class(data=request.POST)
-
-        if form.is_valid():
-          try:
-            send_mail(
-                request.POST.get('subject', ''),
-                request.POST.get('message', ''),
-                request.POST.get('your_email', ''),
-                ['digren@students.wwu.edu'],
-            )
-            return HttpResponseRedirect('sent/')
-          except Exception, err:
-            return HttpResponse(str(err))
-
-    return render(request, 'contact.html', {
-        'form': form_class,
-    })
-
-def sent(request):
-	context = RequestContext(request)
-	return render(request, 'sent.html', context_instance=context)
-
-def about(request):
-	context = RequestContext(request)
-	return render(request, 'about.html', context_instance=context)
+		return render_to_response('meta.html', {"metaResults": samples,}, context_instance=RequestContext(request))
 
 def search(request):
 	form_class = SearchForm
@@ -93,18 +101,18 @@ def search(request):
 def graph(request):
   if request.method == 'POST':
     if 'graphForm' in request.POST:
-      selections = request.POST.getlist('graphing')
+      selections = request.POST.getlist('selection')
       samples = Sample.objects.filter(data_id__in=selections)
       return render_to_response('graph.html', {"graphResults": samples,}, context_instance=RequestContext(request))
 
     elif 'export' in request.POST:
-      selections = request.POST.getlist('graphing')
+      selections = request.POST.getlist('selection')
       samples = Sample.objects.filter(data_id__in=selections)
 
       # Create the HttpResponse object with the appropriate CSV header
       response = HttpResponse(content_type='text/csv')
       response['Content-Disposition'] = 'attachment; filename="metadatafile.csv"'
-      
+
       # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
       writer = csv.writer(response)
       writer.writerow([
@@ -127,10 +135,10 @@ def graph(request):
       for s in samples:
         writer.writerow([
           smart_str(s.data_id),
-          smart_str(s.sample_id), 
-          smart_str(s.date_accessed), 
-          smart_str(s.origin), 
-          smart_str(s.locality), 
+          smart_str(s.sample_id),
+          smart_str(s.date_accessed),
+          smart_str(s.origin),
+          smart_str(s.locality),
           smart_str(s.name),
           smart_str(s.sample_desc),
           smart_str(s.sample_type),

@@ -21,9 +21,10 @@
 
     <!-- Custom styles for this template -->
     <link href="{% static 'navbar-static-top.css' %}" rel="stylesheet">
-   
     <link href="{% static 'dropdown.css' %}" rel="stylesheet">
-    <script src="/usr/home/aytone/marsproject/src/static_in_pro/our_static/js/sorttable.js"></script>
+    <link href="{% static 'footer.css' %}" rel="stylesheet">
+
+    <!-- <script src="/usr/home/aytone/marsproject/src/static_in_pro/our_static/js/sorttable.js"></script> -->
   </head>
 
   <body>
@@ -38,14 +39,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/search">Spectroscopy Database</a>
+          <a class="navbar-brand" href="/">Spectroscopy Database</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="/">Home</a></li>
-            <li><a href="/about">About</a></li>
-            <li><a href="/contact">Contact</a></li>
-            <li class="dropdown">
+            <!-- <li><a href="/about">About</a></li> -->
+            <!-- <li><a href="/contact">Contact</a></li> -->
+            <!-- <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href="#">Action</a></li>
@@ -56,7 +57,7 @@
                 <li><a href="#">Separated link</a></li>
                 <li><a href="#">One more separated link</a></li>
               </ul>
-            </li>
+            </li> -->
           </ul>
           <!-- <ul class="nav navbar-nav navbar-right">
             <li><a href="/admin">Admin Login</a></li>
@@ -71,9 +72,19 @@
       {% block content %}{% endblock %}
     </div>
 
+    <footer>
+      <p> Contact information: Melissa[dot]Rice[at]wwu[dot]edu.</p>
+      <p> Developed by students from Western Washington University Computer Science Department. </p>
+    </footer>
+
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+    <script type="tex/javascript">
+      function gen_mail_to_link(lhs,rhs, subject) {
+        document.write
+      }
+    </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>

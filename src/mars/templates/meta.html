@@ -1,0 +1,32 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+  <style>
+  p {
+    margin: 0em;
+  }
+  </style>
+
+  {% if metaResults %}
+    {% for result in metaResults %}
+      <p> Data ID:            {{ result.data_id }} </p>
+      <p> Sample ID:          {{ result.sample_id }} </p>
+      <p> Mineral name:       {{ result.name }} </p>
+      <p> Mineral class:      {{ result.sample_class }} </p>
+      <p> Mineral type:       {{ result.sample_type }} </p>
+      <p> Formula:            {{ result.formula }} </p>
+      <p> Description:        {{ result.sample_desc }} </p>
+      <p> Database of origin: {{ result.origin }} </p>
+      <p> Date accessed:      {{ result.date_accessed }} </p>
+      <p> Locality:           {{ result.locality }} </p>
+      <p> Grain size:         {{ result.grain_size }} </p>
+      <p> Viewing geometry:   {{ result.view_geom }} </p>
+      <p> Resolution:         {{ result.resolution }} </p>
+      <p> Reflectance range:  {{ result.refl_range }} </p>
+      <p> Composition:        {{ result.composition }} </p>
+      <p> Reflectance:        {{ result.reflectance }} </p>
+      <br>
+    {% endfor %}
+  {% endif %}
+{% endblock %}
