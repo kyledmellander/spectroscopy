@@ -4,9 +4,17 @@
     {% if results %}
       <div class = "container">
 	       <div class="form-inline">
+           <!--
+           <form method="POST" action="/export/" name="exportform">
+             {% csrf_token %}
+             <button type="submit" name="export" class="btn btn-success">Export</button><br>
+             <br>
+           </form> -->
+              
            <form method="POST" action="/graph/" name="resultsform">
              {% csrf_token %}
-             <button type="submit" name="graphForm" class="btn btn-primary">Graph</button><br>
+             <button type="submit" name="graphForm" class="btn btn-success">Graph</button><br>
+             <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button><br>
              <br>
               <table class="table table-hover">
                <thread>
@@ -31,7 +39,7 @@
                 {% endfor %}
               <tbody>
             </table>
-            <button type="submit" name="graphForm" class="btn btn-primary">Graph</button>
+            <button type="submit" name="graphForm" class="btn btn-success">Graph</button>
             <br>
             <p>
             <br>

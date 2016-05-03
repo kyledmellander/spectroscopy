@@ -9,5 +9,6 @@ urlpatterns = [
     url(r'^contact/$', views.contact, name='contact'),
     url(r'^about/$', views.about, name='about'),
     url(r'^graph/$', views.graph, name='graph'),
+    url(r'^export/$', views.graph, name="export"),
     url(r'^$', views.home, name='home'),
 ]

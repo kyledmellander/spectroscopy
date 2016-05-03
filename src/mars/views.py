@@ -7,6 +7,9 @@ from .models import Sample
 
 from .forms import ContactForm, SignUpForm, SearchForm
 from .models import Sample, SignUp
+from django.utils.encoding import smart_str
+
+import csv
 
 # Create your views here.
 
@@ -89,8 +92,54 @@ def search(request):
 
 def graph(request):
   if request.method == 'POST':
-		selections = request.POST.getlist('graphing')
-		samples = Sample.objects.filter(data_id__in=selections)
-      
-                return render_to_response('graph.html', {"graphResults": samples,}, context_instance=RequestContext(request))
+    if 'graphForm' in request.POST:
+      selections = request.POST.getlist('graphing')
+      samples = Sample.objects.filter(data_id__in=selections)
+      return render_to_response('graph.html', {"graphResults": samples,}, context_instance=RequestContext(request))
 
+    elif 'export' in request.POST:
+      selections = request.POST.getlist('graphing')
+      samples = Sample.objects.filter(data_id__in=selections)
+
+      # Create the HttpResponse object with the appropriate CSV header
+      response = HttpResponse(content_type='text/csv')
+      response['Content-Disposition'] = 'attachment; filename="metadatafile.csv"'
+
+      writer = csv.writer(response)
+      writer.writerow([
+        smart_str("Data ID"),
+        smart_str("Sample ID"),
+        smart_str("Date Accessed"),
+        smart_str("Database of Origin"),
+        smart_str("Locality"),
+        smart_str("Mineral Name"),
+        smart_str("Sample Description"),
+        smart_str("Sample Type"),
+        smart_str("Mineral Class"),
+        smart_str("Grain Size"),
+        smart_str("Viewing Geometry"),
+        smart_str("Resolution"),
+        smart_str("Reflectance Range"),
+        smart_str("Formula"),
+        smart_str("Composition"),
+        smart_str("Wavelength v Reflectance"),])
+      for s in samples:
+        writer.writerow([
+          smart_str(s.data_id),
+          smart_str(s.sample_id), 
+          smart_str(s.date_accessed), 
+          smart_str(s.origin), 
+          smart_str(s.locality), 
+          smart_str(s.name),
+          smart_str(s.sample_desc),
+          smart_str(s.sample_type),
+          smart_str(s.sample_class),
+          smart_str(s.grain_size),
+          smart_str(s.view_geom),
+          smart_str(s.resolution),
+          smart_str(s.refl_range),
+          smart_str(s.formula),
+          smart_str(s.composition),
+          smart_str(s.reflectance),])
+
+      return response
