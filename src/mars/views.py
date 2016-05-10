@@ -157,5 +157,3 @@ def graph(request):
 
       return response
 
-def upload(request):
-  return render(request, 'upload.html')
