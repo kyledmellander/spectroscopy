@@ -2,7 +2,6 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.mail import send_mail
-
 from .models import Sample
 
 from .forms import ContactForm, SignUpForm, SearchForm
@@ -10,7 +9,9 @@ from .models import Sample, SignUp
 from django.utils.encoding import smart_str
 
 import csv
-
+import yaml
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 # Create your views here.
 
 # def home(request):
@@ -103,7 +104,10 @@ def graph(request):
     if 'graphForm' in request.POST:
       selections = request.POST.getlist('selection')
       samples = Sample.objects.filter(data_id__in=selections)
-      return render_to_response('graph.html', {"graphResults": samples,}, context_instance=RequestContext(request))
+      dictionaries = [ obj.as_dict() for obj in samples]
+      json_string = json.dumps(dictionaries);
+      
+      return render_to_response('graph.html', {"graphResults": samples,"graphJSON":json_string,}, context_instance=RequestContext(request))
 
     elif 'export' in request.POST:
       selections = request.POST.getlist('selection')
