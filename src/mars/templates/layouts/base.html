@@ -23,7 +23,25 @@
     <link href="{% static 'navbar-static-top.css' %}" rel="stylesheet">
     <link href="{% static 'dropdown.css' %}" rel="stylesheet">
     <link href="{% static 'footer.css' %}" rel="stylesheet">
+    <style>
+      #footer {
+      position: fixed;
+      overflow: hidden;
+      bottom: 0;
+      height : 65px;
+      margin-top: 80px;
+      background-color:black;
+      color:white;
+      clear:both;
+      padding: 5px;
+      text-align:center;
+      width: 100%;
+      }
 
+      #meta {
+      padding: 35px;
+      }
+    </style>
     <!-- <script src="/usr/home/aytone/marsproject/src/static_in_pro/our_static/js/sorttable.js"></script> -->
   </head>
 
@@ -43,7 +61,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="/">Home</a></li>
+            <li><a href="/upload">Upload</a></li>
             <!-- <li><a href="/about">About</a></li> -->
             <!-- <li><a href="/contact">Contact</a></li> -->
             <!-- <li class="dropdown">
@@ -72,10 +90,12 @@
       {% block content %}{% endblock %}
     </div>
 
-    <footer>
+    <div id="footer">
+    <!--<footer> -->
       <p> Contact information: Melissa[dot]Rice[at]wwu[dot]edu.</p>
       <p> Developed by students from Western Washington University Computer Science Department. </p>
-    </footer>
+    </div>
+    <!--</footer> -->
 
     <!-- Bootstrap core JavaScript
     ================================================== -->

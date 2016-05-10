@@ -11,5 +11,6 @@ urlpatterns = [
     url(r'^meta/$', views.meta, name='meta'),
     url(r'^graph/$', views.graph, name='graph'),
     url(r'^export/$', views.graph, name="export"),
+    url(r'^upload/$', views.upload_file, name="upload"),
     url(r'^$', views.search, name='home'),
 ]

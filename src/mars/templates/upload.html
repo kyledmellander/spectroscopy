@@ -1,0 +1,28 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+  <div class="container" style="margin-left:10px">
+    <p><b> Please specify a CSV file </b></p>
+    <div class="form-inline" style="margin-left:10px">
+      <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p align="left">
+          <button type="submit" class="btn btn-primary"/>Upload&raquo;</button>
+        </p>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+  <!--<form method="POST">
+    <p>
+      Please specify a CSV file:<br>
+      <input type="file" name="datafile" size="40">
+    </p>
+    <div>
+      <input type="submit" value="Upload">
+    </div>
+  </form>-->
+
+
