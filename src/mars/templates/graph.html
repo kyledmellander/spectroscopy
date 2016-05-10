@@ -17,60 +17,9 @@
       	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> 
         <script>
         	function InitChart() {
-            var GRAPH = JSON.parse('{{graphJSON|safe}}');
-            
-            var data = [{
-                "Client": "ABC",
-                "sale": "20",
-                "year": "10"
-            }, {
-                "Client": "ABC",
-                "sale": "30",
-                "year": "15"
-            }, {
-                "Client": "ABC",
-                "sale": "40",
-                "year": "20"
-            }, {
-                "Client": "XYZ",
-                "sale": "50",
-                "year": "25"
-            }, {
-                "Client": "XYZ",
-                "sale": "60",
-                "year": "30"
-            }, {
-                "Client": "XYZ",
-                "sale": "70",
-                "year": "35"
-            }];
-
-            var data2 = {
-              "10":"20",
-              "15":"26",
-              "20":"45",
-              "25":"40",
-              "30":"32",
-              "35":"70"
-            }
-
-
-
-            var dataGroup = d3.nest()
-                .key(function(d) {return d.Client;})
-                .entries(data);
-            var specGroup = d3.nest()
-                .key(function(d) {return d.data_id;})
-                .entries(GRAPH);
+            //Change JSON string to object
+            var GRAPH = JSON.parse('{{graphJSON|safe}}'); 
            
-            //console.log(GRAPH);
-            //console.log(specGroup);
-            //console.log(data2);
-            //console.log(data);
-            //console.log(JSON.stringify(specGroup));
-						//console.log(JSON.stringify(dataGroup));
-            //console.log(JSON.stringify(data2));
-            //console.log(data2);
             var color = d3.scale.category10();
 
             var vis = d3.select("#visualisation"),
@@ -83,20 +32,21 @@
                     left: 50
                 },
 								lSpace = WIDTH/GRAPH.length;
-
                 
-                 
-                var minX = d3.min(d3.keys(data2));
-                var maxX = d3.max(d3.keys(data2));
-                var minY = d3.min(d3.values(data2));
-                var maxY = d3.max(d3.values(data2));
+             
+            
+            
+            var minX = d3.min(d3.keys(GRAPH));
+            var maxX = d3.max(d3.keys(GRAPH));
+            var minY = d3.min(d3.values(GRAPH));
+            var maxY = d3.max(d3.values(GRAPH));
 
 
-                xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([2,20]),
-                yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0,1.2]),
-                xAxis = d3.svg.axis()
+            xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([2,20]),
+            yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0,1.2]),
+            xAxis = d3.svg.axis()
                 .scale(xScale),
-                yAxis = d3.svg.axis()
+            yAxis = d3.svg.axis()
                 .scale(yScale)
                 .orient("left");
 
@@ -120,23 +70,23 @@
 
             function keySort (sortfunc,field) {
               return function (a,b) {
-                return sortfunc(a[field],b[field]);
+                return sortfunc(parseFloat(a[field]),parseFloat(b[field]));
               }
             }
 
             GRAPH.forEach(function(d,i) {
-                //d.reflectance.sort(function(a,b) {return d3.descending(a[1],b[2])))
-                //console.log(d.values);
-                //console.log(d3.entries(data2));
-                console.log(d.data_id); 
+                //Creates an array of objects with key-value pairs, sorted by keys
+                var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
+
+                //Append path to graph
                 vis.append('svg:path')
-                .attr('d', lineGenTwo(d3.entries(d.reflectance).sort(keySort(d3.ascending,"key")))) //.attr('d', lineGenTwo(d3.entries(data2))) ||
+                .attr('d', lineGen(reflectanceKV))   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
                 .attr('stroke', function(d,j) {
                         return "hsl(" + Math.random() * 360 + ",50%,50%)";
                 })
                 .attr('stroke-width', 2)
-                .attr('id', 'line_'+d.data_id) //Note color
-                .attr('fill', 'none');
+                .attr('id', 'line_'+d.data_id) 
+                .attr('fill','none');
 
                 // Line Disappearing nonsense
                 vis.append("text")

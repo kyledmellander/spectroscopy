@@ -9,7 +9,6 @@ from .models import Sample, SignUp
 from django.utils.encoding import smart_str
 
 import csv
-import yaml
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 # Create your views here.
@@ -105,6 +104,12 @@ def graph(request):
       selections = request.POST.getlist('selection')
       samples = Sample.objects.filter(data_id__in=selections)
       dictionaries = [ obj.as_dict() for obj in samples]
+      for obj in dictionaries:
+        for key in obj["reflectance"].keys():
+          if (obj["reflectance"][key] == "NULL"):
+            del obj["reflectance"][key]
+         
+      
       json_string = json.dumps(dictionaries);
       
       return render_to_response('graph.html', {"graphResults": samples,"graphJSON":json_string,}, context_instance=RequestContext(request))
