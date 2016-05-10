@@ -4,12 +4,11 @@ from django.template import RequestContext
 from django.core.mail import send_mail
 from .models import Sample
 
-from .forms import ContactForm, SignUpForm, SearchForm
+from .forms import ContactForm, SignUpForm, SearchForm, UploadFileForm
 from .models import Sample, SignUp
 from django.utils.encoding import smart_str
 
 import csv
-import yaml
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 # Create your views here.
@@ -156,3 +155,27 @@ def graph(request):
           smart_str(s.reflectance),])
 
       return response
+
+def upload_file(request):
+  if request.method == 'POST':
+    form = UploadFileForm(request.POST, request.FILES)
+    if form.is_valid():
+      handle_uploaded_file(request.FILES['file'])
+      return HttpResponseRedirect('/success/url/')
+  else:
+    form = UploadFileForm()
+  return render(request, 'upload.html', {'form': form})
+
+def handle_uploaded_file(f):
+  filepath = '/tmp/somefile.txt'
+  with open(filepath, 'wb+') as dest:
+    for chunk in f.chunks():
+      dest.write(chunk)
+    process_file(filepath)
+
+def process_file(filepath):
+  subprocess.Popen(["python","../static_in_pro/our_static/py/dataParser.py","filepath"], close_fds=True)
+
+
+
+  
