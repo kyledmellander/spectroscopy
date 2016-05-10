@@ -30,3 +30,6 @@ class Sample(models.Model):
 	formula = models.CharField(max_length=20, null=True, blank=True)
 	composition = models.CharField(max_length=1000, null=True, blank=True)
 	reflectance = JSONField()
+
+
+
