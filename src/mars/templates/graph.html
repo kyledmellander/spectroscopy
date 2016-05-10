@@ -1,3 +1,4 @@
+
 {% extends "layouts/base.html" %}
 {% block content %}
 <body>
@@ -12,9 +13,12 @@
 	<div class="container">
   	<div class="jumbotron">
     	<svg id="visualisation" width="1000" height="500"></svg>
-      	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+                
+      	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> 
         <script>
         	function InitChart() {
+            var GRAPH = JSON.parse('{{graphJSON|safe}}');
+            
             var data = [{
                 "Client": "ABC",
                 "sale": "20",
@@ -50,12 +54,23 @@
               "35":"70"
             }
 
+
+
             var dataGroup = d3.nest()
                 .key(function(d) {return d.Client;})
                 .entries(data);
-
-						console.log(JSON.stringify(dataGroup));
-            console.log(JSON.stringify(data2));
+            var specGroup = d3.nest()
+                .key(function(d) {return d.data_id;})
+                .entries(GRAPH);
+           
+            //console.log(GRAPH);
+            //console.log(specGroup);
+            //console.log(data2);
+            //console.log(data);
+            //console.log(JSON.stringify(specGroup));
+						//console.log(JSON.stringify(dataGroup));
+            //console.log(JSON.stringify(data2));
+            //console.log(data2);
             var color = d3.scale.category10();
 
             var vis = d3.select("#visualisation"),
@@ -67,8 +82,10 @@
                     bottom: 50,
                     left: 50
                 },
-								lSpace = WIDTH/dataGroup.length;
+								lSpace = WIDTH/GRAPH.length;
 
+                
+                 
                 var minX = d3.min(d3.keys(data2));
                 var maxX = d3.max(d3.keys(data2));
                 var minY = d3.min(d3.values(data2));
@@ -110,11 +127,14 @@
                 })
                 .interpolate("linear");
 
-            dataGroup.forEach(function(d,i) {
-                console.log(d.values);
+            GRAPH.forEach(function(d,i) {
+                //console.log(d.values);
+                //console.log(d3.entries(data2));
                 console.log(d3.entries(data2));
+                console.log(d.reflectance);
+                console.log(d3.entries(d.reflectance));
                 vis.append('svg:path')
-                .attr('d', lineGenTwo(d3.entries(data2)))
+                .attr('d', lineGenTwo(d3.entries(data2))) //.attr('d', lineGenTwo(d3.entries(data2))) ||
                 .attr('stroke', function(d,j) {
                         return "hsl(" + Math.random() * 360 + ",50%,50%)";
                 })
@@ -132,7 +152,7 @@
                         d3.select("#line_" + d.key).style("opacity", opacity);
                         d.active = active;
                     })
-                    .text(d.key);
+                    .text(d.data_id);
             });
 
           }
