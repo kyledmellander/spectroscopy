@@ -166,97 +166,104 @@ with open(csvFile, 'rU') as cf:
     vg = reader.next()
     i = 2
     while i < len(vg):
-        geoArray = [None] * 4
-        if vg[i] != "" and vg[i].find("unknown") == -1 and vg[i].find("?") == -1: #Question mark check: make more robust? Will there be some ?'s and some data?
-            token = vg[i].split('/')
-            if token[0].find("|") != -1:
-                sl = token[0].split("|")
-                geoArray[0] = sl[0]
-                geoArray[1] = sl[1]
-            else:
-                geoArray[0] = token[0]
-            if len(token) > 1:
-                if token[1].find("|") != -1:
-                    sr = token[1].split("|")
-                    if geoArray[1] != None:
-                        geoArray[2] = sr[0]
-                        geoArray[3] = sr[1]
-                    else:
-                        geoArray[1] = sr[0]
-                        geoArray[2] = sr[1]
-                else:
-                    geoArray[1] = token[1]
-            vGeoArray.append(geoArray)
-        else:
-            #empty case - don't put in database
-            vGeoArray.append(geoArray)
+        vGeoArray.append(vg[i])
         i+=1
+
+
+        # geoArray = [None] * 4
+        # if vg[i] != "" and vg[i].find("unknown") == -1 and vg[i].find("?") == -1: #Question mark check: make more robust? Will there be some ?'s and some data?
+        #     token = vg[i].split('/')
+        #     if token[0].find("|") != -1:
+        #         sl = token[0].split("|")
+        #         geoArray[0] = sl[0]
+        #         geoArray[1] = sl[1]
+        #     else:
+        #         geoArray[0] = token[0]
+        #     if len(token) > 1:
+        #         if token[1].find("|") != -1:
+        #             sr = token[1].split("|")
+        #             if geoArray[1] != None:
+        #                 geoArray[2] = sr[0]
+        #                 geoArray[3] = sr[1]
+        #             else:
+        #                 geoArray[1] = sr[0]
+        #                 geoArray[2] = sr[1]
+        #         else:
+        #             geoArray[1] = token[1]
+        #     vGeoArray.append(geoArray)
+        # else:
+        #     #empty case - don't put in database
+        #     vGeoArray.append(geoArray)
 
     # Resolution
     res = reader.next()
     i = 2
-    if ("um" or "micron") in res[0]:
-        scale = "microns"
-    else:
-        scale = "nanometers"
+
+    # if ("um" or "micron") in res[0]:
+    #     scale = "microns"
+    # else:
+    #     scale = "nanometers"
     while i < len(res):
-        tempArray = [None] * 4
-        if res[i] != "" and res[i].find("unknown") == -1:
-            if res[i].find("/") != -1:
-                slash = res[i].split('/')
-                if scale == "microns":
-                    tempArray[0] = float(slash[0]*1000)
-                else:
-                    tempArray[0] = float(slash[0])
-                dash = slash[1].split('-')
-                if len(dash) > 1:
-                    if scale == "microns":
-                        tempArray[1] = float(dash[0]*1000)
-                        tempArray[2] = float(dash[1]*1000)
-                    else:
-                        tempArray[1] = float(dash[0])
-                        tempArray[2] = float(dash[1])
-            else:
-                temp1 = res[i].split('-')
-                if len(temp1) > 1:
-                    first = temp1[0].split('@')
-                    if len(first) > 1:
-                        last = temp1[1].split('@') #Assuming 2@3500-7@3500
-                        if last[1].find("nm") != -1:
-                            lt = last[1].split("n")
-                            scale = "nanometers"
-                        else:
-                            lt = last[1].split("u")
-                            scale = "microns"
-                        if scale == "microns":
-                            tempArray[0] = float(first[0])*1000
-                            tempArray[1] = float(first[1])*1000
-                            tempArray[2] = float(last[0])*1000
-                            tempArray[3] = float(last[1])*1000
-                        else:
-                            tempArray[0] = float(first[0])
-                            tempArray[1] = float(first[1])
-                            tempArray[2] = float(last[0])
-                            tempArray[3] = float(last[1])
-                    else:
-                        if scale == "microns":
-                            tempArray[0] = float(first[0])*1000
-                            tempArray[1] = float(temp1[1])*1000
-                        else:
-                            tempArray[0] = float(first[0])
-                            tempArray[1] = float(temp1[1])
-                else:
-                    #if isinstance(temp1[0], float):
-                    if hasNumbers(temp1[0]) == True:
-                        if scale == "microns":
-                            tempArray[0] = float(temp1[0])*1000
-                        else:
-                            tempArray[0] = float(temp1[0])
-            resArray.append(tempArray)
-        else:
-            #empty case- don't put in database
-            resArray.append(tempArray)
+        resArray.append(res[i])
         i+=1
+
+        ############# For making Resolution a searchable array #############
+        # tempArray = [None] * 4
+        # if res[i] != "" and res[i].find("unknown") == -1:
+        #     if res[i].find("/") != -1:
+        #         slash = res[i].split('/')
+        #         if scale == "microns":
+        #             tempArray[0] = float(slash[0]*1000)
+        #         else:
+        #             tempArray[0] = float(slash[0])
+        #         dash = slash[1].split('-')
+        #         if len(dash) > 1:
+        #             if scale == "microns":
+        #                 tempArray[1] = float(dash[0]*1000)
+        #                 tempArray[2] = float(dash[1]*1000)
+        #             else:
+        #                 tempArray[1] = float(dash[0])
+        #                 tempArray[2] = float(dash[1])
+        #     else:
+        #         temp1 = res[i].split('-')
+        #         if len(temp1) > 1:
+        #             first = temp1[0].split('@')
+        #             if len(first) > 1:
+        #                 last = temp1[1].split('@') #Assuming 2@3500-7@3500
+        #                 if last[1].find("nm") != -1:
+        #                     lt = last[1].split("n")
+        #                     scale = "nanometers"
+        #                 else:
+        #                     lt = last[1].split("u")
+        #                     scale = "microns"
+        #                 if scale == "microns":
+        #                     tempArray[0] = float(first[0])*1000
+        #                     tempArray[1] = float(first[1])*1000
+        #                     tempArray[2] = float(last[0])*1000
+        #                     tempArray[3] = float(last[1])*1000
+        #                 else:
+        #                     tempArray[0] = float(first[0])
+        #                     tempArray[1] = float(first[1])
+        #                     tempArray[2] = float(last[0])
+        #                     tempArray[3] = float(last[1])
+        #             else:
+        #                 if scale == "microns":
+        #                     tempArray[0] = float(first[0])*1000
+        #                     tempArray[1] = float(temp1[1])*1000
+        #                 else:
+        #                     tempArray[0] = float(first[0])
+        #                     tempArray[1] = float(temp1[1])
+        #         else:
+        #             #if isinstance(temp1[0], float):
+        #             if hasNumbers(temp1[0]) == True:
+        #                 if scale == "microns":
+        #                     tempArray[0] = float(temp1[0])*1000
+        #                 else:
+        #                     tempArray[0] = float(temp1[0])
+        #     resArray.append(tempArray)
+        # else:
+        #     #empty case- don't put in database
+        #     resArray.append(tempArray)
 
     # Range
     rang = reader.next()
@@ -273,11 +280,11 @@ with open(csvFile, 'rU') as cf:
                 temp = rang[i].split('-')
                 if temp[1].find("um") != -1:
                     ty = temp[1].split("u")
-                    temp1.append(float(temp[0])*1000)
-                    temp1.append(float(ty[0])*1000)
+                    temp1.append(float(temp[0]))
+                    temp1.append(float(ty[0]))
                 else:
-                    temp1.append(float(temp[0])*1000)
-                    temp1.append(float(temp[1])*1000)
+                    temp1.append(float(temp[0]))
+                    temp1.append(float(temp[1]))
             else:
                 temp = rang[i].split('-')
                 if temp[1].find("nm") != -1:
@@ -316,7 +323,6 @@ with open(csvFile, 'rU') as cf:
         factor = 1
 
     wl = reader.next()
-    #print wl
 
     row_len = len(wl)
 
@@ -331,8 +337,10 @@ with open(csvFile, 'rU') as cf:
         currDict = copy.deepcopy(waveDataPt)
 
         for row in itertools.islice(reader, 21, len(currDict)):
-            if hasNumbers(row[0]) == True:
-                currDict[row[0]] = row[i] * factor
+            if hasNumbers(row[0]) == True and row[i] != '':
+                if float(row[i]) > 1.0:
+                    row[i] = float(row[i]) / 100.
+                currDict[row[0]] = row[i]
 
         dataPts.append(currDict)
         i += 1
@@ -350,18 +358,26 @@ for i in range(size):
     sampId = sampArray[i]
     name = nameArray[i]
     gr = grainArray[i]
+    vGeo= vGeoArray[i]
+    res = resArray[i]
 
-    tempVG = vGeoArray[i]
-    for j in range(len(tempVG)):
-        if tempVG[j] == None:
-            tempVG[j] = 'NULL'
-    vg = '{' + str(tempVG[0]).strip() + ', ' + str(tempVG[1]).strip() + ', ' + str(tempVG[2]).strip() + ', ' + str(tempVG[3]).strip() + '}'
+    # tempVG = vGeoArray[i]
+    # for j in range(len(tempVG)):
+    #     if tempVG[j] == None:
+    #         tempVG[j] = 'NULL'
+    # vg = '{' + str(tempVG[0]).strip() + ', ' + str(tempVG[1]).strip() + ', ' + str(tempVG[2]).strip() + ', ' + str(tempVG[3]).strip() + '}'
 
-    tempRes = resArray[i]
-    for j in range(len(tempRes)):
-        if tempRes[j] == None:
-            tempRes[j] = 'NULL'
-    res = '{' + str(tempRes[0]).strip() + ', ' + str(tempRes[1]).strip() + ', ' + str(tempRes[2]).strip() + ', ' + str(tempRes[3]).strip() + '}'
+    # tempRes = resArray[i]
+    # for j in range(len(tempRes)):
+    #     if tempRes[j] == None:
+    #         tempRes[j] = 'NULL'
+    # res = '{' + str(tempRes[0]).strip() + ', ' + str(tempRes[1]).strip() + ', ' + str(tempRes[2]).strip() + ', ' + str(tempRes[3]).strip() + '}'
+
+    if vGeo == '':
+        vGeo = 'NULL'
+
+    if res == '':
+        res = 'NULL'
 
     tempRan = rangArray[i]
     if len(tempRan) == 0:
@@ -371,14 +387,20 @@ for i in range(size):
             tempRan[j] = 'NULL'
     ran = '{' + str(tempRan[0]).strip() + ', ' + str(tempRan[1]).strip() + '}'
 
+    finalDataPts = copy.deepcopy(dataPts)
+
+    for j in range(len(dataPts)):
+        for key in dataPts[j]:
+            if dataPts[j][key] == "NULL":
+                del finalDataPts[j][key]
+
     form = formArray[i]
     comp = compArray[i]
-    print dataPts[i]
-    reflect = json.dumps(dataPts[i])
-    # query = "INSERT INTO mars_sample (DATA_ID, SAMPLE_ID, DATE_ACCESSED, ORIGIN, LOCALITY, NAME, SAMPLE_DESC, GRAIN_SIZE, VIEW_GEOM, RESOLUTION, REFL_RANGE, FORMULA, COMPOSITION, REFLECTANCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-    # data = (dataId, sampId, access, origin, collection, name, desc, gr, vg, res, ran, form, comp, reflect)
-    query = "UPDATE mars_sample SET SAMPLE_CLASS = %s WHERE DATA_ID = %s"
-    data = (sample_cl, dataId)
+    reflect = json.dumps(finalDataPts[i])
+    query = "INSERT INTO mars_sample (DATA_ID, SAMPLE_ID, DATE_ACCESSED, ORIGIN, LOCALITY, NAME, SAMPLE_CLASS, SAMPLE_DESC, GRAIN_SIZE, VIEW_GEOM, RESOLUTION, REFL_RANGE, FORMULA, COMPOSITION, REFLECTANCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+    data = (dataId, sampId, access, origin, collection, name, sample_cl, desc, gr, vGeo, res, ran, form, comp, reflect)
+    # query = "UPDATE mars_sample SET SAMPLE_CLASS = %s WHERE DATA_ID = %s"
+    # data = (sample_cl, dataId)
     cur.execute(query, data)
 
 conn.commit()
