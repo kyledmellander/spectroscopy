@@ -32,5 +32,8 @@ class SearchForm(forms.Form):
     database_of_origin = forms.CharField(
         widget=forms.TextInput(attrs={'placeholder': 'Database of origin'}))
 
+<<<<<<< HEAD
 class UploadFileForm(forms.Form):
   file = forms.FileField()
+=======
+>>>>>>> 593e2a282363a8bcc977decc7eab14bde279cc47

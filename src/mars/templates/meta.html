@@ -9,24 +9,37 @@
   </style>
 
   {% if metaResults %}
-    {% for result in metaResults %}
-      <p> Data ID:            {{ result.data_id }} </p>
-      <p> Sample ID:          {{ result.sample_id }} </p>
-      <p> Mineral name:       {{ result.name }} </p>
-      <p> Mineral class:      {{ result.sample_class }} </p>
-      <p> Mineral type:       {{ result.sample_type }} </p>
-      <p> Formula:            {{ result.formula }} </p>
-      <p> Description:        {{ result.sample_desc }} </p>
-      <p> Database of origin: {{ result.origin }} </p>
-      <p> Date accessed:      {{ result.date_accessed }} </p>
-      <p> Locality:           {{ result.locality }} </p>
-      <p> Grain size:         {{ result.grain_size }} </p>
-      <p> Viewing geometry:   {{ result.view_geom }} </p>
-      <p> Resolution:         {{ result.resolution }} </p>
-      <p> Reflectance range:  {{ result.refl_range }} </p>
-      <p> Composition:        {{ result.composition }} </p>
-      <p> Reflectance:        {{ result.reflectance }} </p>
-      <br>
-    {% endfor %}
+    <div id="meta">
+<!--      <div class = "form-inline"> -->
+<!--        <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button> -->
+        <br>
+        <br>
+        {% for result in metaResults %}
+            <p><b> Data ID:</b>            {{ result.data_id }} </p>
+            <p><b> Sample ID:</b>          {{ result.sample_id }} </p>
+            <p><b> Mineral name:</b>       {{ result.name }} </p>
+            <p><b> Mineral class:</b>      {{ result.sample_class }} </p>
+            <p><b> Mineral type:</b>       {{ result.sample_type }} </p>
+            <p><b>Formula:</b>            {{ result.formula }} </p>
+            <p><b> Description:</b>        {{ result.sample_desc }} </p>
+            <p><b> Database of origin:</b> {{ result.origin }} </p>
+            <p><b> Date accessed:</b>      {{ result.date_accessed }} </p>
+            <p><b> Locality:</b>           {{ result.locality }} </p>
+            <p><b> Grain size:</b>         {{ result.grain_size }} </p>
+            <p><b> Viewing geometry:</b>   {{ result.view_geom }} </p>
+            <p><b> Resolution:</b>         {{ result.resolution }} </p>
+            <p><b> Reflectance range:</b>  {{ result.refl_range }} </p>
+            <p><b> Composition: </b>        {{ result.composition }} </p>
+            <div id="scroll" style="overflow-y:scroll; height:250px; width:500px;">
+              <p><b> Reflectance: </b>       {{ result.reflectance }} </p>
+            </div>
+            <br>
+            <br>
+          {% endfor %}
+          <br>
+          <br>
+        <tbody>
+<!--      </div> -->
+    </div>
   {% endif %}
 {% endblock %}

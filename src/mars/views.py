@@ -156,6 +156,7 @@ def graph(request):
 
       return response
 
+<<<<<<< HEAD
 def upload_file(request):
   if request.method == 'POST':
     form = UploadFileForm(request.POST, request.FILES)
@@ -179,3 +180,5 @@ def process_file(filepath):
 
 
   
+=======
+>>>>>>> 593e2a282363a8bcc977decc7eab14bde279cc47

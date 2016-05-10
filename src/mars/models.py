@@ -36,4 +36,5 @@ class Sample(models.Model):
     return {
       "data_id": self.data_id, 
       "reflectance": self.reflectance, 
-    }
+    } 
+
