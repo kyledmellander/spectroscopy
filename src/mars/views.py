@@ -9,7 +9,7 @@ from .models import Sample, SignUp
 from django.utils.encoding import smart_str
 
 import csv
-import yaml
+#import yaml
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 # Create your views here.
@@ -157,3 +157,5 @@ def graph(request):
 
       return response
 
+def upload(request):
+  return render(request, 'upload.html')
