@@ -31,3 +31,4 @@ class SearchForm(forms.Form):
         widget=forms.TextInput(attrs={'placeholder': 'Mineral Class'}))
     database_of_origin = forms.CharField(
         widget=forms.TextInput(attrs={'placeholder': 'Database of origin'}))
+

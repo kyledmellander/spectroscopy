@@ -152,3 +152,4 @@ def graph(request):
           smart_str(s.reflectance),])
 
       return response
+
