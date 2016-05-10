@@ -33,21 +33,21 @@ class Sample(models.Model):
 	composition = models.CharField(max_length=1000, null=True, blank=True)
 	reflectance = JSONField()
 
-  def as_dict(self):
-    return {
-      "data_id": self.data_id,
-      "reflectance": self.reflectance,
-      "sample_id" : self.sample_id,
-      "origin" : self.origin,
-      "locality" : self.locality,
-      "name" : self.name,
-      "sample_desc" : self.sample_desc,
-      "sample_type" : self.sample_type,
-      "sample_class" : self.sample_class,
-      "grain_size" : self.grain_size,
-      "view_geom" : self.view_geom,
-      "resolution" : self.resolution,
-      "refl_range" : self.refl_range,
-      "formula" : self.formula,
-      "composition" : self.composition,
-    }
+    def as_dict(self):
+        return {
+          "data_id": self.data_id,
+          "reflectance": self.reflectance,
+          "sample_id" : self.sample_id,
+          "origin" : self.origin,
+          "locality" : self.locality,
+          "name" : self.name,
+          "sample_desc" : self.sample_desc,
+          "sample_type" : self.sample_type,
+          "sample_class" : self.sample_class,
+          "grain_size" : self.grain_size,
+          "view_geom" : self.view_geom,
+          "resolution" : self.resolution,
+          "refl_range" : self.refl_range,
+          "formula" : self.formula,
+          "composition" : self.composition,
+        }
