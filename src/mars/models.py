@@ -50,3 +50,4 @@ class Sample(models.Model):
       "formula" : self.formula, 
       "composition" : self.composition, 
     } 
+

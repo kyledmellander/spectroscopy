@@ -7,3 +7,4 @@ class SampleAdmin(admin.ModelAdmin):
 	search_fields = ('data_id', 'sample_id', 'name', 'origin', 'sample_class', 'refl_range')
 
 admin.site.register(Sample,SampleAdmin)
+#admin.site.register(DataFile)
