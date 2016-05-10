@@ -29,8 +29,8 @@
             console.log(jumboheight);
 
             var vis = d3.select("#visualisation"),
-                WIDTH = jumbowidth *.9,
-                HEIGHT = jumboheight*.9,
+                WIDTH = jumbowidth *.8,
+                HEIGHT = jumboheight*.8,
                 MARGINS = {
                     top: 50,
                     right: 20,
@@ -78,6 +78,7 @@
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
                 .call(xAxis);
+
             vis.append("svg:g")
                 .attr("class", "y axis")
                 .attr("transform", "translate(" + (MARGINS.left) + ",0)")
