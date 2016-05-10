@@ -92,8 +92,8 @@
                 var maxY = d3.max(d3.values(data2));
 
 
-                xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([minX,maxX]),
-                yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([minY,maxY]),
+                xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([2,20]),
+                yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0,1.2]),
                 xAxis = d3.svg.axis()
                 .scale(xScale),
                 yAxis = d3.svg.axis()
@@ -109,7 +109,7 @@
                 .attr("transform", "translate(" + (MARGINS.left) + ",0)")
                 .call(yAxis);
 
-            var lineGenTwo = d3.svg.line()
+            var lineGen = d3.svg.line()
                 .x(function(d) {
                     return xScale(d.key);
                 })
@@ -118,38 +118,36 @@
                 })
                 .interpolate("linear");
 
-            var lineGen = d3.svg.line()
-                .x(function(d) {
-                    return xScale(d.year);
-                })
-                .y(function(d) {
-                    return yScale(d.sale);
-                })
-                .interpolate("linear");
+            function keySort (sortfunc,field) {
+              return function (a,b) {
+                return sortfunc(a[field],b[field]);
+              }
+            }
 
             GRAPH.forEach(function(d,i) {
+                //d.reflectance.sort(function(a,b) {return d3.descending(a[1],b[2])))
                 //console.log(d.values);
                 //console.log(d3.entries(data2));
-                console.log(d3.entries(data2));
-                console.log(d.reflectance);
-                console.log(d3.entries(d.reflectance));
+                console.log(d.data_id); 
                 vis.append('svg:path')
-                .attr('d', lineGenTwo(d3.entries(data2))) //.attr('d', lineGenTwo(d3.entries(data2))) ||
+                .attr('d', lineGenTwo(d3.entries(d.reflectance).sort(keySort(d3.ascending,"key")))) //.attr('d', lineGenTwo(d3.entries(data2))) ||
                 .attr('stroke', function(d,j) {
                         return "hsl(" + Math.random() * 360 + ",50%,50%)";
                 })
                 .attr('stroke-width', 2)
-                .attr('id', 'line_'+d.key)
+                .attr('id', 'line_'+d.data_id) //Note color
                 .attr('fill', 'none');
+
+                // Line Disappearing nonsense
                 vis.append("text")
                     .attr("x", (lSpace/2)+i*lSpace)
                     .attr("y", HEIGHT)
                     .style("fill", "black")
                     .attr("class","legend")
-                    .on('click',function(){
+                    .on('click',function() {
                         var active   = d.active ? false : true;
                         var opacity = active ? 0 : 1;
-                        d3.select("#line_" + d.key).style("opacity", opacity);
+                        d3.select("#line_" + d.data_id).style("opacity", opacity);
                         d.active = active;
                     })
                     .text(d.data_id);
