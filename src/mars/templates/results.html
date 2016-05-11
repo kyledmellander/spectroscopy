@@ -32,13 +32,13 @@
                <tbody>
                <tr>
                 {% for result in results %}
-                  <td> <input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}}> </td>
-                  <td> {{ result.data_id }}</td>
-                  <td> {{ result.name }} </td>
-                  <td> {{ result.sample_class }} </td>
-                  <td> {{ result.origin }} </td>
-                  <td> {{ result.grain_size }} </td>
-                  <td> {{ result.refl_range }} </td>
+                  <td> <input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} style="height:15px; width:15px;"> </td>
+                  <td><label for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
+                  <td><label for="option{{ result.data_id }}"> {{ result.name }} </label></td>
+                  <td><label for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
+                  <td><label for="option{{ result.data_id }}"> {{ result.origin }} </label></td>
+                  <td><label for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
+                  <td><label for="option{{ result.data_id }}"> {{ result.refl_range }} </label></td>
                   <tr>
                 {% endfor %}
               </tr>
