@@ -1,8 +1,9 @@
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render, render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.mail import send_mail
 from .models import Sample
+from django.conf import settings
 
 from .forms import ContactForm, SignUpForm, SearchForm, UploadFileForm
 from .models import Sample, SignUp
@@ -10,7 +11,10 @@ from django.utils.encoding import smart_str
 
 import csv
 import json
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
 from django.core.serializers.json import DjangoJSONEncoder
+
 # Create your views here.
 
 # def home(request):
@@ -162,6 +166,21 @@ def graph(request):
 
       return response
 
+#def my_view(request):
+ # username = request.POST['username']
+  #password = request.POST['password']
+ # user = authenticate(username=username, password=password)
+ # if user is not None:
+ #   if user.is_active:
+ #     login(request, user)
+ #     return redirect('%s?next=%s') % (settings.LOGIN_URL, request.path))
+ #   else:
+ #     print("The password is valid, but the account has been disabled!")
+ # else:
+ #   print("The user and password were incorrect.")
+
+
+@login_required
 def upload_file(request):
   if request.method == 'POST':
     form = UploadFileForm(request.POST, request.FILES)
