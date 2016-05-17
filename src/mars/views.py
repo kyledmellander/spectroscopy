@@ -8,9 +8,12 @@ from django.conf import settings
 from .forms import ContactForm, SignUpForm, SearchForm, UploadFileForm
 from .models import Sample, SignUp
 from django.utils.encoding import smart_str
+from django.contrib.staticfiles import finders
 
+import os, sys
 import csv
 import json
+import subprocess
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.core.serializers.json import DjangoJSONEncoder
@@ -186,20 +189,21 @@ def upload_file(request):
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
       handle_uploaded_file(request.FILES['file'])
-      return HttpResponseRedirect('/success/url/')
+      return HttpResponseRedirect('/admin/')
   else:
     form = UploadFileForm()
   return render(request, 'upload.html', {'form': form})
 
 def handle_uploaded_file(f):
-  filepath = '/tmp/somefile.txt'
+  filepath = '/tmp/somefile.csv'
   with open(filepath, 'wb+') as dest:
     for chunk in f.chunks():
       dest.write(chunk)
     process_file(filepath)
 
 def process_file(filepath):
-  subprocess.Popen(["python","../static_in_pro/our_static/py/dataParser.py","filepath"], close_fds=True)
+  result = finders.find('py/dataParser.py')
+  subprocess.Popen(['python', str(result), filepath], shell=True, close_fds=True)
 
 
 

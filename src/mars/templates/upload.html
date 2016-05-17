@@ -2,9 +2,9 @@
 
 {% block content %}
   <div class="container" style="margin-left:10px">
-    <p><b> Please specify a CSV file </b></p>
+    <!--<p><b> Please specify a CSV file </b></p> -->
     <div class="form-inline" style="margin-left:10px">
-      <form method="POST">
+      <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <p align="left">
