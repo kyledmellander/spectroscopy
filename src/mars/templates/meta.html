@@ -6,39 +6,55 @@
   p {
     margin: 0em;
   }
+  table td {
+    border-top: none !important;
+  }
   </style>
   {% if metaResults %}
     <div id="meta">
-      <div class = "form-inline"> 
-<!--        <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button> -->
-        <br>
-        <br>
-        {% for result in metaResults %}
-            <p><b> Data ID:</b>            {{ result.data_id }} </p>
-            <p><b> Sample ID:</b>          {{ result.sample_id }} </p>
-            <p><b> Mineral name:</b>       {{ result.name }} </p>
-            <p><b> Mineral class:</b>      {{ result.sample_class }} </p>
-            <p><b> Mineral type:</b>       {{ result.sample_type }} </p>
-            <p><b>Formula:</b>            {{ result.formula }} </p>
-            <p><b> Description:</b>        {{ result.sample_desc }} </p>
-            <p><b> Database of origin:</b> {{ result.origin }} </p>
-            <p><b> Date accessed:</b>      {{ result.date_accessed }} </p>
-            <p><b> Locality:</b>           {{ result.locality }} </p>
-            <p><b> Grain size:</b>         {{ result.grain_size }} </p>
-            <p><b> Viewing geometry:</b>   {{ result.view_geom }} </p>
-            <p><b> Resolution:</b>         {{ result.resolution }} </p>
-            <p><b> Reflectance range:</b>  {{ result.refl_range }} </p>
-            <p><b> Composition: </b>        {{ result.composition }} </p>
-            <div id="scroll" style="overflow-y:scroll; height:250px; width:500px;">
-              <p><b> Reflectance: </b>      {{reflectancedict|get_reflectance:result.data_id}} </p>
-            </div>
-            <br>
-            <br>
-          {% endfor %}
+      <div class = "form-inline">
+        <form method="POST" name="resultsform">
+          {% csrf_token %}
+          <button type="submit" name="graphForm" formaction="/graph/" class="btn btn-success">Graph</button>
+          <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button>
+          <table class="table">
+              {% for result in metaResults %}
+                <tr>
+                <td><input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} style="he    ight:15px; width:15px;"></td>
+               <td> <p><b> Data ID:</b>            {{ result.data_id }} </p>
+                <p><b> Sample ID:</b>          {{ result.sample_id }} </p>
+                <p><b> Mineral name:</b>       {{ result.name }} </p>
+                <p><b> Mineral class:</b>      {{ result.sample_class }} </p>
+                <p><b> Mineral type:</b>       {{ result.sample_type }} </p>
+                <p><b>Formula:</b>            {{ result.formula }} </p>
+                <p><b> Description:</b>        {{ result.sample_desc }} </p>
+                <p><b> Database of origin:</b> {{ result.origin }} </p>
+                <p><b> Date accessed:</b>      {{ result.date_accessed }} </p>
+                <p><b> Locality:</b>           {{ result.locality }} </p>
+                <p><b> Grain size:</b>         {{ result.grain_size }} </p>
+                <p><b> Viewing geometry:</b>   {{ result.view_geom }} </p>
+                <p><b> Resolution:</b>         {{ result.resolution }} </p>
+                <p><b> Reflectance range:</b>  {{ result.refl_range }} </p>
+                <p><b> Composition: </b>        {{ result.composition }} </p>
+                <p><b> Reflectance: </b></p>
+                <div id="scroll" style="overflow-y:scroll; height:250px; width:500px;">
+                  <p>     {{ result.reflectance }} </p>
+                </div>
+                <br>
+                </td>
+                <br>
+                <br>
+                </tr>
+              {% endfor %}
+          </table> 
           <br>
           <br>
-        <tbody>
+        </form>
       </div>
+    </div>
+  {% else %}
+    <div id="meta">
+      <h4><b> Please select a sample to view the meta data.</b></h4>
     </div>
   {% endif %}
 {% endblock %}

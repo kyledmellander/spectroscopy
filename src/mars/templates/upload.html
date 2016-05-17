@@ -1,9 +1,9 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-  <div class="container" style="margin-left:10px">
+  <div id="upload" class="container" style="margin-left:10px">
     <p><b> Please specify a CSV file </b></p>
-    <div class="form-inline" style="margin-left:10px">
+    <div class="form-inline"> <!-- style="margin-left:10px">-->
       <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
