@@ -280,11 +280,11 @@ with open(csvFile, 'rU') as cf:
                 temp = rang[i].split('-')
                 if temp[1].find("um") != -1:
                     ty = temp[1].split("u")
-                    temp1.append(float(temp[0]))
-                    temp1.append(float(ty[0]))
+                    temp1.append(float(temp[0]) * 1000)
+                    temp1.append(float(ty[0]) * 1000)
                 else:
-                    temp1.append(float(temp[0]))
-                    temp1.append(float(temp[1]))
+                    temp1.append(float(temp[0]) * 1000)
+                    temp1.append(float(temp[1]) * 1000)
             else:
                 temp = rang[i].split('-')
                 if temp[1].find("nm") != -1:
@@ -350,6 +350,7 @@ conn = None
 
 #Need to fill in with correct information
 conn = psycopg2.connect("dbname = 'spectrodb' user = 'myprojectuser' host = localhost password = 'password'")
+
 cur = conn.cursor()
 
 size = len(dataArray)
@@ -399,11 +400,16 @@ for i in range(size):
     reflect = json.dumps(finalDataPts[i])
     query = "INSERT INTO mars_sample (DATA_ID, SAMPLE_ID, DATE_ACCESSED, ORIGIN, LOCALITY, NAME, SAMPLE_CLASS, SAMPLE_DESC, GRAIN_SIZE, VIEW_GEOM, RESOLUTION, REFL_RANGE, FORMULA, COMPOSITION, REFLECTANCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
     data = (dataId, sampId, access, origin, collection, name, sample_cl, desc, gr, vGeo, res, ran, form, comp, reflect)
-    # query = "UPDATE mars_sample SET SAMPLE_CLASS = %s WHERE DATA_ID = %s"
-    # data = (sample_cl, dataId)
-    cur.execute(query, data)
+    try:
+        cur.execute(query, data)
+        conn.commit()
+    except psycopg2.IntegrityError:
+        print dataId + " already in database. Commit of sample aborted."
+        conn.rollback()
+        # query = "UPDATE mars_sample SET SAMPLE_ID = %s, SAMPLE_CLASS = %s WHERE DATA_ID = %s"
+        # data = (sample_cl, dataId)
+        # cur.execute(query, data)
 
-conn.commit()
 conn.close()
 
 # f = open('marsdb.sql', 'w')
