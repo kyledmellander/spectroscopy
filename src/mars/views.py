@@ -4,7 +4,7 @@ from django.template import RequestContext
 from django.core.mail import send_mail
 from .models import Sample
 from django.conf import settings
-
+from django.template.defaulttags import register
 from .forms import ContactForm, SignUpForm, SearchForm, UploadFileForm
 from .models import Sample, SignUp
 from django.utils.encoding import smart_str
@@ -68,13 +68,27 @@ from django.core.serializers.json import DjangoJSONEncoder
 # 	context = RequestContext(request)
 # 	return render(request, 'about.html', context_instance=context)
 
-def meta(request):
-	if request.method == 'POST':
-		if 'meta' in request.POST:
-			selections = request.POST.getlist('selection')
-	        samples = Sample.objects.filter(data_id__in=selections)
+@register.filter
+def get_reflectance(dictionary, key):
+  for item in dictionary:
+    if item.get("data_id") == key:
+      reflectancedict = sorted(item.get("reflectance").iteritems())
+      stringlist = [] 
+      for key,value in reflectancedict:
+        stringlist.append(str(key) + ":" +  str(value) + ",\n")
+      return ''.join(stringlist)
+  return None 
 
-		return render_to_response('meta.html', {"metaResults": samples,}, context_instance=RequestContext(request))
+def meta(request):
+  if request.method == 'POST':
+    if 'meta' in request.POST:
+      selections = request.POST.getlist('selection')
+      samples = Sample.objects.filter(data_id__in=selections)
+    samples 
+    dictionaries = [ obj.as_dict() for obj in samples]
+    
+    json_string = json.dumps(dictionaries)
+    return render_to_response('meta.html', {"metaResults": samples,"reflectancedict":dictionaries,}, context_instance=RequestContext(request))
 
 def search(request):
 	form_class = SearchForm
