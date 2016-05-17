@@ -1,16 +1,20 @@
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render, render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.mail import send_mail
 from .models import Sample
-
+from django.conf import settings
+from django.template.defaulttags import register
 from .forms import ContactForm, SignUpForm, SearchForm, UploadFileForm
 from .models import Sample, SignUp
 from django.utils.encoding import smart_str
 
 import csv
 import json
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
 from django.core.serializers.json import DjangoJSONEncoder
+
 # Create your views here.
 
 # def home(request):
@@ -64,13 +68,25 @@ from django.core.serializers.json import DjangoJSONEncoder
 # 	context = RequestContext(request)
 # 	return render(request, 'about.html', context_instance=context)
 
-def meta(request):
-	if request.method == 'POST':
-		if 'meta' in request.POST:
-			selections = request.POST.getlist('selection')
-	        samples = Sample.objects.filter(data_id__in=selections)
+@register.filter
+def get_reflectance(dictionary, key):
+  for item in dictionary:
+    if item.get("data_id") == key:
+      reflectancedict = sorted(item.get("reflectance").iteritems())
+      stringlist = [] 
+      for key,value in reflectancedict:
+        stringlist.append(str(key) + ":" +  str(value) + ",\n")
+      return ''.join(stringlist)
+  return None 
 
-		return render_to_response('meta.html', {"metaResults": samples,}, context_instance=RequestContext(request))
+def meta(request):
+  if request.method == 'POST':
+    if 'meta' in request.POST:
+      selections = request.POST.getlist('selection')
+      samples = Sample.objects.filter(data_id__in=selections)
+    samples 
+    dictionaries = [ obj.as_dict() for obj in samples]
+    return render_to_response('meta.html', {"metaResults": samples,"reflectancedict":dictionaries,}, context_instance=RequestContext(request))
 
 def search(request):
 	form_class = SearchForm
@@ -108,16 +124,23 @@ def graph(request):
         for key in obj["reflectance"].keys():
           if (obj["reflectance"][key] == "NULL"):
             del obj["reflectance"][key]
+      json_string = json.dumps(dictionaries)
          
-      
-      json_string = json.dumps(dictionaries);
-      
       return render_to_response('graph.html', {"graphResults": samples,"graphJSON":json_string,}, context_instance=RequestContext(request))
 
     elif 'export' in request.POST:
       selections = request.POST.getlist('selection')
       samples = Sample.objects.filter(data_id__in=selections)
+      dictionaries = [obj.as_dict() for obj in samples]
+      reflectanceDict = {} 
+      for item in dictionaries:
+        sortedList = sorted(item["reflectance"].iteritems())
+        stringlist = [] 
+        for key,value in sortedList:
+          stringlist.append(str(key) + ":" +  str(value) + ",")
 
+        reflectanceDict[item["data_id"]] =  ''.join(stringlist)
+        
       # Create the HttpResponse object with the appropriate CSV header
       response = HttpResponse(content_type='text/csv')
       response['Content-Disposition'] = 'attachment; filename="metadatafile.csv"'
@@ -158,10 +181,25 @@ def graph(request):
           smart_str(s.refl_range),
           smart_str(s.formula),
           smart_str(s.composition),
-          smart_str(s.reflectance),])
+          smart_str(reflectanceDict[s.data_id]),])
 
       return response
 
+#def my_view(request):
+ # username = request.POST['username']
+  #password = request.POST['password']
+ # user = authenticate(username=username, password=password)
+ # if user is not None:
+ #   if user.is_active:
+ #     login(request, user)
+ #     return redirect('%s?next=%s') % (settings.LOGIN_URL, request.path))
+ #   else:
+ #     print("The password is valid, but the account has been disabled!")
+ # else:
+ #   print("The user and password were incorrect.")
+
+
+@login_required(login_url='/admin/login/')
 def upload_file(request):
   if request.method == 'POST':
     form = UploadFileForm(request.POST, request.FILES)

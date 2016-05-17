@@ -7,7 +7,6 @@
     margin: 0em;
   }
   </style>
-
   {% if metaResults %}
     <div id="meta">
       <div class = "form-inline"> 
@@ -31,7 +30,7 @@
             <p><b> Reflectance range:</b>  {{ result.refl_range }} </p>
             <p><b> Composition: </b>        {{ result.composition }} </p>
             <div id="scroll" style="overflow-y:scroll; height:250px; width:500px;">
-              <p><b> Reflectance: </b>       {{ result.reflectance }} </p>
+              <p><b> Reflectance: </b>      {{reflectancedict|get_reflectance:result.data_id}} </p>
             </div>
             <br>
             <br>

@@ -78,7 +78,23 @@
                 .attr("transform", "translate(" + (MARGINS.left) + ",0)")
                 .call(yAxis);
 
+          	vis.append("text")
+          	   .attr("class", "x label")
+          	   .attr("text-anchor", "end")
+          	   .attr("x", WIDTH)
+          	   .attr("y", HEIGHT)
+          	   .text("Wavelength");
+
+          	vis.append("text")
+          	   .attr("class", "y label")
+          	   .attr("text-anchor", "end")
+          	   .attr("y", HEIGHT)
+          	   .attr("dy", "-45em")
+          	   .attr("transform", "rotate(-90)")
+          	   .text("Reflectance");
+
             var lineGen = d3.svg.line()
+
                 .x(function(d) {
                     return xScale(d.key);
                 })
