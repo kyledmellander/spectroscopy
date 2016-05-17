@@ -38,7 +38,7 @@
                 <p><b> Composition: </b>        {{ result.composition }} </p>
                 <p><b> Reflectance: </b></p>
                 <div id="scroll" style="overflow-y:scroll; height:250px; width:500px;">
-                  <p>     {{ result.reflectance }} </p>
+                  <p>     {{ reflectancedict|get_reflectance:result.data_id }} </p>
                 </div>
                 <br>
                 </td>
