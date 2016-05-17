@@ -180,7 +180,7 @@ def graph(request):
  #   print("The user and password were incorrect.")
 
 
-@login_required
+@login_required(login_url='/admin/login/')
 def upload_file(request):
   if request.method == 'POST':
     form = UploadFileForm(request.POST, request.FILES)
