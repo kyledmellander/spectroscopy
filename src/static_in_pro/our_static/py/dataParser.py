@@ -21,8 +21,7 @@ elif "Sulfates" in path:
 else: sample_cl = 'NULL'
 
 def hasNumbers(inputString):
-    return bool(re.search(r'\d', i
-    utString))
+    return bool(re.search(r'\d', inputString))
 
 dataArray = [] #Array of IDs
 sampArray = [] #Sample IDs
