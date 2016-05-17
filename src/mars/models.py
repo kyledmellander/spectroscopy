@@ -15,7 +15,7 @@ class SignUp(models.Model):
     return self.emaills
 
 class Sample(models.Model):
-    data_id = models.CharField(max_length=15)
+    data_id = models.CharField(max_length=15, unique=True)
     sample_id = models.CharField(max_length=20)
     date_accessed = models.DateTimeField(auto_now_add = False, auto_now = False)
     origin = models.CharField(max_length=50)

@@ -2,24 +2,18 @@
 {% extends "layouts/base.html" %}
 {% block content %}
 <body>
-<p> The graph should be here </p>
 {% if graphResults %}
-  {% for gr in graphResults %}
-    <td> {{gr.data_id}} </td> <br>
-    <!-- Data right here! -->
-    <!-- <td> {{gr.reflectance}}</td> -->
-  {% endfor %}
 <!-- load the d3.js library -->
 	<div class="container">
   	<div class="jumbotron" id="graphJtron">
     	<svg id="visualisation" width="1000" height="500"></svg>
-                
-      	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> 
+
+      	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
         <script>
         	function InitChart() {
             //Change JSON string to object
-            var GRAPH = JSON.parse('{{graphJSON|safe}}'); 
-           
+            var GRAPH = JSON.parse('{{graphJSON|safe}}');
+
             var color = d3.scale.category10();
 
 
@@ -38,13 +32,13 @@
                     left: 50
                 },
 								lSpace = WIDTH/GRAPH.length;
-            
+
             var minX = Number.MAX_VALUE;
             var minY = Number.MAX_VALUE;
             var maxX = Number.MIN_VALUE;
             var maxY = Number.MIN_VALUE;
 
-            //Update the min and maxX 
+            //Update the min and maxX
             GRAPH.forEach(function (d,i) {
               //Creates an array of objects with key-value pairs, sorted by keys
               var reflectance = d3.entries(d.reflectance);
@@ -84,22 +78,23 @@
                 .attr("transform", "translate(" + (MARGINS.left) + ",0)")
                 .call(yAxis);
 
-		vis.append("text")
-		   .attr("class", "x label")
-		   .attr("text-anchor", "end")
-		   .attr("x", WIDTH)
-		   .attr("y", HEIGHT)
-		   .text("Wavelength");
+          	vis.append("text")
+          	   .attr("class", "x label")
+          	   .attr("text-anchor", "end")
+          	   .attr("x", WIDTH)
+          	   .attr("y", HEIGHT)
+          	   .text("Wavelength");
 
-		vis.append("text")
-		   .attr("class", "y label")
-		   .attr("text-anchor", "end")
-		   .attr("y", HEIGHT)
-		   .attr("dy", "-45em")
-		   .attr("transform", "rotate(-90)")
-		   .text("Reflectance");
+          	vis.append("text")
+          	   .attr("class", "y label")
+          	   .attr("text-anchor", "end")
+          	   .attr("y", HEIGHT)
+          	   .attr("dy", "-45em")
+          	   .attr("transform", "rotate(-90)")
+          	   .text("Reflectance");
 
-	var lineGen = d3.svg.line()
+            var lineGen = d3.svg.line()
+
                 .x(function(d) {
                     return xScale(d.key);
                 })
@@ -108,7 +103,7 @@
                 })
                 .interpolate("linear");
 
-            //Define the function that sorts the data 
+            //Define the function that sorts the data
             function keySort (sortfunc,field) {
               return function (a,b) {
                 return sortfunc(parseFloat(a[field]),parseFloat(b[field]));
@@ -126,7 +121,7 @@
                         return "hsl(" + Math.random() * 360 + ",50%,50%)";
                 })
                 .attr('stroke-width', 2)
-                .attr('id', 'line_'+d.data_id) 
+                .attr('id', 'line_'+d.data_id)
                 .attr('fill','none');
 
                 // Line Disappearing nonsense
