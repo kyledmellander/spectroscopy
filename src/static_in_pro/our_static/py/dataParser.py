@@ -410,6 +410,7 @@ for i in range(size):
         # data = (sample_cl, dataId)
         # cur.execute(query, data)
 
+conn.commit()
 conn.close()
 
 # f = open('marsdb.sql', 'w')
