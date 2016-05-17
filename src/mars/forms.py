@@ -29,8 +29,11 @@ class SearchForm(forms.Form):
         widget=forms.TextInput(attrs={'placeholder': 'Mineral Name'}))
     mineral_class = forms.CharField(
         widget=forms.TextInput(attrs={'placeholder': 'Mineral Class'}))
-    database_of_origin = forms.CharField(
-        widget=forms.TextInput(attrs={'placeholder': 'Database of origin'}))
+    querylist=list(Sample.objects.all().values_list('origin', flat=True).distinct())
+    querylist=list(map(str, querylist))
+    for i in range(len(querylist)):
+        querylist[i] = (querylist[i], querylist[i])
+    database_of_origin = forms.ChoiceField(choices=querylist)
 
 class UploadFileForm(forms.Form):
   file = forms.FileField()
