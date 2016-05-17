@@ -86,8 +86,6 @@ def meta(request):
       samples = Sample.objects.filter(data_id__in=selections)
     samples 
     dictionaries = [ obj.as_dict() for obj in samples]
-    
-    json_string = json.dumps(dictionaries)
     return render_to_response('meta.html', {"metaResults": samples,"reflectancedict":dictionaries,}, context_instance=RequestContext(request))
 
 def search(request):
@@ -126,16 +124,23 @@ def graph(request):
         for key in obj["reflectance"].keys():
           if (obj["reflectance"][key] == "NULL"):
             del obj["reflectance"][key]
+      json_string = json.dumps(dictionaries)
          
-      
-      json_string = json.dumps(dictionaries);
-      
       return render_to_response('graph.html', {"graphResults": samples,"graphJSON":json_string,}, context_instance=RequestContext(request))
 
     elif 'export' in request.POST:
       selections = request.POST.getlist('selection')
       samples = Sample.objects.filter(data_id__in=selections)
+      dictionaries = [obj.as_dict() for obj in samples]
+      reflectanceDict = {} 
+      for item in dictionaries:
+        sortedList = sorted(item["reflectance"].iteritems())
+        stringlist = [] 
+        for key,value in sortedList:
+          stringlist.append(str(key) + ":" +  str(value) + ",")
 
+        reflectanceDict[item["data_id"]] =  ''.join(stringlist)
+        
       # Create the HttpResponse object with the appropriate CSV header
       response = HttpResponse(content_type='text/csv')
       response['Content-Disposition'] = 'attachment; filename="metadatafile.csv"'
@@ -176,7 +181,7 @@ def graph(request):
           smart_str(s.refl_range),
           smart_str(s.formula),
           smart_str(s.composition),
-          smart_str(s.reflectance),])
+          smart_str(reflectanceDict[s.data_id]),])
 
       return response
 
