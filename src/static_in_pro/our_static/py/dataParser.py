@@ -4,7 +4,7 @@ import json
 import re
 import copy
 import itertools
-import numpy as np
+#import numpy as np
 import psycopg2
 
 #Takes in the csv file
@@ -21,7 +21,8 @@ elif "Sulfates" in path:
 else: sample_cl = 'NULL'
 
 def hasNumbers(inputString):
-    return bool(re.search(r'\d', inputString))
+    return bool(re.search(r'\d', i
+    utString))
 
 dataArray = [] #Array of IDs
 sampArray = [] #Sample IDs
@@ -34,7 +35,7 @@ formArray = []
 compArray = []
 dataPts = []  #matrix of num_data_point rows by 1+num_samples columns
 #reflectance = []
-A = np.array([])
+#A = np.array([])
 
 
 with open(csvFile, 'rU') as cf:
