@@ -24,6 +24,14 @@
     <link href="{% static 'dropdown.css' %}" rel="stylesheet">
     <link href="{% static 'footer.css' %}" rel="stylesheet">
     <script src="/usr/home/aytone/marsproject/src/static_in_pro/our_static/js/staticsorttable.js" type="text/javascript"></script>
+    <script language="JavaScript">
+      function toggle(source){
+        checkboxes = document.getElementsByName("selection");
+        for(var i=0, n=checkboxes.length; i<n; i++){
+          checkboxes[i].checked = source.checked;
+          }
+      }
+      </script>
     <style>
       #footer {
       position: fixed;
@@ -58,7 +66,7 @@
 
     <!-- Static navbar -->
     <nav class="navbar navbar-inverse navbar-static-top">
-      <img style="height:45px;width:100px;" src="{%static 'img/western.png'%}">
+     <!-- <img style="height:45px;width:100px;" src="{%static 'img/western.png'%}">-->
       <div class="container">
 <!---        <img src="marsproject/src/static_in_pro/our_static/img/western.png"> -->
         <div class="navbar-header">

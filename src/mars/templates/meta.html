@@ -18,6 +18,9 @@
           <div id="meta">
             <button type="submit" name="graphForm" formaction="/graph/" class="btn btn-success">Graph</button>
             <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button>
+            <br>
+            <br>
+            <input type="checkbox" name="selection" onClick="toggle(this)" style="height:15px; width:15px;"><b> Select All</b>
           </div> 
           <!---<table class="table table-hover"> -->
               {% for result in metaResults %}
