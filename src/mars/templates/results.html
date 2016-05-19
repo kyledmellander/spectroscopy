@@ -15,7 +15,7 @@
              {% csrf_token %}
              <button type="submit" name="graphForm" formaction="/graph/" class="btn btn-success">Graph</button>
              <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button>
-             <button type="submit" name="meta" formaction="/meta/" class="btn btn-success">View metadata</button><br>
+             <button type="submit" name="meta" formaction="/meta/" class="btn btn-success">View Metadata</button><br>
              <br>
              <input type="checkbox" name="selection" onClick="toggle(this)" style="height:15px; width:15px;"><b> Select All</b>
               <table class="table table-hover">
@@ -58,7 +58,9 @@
        </div>
       </div>
     {% else %}
-      <h3 class='error'>Your search yielded no results. Please try again.</h3>
+      <div id="meta">
+        <h3><b>Your search yielded no results. Please try again.</b></h3>
+      </div>
       <!-- <form action="/search/" method="get">
         <input type="text" id="searchBox" placeholder="Enter Mineral Name..." name="mineral", value="{{ query }}"/>
         <input type="button" value="Search"/><br>
