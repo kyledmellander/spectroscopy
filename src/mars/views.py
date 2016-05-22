@@ -225,46 +225,49 @@ def handle_uploaded_file(f):
     process_file(filepath)
 
 def process_file(filepath):
-  #result = finders.find('py/dataParser.py')
-  #subprocess.Popen(['python', str(result), filepath], shell=True, close_fds=True)
-  def hasNumbers(inputString):
-    return bool(re.search(r'\d', inputString))
+    #result = finders.find('py/dataParser.py')
+    #subprocess.Popen(['python', str(result), filepath], shell=True, close_fds=True)
+    def hasNumbers(inputString):
+        return bool(re.search(r'\d', inputString))
 
-  dataArray = [] #Array of IDs
-  sampArray = [] #Sample IDs
-  nameArray = [] #names
-  grainArray = []
-  vGeoArray = []
-  resArray = []
-  rangArray = []
-  formArray = []
-  compArray = []
-  dataPts = []  #matrix of num_data_point rows by 1+num_samples columns
+    dataArray = [] #Array of IDs
+    sampArray = [] #Sample IDs
+    nameArray = [] #names
+    grainArray = []
+    vGeoArray = []
+    resArray = []
+    rangArray = []
+    formArray = []
+    compArray = []
+    dataPts = []  #matrix of num_data_point rows by 1+num_samples columns
+    #reflectance = []
+    #A = np.array([])
 
-  with open(filepath, 'rU') as cf:
-      reader = csv.reader(cf)
-      origin = reader.next()[1]
-      collection = reader.next()[1]
-      desc = reader.next()[1]
-      access = reader.next()[1]
-      reader.next()
 
-      # Data ID
-      data = reader.next()
-      if data[1] != None:
-          i =1
-      else:
-          i = 2
+    with open(filepath, 'rU') as cf:
+        reader = csv.reader(cf)
+        origin = reader.next()[1]
+        collection = reader.next()[1]
+        desc = reader.next()[1]
+        access = reader.next()[1]
+        reader.next()
 
-      idArray = []
-      idStringArray = []
-      while i < len(data):
-          id_num = data[i].rsplit("_", 1)
-          if len(id_num) > 1:
-              idStringArray.append(id_num[0])
-              num = int(id_num[1])
-              idArray.append(num)
-          i+=1
+        # Data ID
+        data = reader.next()
+        if data[1] != None:
+            i =1
+        else:
+            i = 2
+        #i = 2
+        idArray = []
+        idStringArray = []
+        while i < len(data):
+            id_num = data[i].rsplit("_", 1)
+            if len(id_num) > 1:
+                idStringArray.append(id_num[0])
+                num = int(id_num[1])
+                idArray.append(num)
+            i+=1
 
         j = 1
         sizeIdArray = len(idArray)
@@ -344,7 +347,6 @@ def process_file(filepath):
                             arr.append(temp2[0])
                         else:
                             arr.append(temp1)
-                        #temp1 = "<" + str(temp1)
                     elif "-" in temp1:
                         temp2 = temp1.split("-")
                         arr.append(temp2[0])
@@ -366,17 +368,9 @@ def process_file(filepath):
             vGeoArray.append(vg[i])
             i+=1
 
-        # Resolution
-        res = reader.next()
-        i = 2
-        while i < len(res):
-            resArray.append(res[i])
-            i+=1
-
         # Range
         rang = reader.next()
         i = 2
-        #print rang[0]
         if ("um" or "micron") in rang[0]:
             scale = "microns"
         else:
@@ -453,32 +447,38 @@ def process_file(filepath):
             dataPts.append(currDict)
             i += 1
 
-        size = len(dataArray)
-        for i in range(size):
-            dataId = dataArray[i]
-            sampId = sampArray[i]
-            name = nameArray[i]
-            gr = grainArray[i]
-            vGeo= vGeoArray[i]
-            res = resArray[i]
+    size = len(dataArray)
+    for i in range(size):
+        dataId = dataArray[i]
+        sampId = sampArray[i]
+        name = nameArray[i]
+        gr = grainArray[i]
+        vGeo= vGeoArray[i]
+        res = resArray[i]
 
-            if vGeo == '':
-                vGeo = 'NULL'
+        if vGeo == '':
+            vGeo = 'NULL'
 
-            if res == '':
-                res = 'NULL'
+        if res == '':
+            res = 'NULL'
 
-            tempRan = rangArray[i]
-            if len(tempRan) == 0:
-                tempRan = ['NULL', 'NULL']
-            for j in range(len(tempRan)):
-                if tempRan[j] == None:
-                    tempRan[j] = 'NULL'
+        tempRan = rangArray[i]
+        if len(tempRan) == 0:
+            tempRan = ['NULL', 'NULL']
+        for j in range(len(tempRan)):
+            if tempRan[j] == None:
+                tempRan[j] = 'NULL'
 
-            form = formArray[i]
-            comp = compArray[i]
+        #finalDataPts = copy.deepcopy(dataPts)
 
-            reflect = json.dumps(dataPts[i])
+        # for j in range(len(dataPts)):
+        #     for key in dataPts[j]:
+        #         if dataPts[j][key] == "NULL":
+        #             del finalDataPts[j][key]
 
-            sample = Sample.create(dataId, sampleId, access, origin, 'NULL', name, desc, 'NULL', 'NULL', gr, vGeo, res, tempRan, form, comp, reflect)
-            sample.save()
+        form = formArray[i]
+        comp = compArray[i]
+        reflect = json.dumps(dataPts[i])
+
+        sample = Sample.create(dataId, sampleId, access, origin, 'NULL', name, desc, 'NULL', 'NULL', gr, vGeo, res, tempRan, form, comp, reflect)
+        sample.save()
