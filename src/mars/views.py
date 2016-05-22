@@ -243,209 +243,211 @@ def process_file(filepath):
     #reflectance = []
     #A = np.array([])
 
+    try:
+        with open(filepath, 'rU') as cf:
+            reader = csv.reader(cf)
+            origin = reader.next()[1]
+            collection = reader.next()[1]
+            desc = reader.next()[1]
+            access = reader.next()[1]
+            reader.next()
 
-    with open(filepath, 'rU') as cf:
-        reader = csv.reader(cf)
-        origin = reader.next()[1]
-        collection = reader.next()[1]
-        desc = reader.next()[1]
-        access = reader.next()[1]
-        reader.next()
-
-        # Data ID
-        data = reader.next()
-        if data[1] != None:
-            i =1
-        else:
-            i = 2
-        #i = 2
-        idArray = []
-        idStringArray = []
-        while i < len(data):
-            id_num = data[i].rsplit("_", 1)
-            if len(id_num) > 1:
-                idStringArray.append(id_num[0])
-                num = int(id_num[1])
-                idArray.append(num)
-            i+=1
-
-        j = 1
-        sizeIdArray = len(idArray)
-        finalIdArray = []
-        finalIdArray.append(idArray[0])
-        while j < sizeIdArray:
-            if idArray[j] == idArray[j-1]:
-                newNum = idArray[j] + 1
-                idArray[j] = newNum
-                finalIdArray.append(newNum)
+            # Data ID
+            data = reader.next()
+            if data[1] != None:
+                i =1
             else:
-                finalIdArray.append(idArray[j])
-            j += 1
+                i = 2
+            #i = 2
+            idArray = []
+            idStringArray = []
+            while i < len(data):
+                id_num = data[i].rsplit("_", 1)
+                if len(id_num) > 1:
+                    idStringArray.append(id_num[0])
+                    num = int(id_num[1])
+                    idArray.append(num)
+                i+=1
 
-        k = 0
-        while k < sizeIdArray:
-            newId = str(idStringArray[k]) + "_" + str(finalIdArray[k]).zfill(2)
-            dataArray.append(newId)
-            k += 1
-
-        # Sample ID
-        samp = reader.next()
-        i = 2
-        while i < len(samp):
-            sampArray.append(samp[i])
-            i+=1
-
-        # Mineral name
-        name = reader.next()
-        i = 2
-        while i < len(name):
-            nameArray.append(name[i])
-            i+=1
-
-        scale = "nanometers"
-        size = reader.next()
-        if ("um" or "micron") in size[0]:
-            scale = "microns"
-        i = 2
-
-        while i < len(size):
-            arr = []
-            if hasNumbers(size[i]) == False:
-                grainArray.append(size[i])
-            else:
-                if ("um" or "micron") in size[i]:
-                    temp = size[i].split()
-                    temp1 = temp[0]
-                    if "<" in temp1:
-                        temp2 = temp1.replace("<", "")
-                        if temp2.find("um") != -1:
-                            temp3 = temp2.split("u")
-                            arr.append(str(float(temp3[0])*1000))
-                        else:
-                            temp3 = float(temp2)*1000
-                            arr.append(temp3)
-                    elif "-" in temp1:
-                        temp2 = temp1.split("-")
-                        temp3 = str(float(temp2[0])*1000)
-                        arr.append(temp3)
-
-                        if temp2[1].find("um") != -1:
-                            temp5 = temp2[1].split("u")
-                            temp4 = str(float(temp5[0])*1000)
-                        else:
-                            temp4 = str(float(temp2[1])*1000)
-                        arr.append(temp4)
-                    else:
-                        arr.append(temp1)
+            j = 1
+            sizeIdArray = len(idArray)
+            finalIdArray = []
+            finalIdArray.append(idArray[0])
+            while j < sizeIdArray:
+                if idArray[j] == idArray[j-1]:
+                    newNum = idArray[j] + 1
+                    idArray[j] = newNum
+                    finalIdArray.append(newNum)
                 else:
-                    temp = size[i].split()
-                    temp1 = temp[0]
-                    if "<" in temp1:
-                        temp1 = temp1.replace("<", "")
-                        if temp1.find("nm") != -1:
-                            temp2 = temp1.split("n")
-                            arr.append(temp2[0])
+                    finalIdArray.append(idArray[j])
+                j += 1
+
+            k = 0
+            while k < sizeIdArray:
+                newId = str(idStringArray[k]) + "_" + str(finalIdArray[k]).zfill(2)
+                dataArray.append(newId)
+                k += 1
+
+            # Sample ID
+            samp = reader.next()
+            i = 2
+            while i < len(samp):
+                sampArray.append(samp[i])
+                i+=1
+
+            # Mineral name
+            name = reader.next()
+            i = 2
+            while i < len(name):
+                nameArray.append(name[i])
+                i+=1
+
+            scale = "nanometers"
+            size = reader.next()
+            if ("um" or "micron") in size[0]:
+                scale = "microns"
+            i = 2
+
+            while i < len(size):
+                arr = []
+                if hasNumbers(size[i]) == False:
+                    grainArray.append(size[i])
+                else:
+                    if ("um" or "micron") in size[i]:
+                        temp = size[i].split()
+                        temp1 = temp[0]
+                        if "<" in temp1:
+                            temp2 = temp1.replace("<", "")
+                            if temp2.find("um") != -1:
+                                temp3 = temp2.split("u")
+                                arr.append(str(float(temp3[0])*1000))
+                            else:
+                                temp3 = float(temp2)*1000
+                                arr.append(temp3)
+                        elif "-" in temp1:
+                            temp2 = temp1.split("-")
+                            temp3 = str(float(temp2[0])*1000)
+                            arr.append(temp3)
+
+                            if temp2[1].find("um") != -1:
+                                temp5 = temp2[1].split("u")
+                                temp4 = str(float(temp5[0])*1000)
+                            else:
+                                temp4 = str(float(temp2[1])*1000)
+                            arr.append(temp4)
                         else:
                             arr.append(temp1)
-                    elif "-" in temp1:
-                        temp2 = temp1.split("-")
-                        arr.append(temp2[0])
-                        if temp2[1].find("nm") != -1:
-                            temp3 = temp2[1].split("n")
-                            arr.append(temp3[0])
+                    else:
+                        temp = size[i].split()
+                        temp1 = temp[0]
+                        if "<" in temp1:
+                            temp1 = temp1.replace("<", "")
+                            if temp1.find("nm") != -1:
+                                temp2 = temp1.split("n")
+                                arr.append(temp2[0])
+                            else:
+                                arr.append(temp1)
+                        elif "-" in temp1:
+                            temp2 = temp1.split("-")
+                            arr.append(temp2[0])
+                            if temp2[1].find("nm") != -1:
+                                temp3 = temp2[1].split("n")
+                                arr.append(temp3[0])
+                            else:
+                                arr.append(temp2[1])
                         else:
-                            arr.append(temp2[1])
-                    else:
-                        arr.append(temp1)
-                grainArray.append(arr)
-            i+=1
-        scale = "nanometers"
-
-        # Viewing Geometry
-        vg = reader.next()
-        i = 2
-        while i < len(vg):
-            vGeoArray.append(vg[i])
-            i+=1
-
-        # Range
-        rang = reader.next()
-        i = 2
-        if ("um" or "micron") in rang[0]:
-            scale = "microns"
-        else:
+                            arr.append(temp1)
+                    grainArray.append(arr)
+                i+=1
             scale = "nanometers"
-        while i < len(rang):
-            if rang[i] != "":
-                temp1 = []
-                if scale == "microns":
-                    temp = rang[i].split('-')
-                    if temp[1].find("um") != -1:
-                        ty = temp[1].split("u")
-                        temp1.append(float(temp[0]) * 1000)
-                        temp1.append(float(ty[0]) * 1000)
-                    else:
-                        temp1.append(float(temp[0]) * 1000)
-                        temp1.append(float(temp[1]) * 1000)
-                else:
-                    temp = rang[i].split('-')
-                    if temp[1].find("nm") != -1:
-                        ty = temp[1].split("n")
-                        temp1.append(float(temp[0]))
-                        temp1.append(float(ty[0]))
-                    else:
-                        temp1.append(float(temp[0]))
-                        temp1.append(float(temp[1]))
-                rangArray.append(temp1)
+
+            # Viewing Geometry
+            vg = reader.next()
+            i = 2
+            while i < len(vg):
+                vGeoArray.append(vg[i])
+                i+=1
+
+            # Range
+            rang = reader.next()
+            i = 2
+            if ("um" or "micron") in rang[0]:
+                scale = "microns"
             else:
-                #empty case - don't put in database
-                rangArray.append(rang[i])
-            i+=1
-        scale = "nanometers"
+                scale = "nanometers"
+            while i < len(rang):
+                if rang[i] != "":
+                    temp1 = []
+                    if scale == "microns":
+                        temp = rang[i].split('-')
+                        if temp[1].find("um") != -1:
+                            ty = temp[1].split("u")
+                            temp1.append(float(temp[0]) * 1000)
+                            temp1.append(float(ty[0]) * 1000)
+                        else:
+                            temp1.append(float(temp[0]) * 1000)
+                            temp1.append(float(temp[1]) * 1000)
+                    else:
+                        temp = rang[i].split('-')
+                        if temp[1].find("nm") != -1:
+                            ty = temp[1].split("n")
+                            temp1.append(float(temp[0]))
+                            temp1.append(float(ty[0]))
+                        else:
+                            temp1.append(float(temp[0]))
+                            temp1.append(float(temp[1]))
+                    rangArray.append(temp1)
+                else:
+                    #empty case - don't put in database
+                    rangArray.append(rang[i])
+                i+=1
+            scale = "nanometers"
 
-        formula = reader.next()
-        i = 2
-        while i < len(formula):
-            formArray.append(formula[i])
-            i+=1
+            formula = reader.next()
+            i = 2
+            while i < len(formula):
+                formArray.append(formula[i])
+                i+=1
 
-        comp = reader.next()
-        i = 2
-        while i < len(comp):
-            compArray.append(comp[i])
-            i+=1
+            comp = reader.next()
+            i = 2
+            while i < len(comp):
+                compArray.append(comp[i])
+                i+=1
 
-        line = reader.next()
-        while ("Wavelength" not in line[0]):
             line = reader.next()
+            while ("Wavelength" not in line[0]):
+                line = reader.next()
 
-        if ("microns" or "um") in line:
-            factor = 1000
-        else:
-            factor = 1
+            if ("microns" or "um") in line:
+                factor = 1000
+            else:
+                factor = 1
 
-        wl = reader.next()
+            wl = reader.next()
 
-        row_len = len(wl)
+            row_len = len(wl)
 
-        waveDataPt = {}
-        for row in reader:
-            if hasNumbers(row[0]) == True:
-                waveDataPt[row[0]] = 'NULL'
+            waveDataPt = {}
+            for row in reader:
+                if hasNumbers(row[0]) == True:
+                    waveDataPt[row[0]] = 'NULL'
 
-        i = 2
-        while i < row_len:
-            cf.seek(20)
-            currDict = copy.deepcopy(waveDataPt)
+            i = 2
+            while i < row_len:
+                cf.seek(20)
+                currDict = copy.deepcopy(waveDataPt)
 
-            for row in itertools.islice(reader, 21, len(currDict)):
-                if hasNumbers(row[0]) == True and row[i] != '':
-                    if float(row[i]) > 1.0:
-                        row[i] = float(row[i]) / 100.
-                    currDict[row[0]] = row[i]
+                for row in itertools.islice(reader, 21, len(currDict)):
+                    if hasNumbers(row[0]) == True and row[i] != '':
+                        if float(row[i]) > 1.0:
+                            row[i] = float(row[i]) / 100.
+                        currDict[row[0]] = row[i]
 
-            dataPts.append(currDict)
-            i += 1
+                dataPts.append(currDict)
+                i += 1
+    except Exception, e:
+        print str(e)
 
     size = len(dataArray)
     for i in range(size):
