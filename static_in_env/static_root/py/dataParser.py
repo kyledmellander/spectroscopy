@@ -4,7 +4,7 @@ import json
 import re
 import copy
 import itertools
-#import numpy as np
+import numpy as np
 import psycopg2
 
 #Takes in the csv file
@@ -34,7 +34,7 @@ formArray = []
 compArray = []
 dataPts = []  #matrix of num_data_point rows by 1+num_samples columns
 #reflectance = []
-#A = np.array([])
+A = np.array([])
 
 
 with open(csvFile, 'rU') as cf:

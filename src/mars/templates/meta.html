@@ -18,13 +18,16 @@
           <div id="meta">
             <button type="submit" name="graphForm" formaction="/graph/" class="btn btn-success">Graph</button>
             <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button>
+            <br>
+            <br>
+            <input type="checkbox" name="selection" onClick="toggle(this)" style="height:15px; width:15px;"><b> Select All</b>
           </div> 
           <!---<table class="table table-hover"> -->
               {% for result in metaResults %}
                 <table class="table table-hover">
                 <tr>
-                <td><input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}}></td>
-               <td> <p><b> Data ID:</b>            {{ result.data_id }} </p>
+                <td><input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} style="height:15px; width:15px;"></td>
+                <td> <p><b> Data ID:</b>            {{ result.data_id }} </p>
                 <p><b> Sample ID:</b>          {{ result.sample_id }} </p>
                 <p><b> Mineral name:</b>       {{ result.name }} </p>
                 <p><b> Mineral class:</b>      {{ result.sample_class }} </p>
@@ -58,7 +61,7 @@
     </div>
   {% else %}
     <div id="meta">
-      <h4><b> Please select a sample to view the meta data.</b></h4>
+      <h3><b> Please select a sample to view the meta data.</b></h3>
     </div>
   {% endif %}
 {% endblock %}
