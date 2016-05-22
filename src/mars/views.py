@@ -221,9 +221,22 @@ def handle_uploaded_file(f):
     process_file(filepath)
 
 def process_file(filepath):
-  result = finders.find('py/dataParser.py')
-  subprocess.Popen(['python', str(result), filepath], shell=True, close_fds=True)
+  #result = finders.find('py/dataParser.py')
+  #subprocess.Popen(['python', str(result), filepath], shell=True, close_fds=True)
+  def hasNumbers(inputString):
+    return bool(re.search(r'\d', inputString))
 
+  dataArray = [] #Array of IDs
+  sampArray = [] #Sample IDs
+  nameArray = [] #names
+  grainArray = []
+  vGeoArray = []
+  resArray = []
+  rangArray = []
+  formArray = []
+  compArray = []
+  dataPts = []  #matrix of num_data_point rows by 1+num_samples columns
+     
 
 
   

@@ -4,7 +4,7 @@
   <div id="upload" class="container" style="margin-left:10px">
     <p><b> Please specify a CSV file </b></p>
     <div class="form-inline"> <!-- style="margin-left:10px">-->
-      <form method="POST">
+      <form enctype="multipart/form-data" method="POST">
         {% csrf_token %}
         {{ form.as_p }}
         <p align="left">
