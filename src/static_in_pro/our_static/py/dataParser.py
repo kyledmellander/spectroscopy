@@ -348,12 +348,12 @@ with open(csvFile, 'rU') as cf:
         i += 1
 
 #----Database Things Happen Here----
-# conn = None
+conn = None
 
-#Need to fill in with correct information
-# conn = psycopg2.connect("dbname = 'spectrodb' user = 'myprojectuser' host = localhost password = 'password'")
-#
-# cur = conn.cursor()
+Need to fill in with correct information
+conn = psycopg2.connect("dbname = 'spectrodb' user = 'myprojectuser' host = localhost password = 'password'")
+
+cur = conn.cursor()
 
 size = len(dataArray)
 for i in range(size):
@@ -397,23 +397,23 @@ for i in range(size):
             if dataPts[j][key] == "NULL":
                 del finalDataPts[j][key]
 
-#     form = formArray[i]
-#     comp = compArray[i]
-#     reflect = json.dumps(finalDataPts[i])
-#     query = "INSERT INTO mars_sample (DATA_ID, SAMPLE_ID, DATE_ACCESSED, ORIGIN, LOCALITY, NAME, SAMPLE_CLASS, SAMPLE_DESC, GRAIN_SIZE, VIEW_GEOM, RESOLUTION, REFL_RANGE, FORMULA, COMPOSITION, REFLECTANCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-#     data = (dataId, sampId, access, origin, collection, name, sample_cl, desc, gr, vGeo, res, ran, form, comp, reflect)
-#     try:
-#         cur.execute(query, data)
-#         conn.commit()
-#     except psycopg2.IntegrityError:
-#         print dataId + " already in database. Commit of sample aborted."
-#         conn.rollback()
-#         # query = "UPDATE mars_sample SET SAMPLE_ID = %s, SAMPLE_CLASS = %s WHERE DATA_ID = %s"
-#         # data = (sample_cl, dataId)
-#         # cur.execute(query, data)
-#
-# conn.commit()
-# conn.close()
+    form = formArray[i]
+    comp = compArray[i]
+    reflect = json.dumps(finalDataPts[i])
+    query = "INSERT INTO mars_sample (DATA_ID, SAMPLE_ID, DATE_ACCESSED, ORIGIN, LOCALITY, NAME, SAMPLE_CLASS, SAMPLE_DESC, GRAIN_SIZE, VIEW_GEOM, RESOLUTION, REFL_RANGE, FORMULA, COMPOSITION, REFLECTANCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+    data = (dataId, sampId, access, origin, collection, name, sample_cl, desc, gr, vGeo, res, ran, form, comp, reflect)
+    try:
+        cur.execute(query, data)
+        conn.commit()
+    except psycopg2.IntegrityError:
+        print dataId + " already in database. Commit of sample aborted."
+        conn.rollback()
+        # query = "UPDATE mars_sample SET SAMPLE_ID = %s, SAMPLE_CLASS = %s WHERE DATA_ID = %s"
+        # data = (sample_cl, dataId)
+        # cur.execute(query, data)
+
+conn.commit()
+conn.close()
 
 # f = open('marsdb.sql', 'w')
 # insert = "INSERT INTO mars_sample (data_id, sample_id, date_accessed, origin, name, grain_size, view_geom)"
