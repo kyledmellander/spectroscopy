@@ -17,6 +17,8 @@ import itertools
 import StringIO
 
 import os, sys
+import zipfile
+import StringIO
 import csv
 import json
 import subprocess
@@ -153,66 +155,45 @@ def graph(request):
 
         reflectanceDict[item["data_id"]] =  ''.join(stringlist)
 
-      # Create the HttpResponse object with the appropriate CSV header
-      #response = HttpResponse(content_type='text/csv')
-      #response['Content-Disposition'] = 'attachment; filename="metadatafile.csv"'
-
-      # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
-      #file = StringIO.StringIO()
-      #writer = csv.writer(file)
-      #writer.writerow([
-       # smart_str("Data ID"),
-        #smart_str("Sample ID"),
-        #smart_str("Date Accessed"),
-        #smart_str("Database of Origin"),
-        #smart_str("Locality"),
-        #smart_str("Mineral Name"),
-        #smart_str("Sample Description"),
-        #smart_str("Sample Type"),
-        #smart_str("Mineral Class"),
-        #smart_str("Grain Size"),
-        #smart_str("Viewing Geometry"),
-        #smart_str("Resolution"),
-        #smart_str("Reflectance Range"),
-        #smart_str("Formula"),
-        #smart_str("Composition"),
-        #smart_str("Wavelength v Reflectance"),])
-      files = []
-      #zippy = ""
+      files = [] 
       for s in samples:
-        #zippy = zippy + "_"+str(s.data_id)
+        # Create the HttpResponse object with the appropriate CSV header
         file = StringIO.StringIO()
         writer = csv.writer(file)
-        writer.writerow([
-          smart_str(s.data_id),
-          smart_str(s.sample_id),
-          smart_str(s.date_accessed),
-          smart_str(s.origin),
-          smart_str(s.locality),
-          smart_str(s.name),
-          smart_str(s.sample_desc),
-          smart_str(s.sample_type),
-          smart_str(s.sample_class),
-          smart_str(s.grain_size),
-          smart_str(s.view_geom),
-          smart_str(s.resolution),
-          smart_str(s.refl_range),
-          smart_str(s.formula),
-          smart_str(s.composition),
-          smart_str(reflectanceDict[s.data_id]),])
+      
+        # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
+        writer.writerow([smart_str("Data ID"), smart_str(s.data_id),])
+        writer.writerow([smart_str("Sample ID"), smart_str(s.sample_id),])
+        writer.writerow([smart_str("Date Accessed"), smart_str(s.date_accessed),])
+        writer.writerow([smart_str("Database of Origin"), smart_str(s.origin),])
+        writer.writerow([smart_str("Locality"), smart_str(s.locality),])
+        writer.writerow([smart_str("Mineral Name"), smart_str(s.name),])
+        writer.writerow([smart_str("Sample Description"), smart_str(s.sample_desc),])
+        writer.writerow([smart_str("Sample Type"), smart_str(s.sample_type),])
+        writer.writerow([smart_str("Mineral Class"), smart_str(s.sample_class),])
+        writer.writerow([smart_str("Grain Size"), smart_str(s.grain_size),])
+        writer.writerow([smart_str("Viewing Geometry"), smart_str(s.view_geom),])
+        writer.writerow([smart_str("Resolution"), smart_str(s.resolution),])
+        writer.writerow([smart_str("Reflectance Range"), smart_str(s.refl_range),])
+        writer.writerow([smart_str("Formula"), smart_str(s.formula),])
+        writer.writerow([smart_str("Composition"), smart_str(s.composition),])
+        writer.writerow([smart_str("Wavelength"), smart_str("Reflectance"),])
+        refl = reflectanceDict[s.data_id].split(',')
+        for r in range(0,len(refl)-1):
+          line = refl[r].split(':')
+          writer.writerow([line[0], line[1],])
         file.seek(0)
         files.append(file)
-
       zipped_file = StringIO.StringIO()
       with ZipFile(zipped_file, 'w') as zip:
         for i, file in enumerate(files):
           file.seek(0)
           zip.writestr("{}.csv".format(i), file.read())
-      zipped_file.seek(0)
-      #zippy = zippy+".zip"
-      response = HttpResponse(zipped_file, content_type='application/octet-stream')
-      response['Content-Disposition'] = 'attachment; filename=zippy.zip'
+       # zipped_file.seek(0)
 
+        response = HttpResponse(zipped_file, content_type='application/octet-stream')
+        response['Content-Disposition'] = 'attachment; filename=zippy.zip'
+      
 
       return response
 

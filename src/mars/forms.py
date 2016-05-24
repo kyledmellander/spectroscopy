@@ -38,5 +38,4 @@ class SearchForm(forms.Form):
     database_of_origin = forms.ChoiceField(choices=querylist)
 
 class UploadFileForm(forms.Form):
- # title = forms.CharField(max_length=100)
   file = forms.FileField()
