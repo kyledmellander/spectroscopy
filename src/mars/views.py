@@ -9,10 +9,12 @@ from .forms import ContactForm, SignUpForm, SearchForm, UploadFileForm
 from .models import Sample, SignUp
 from django.utils.encoding import smart_str
 from django.contrib.staticfiles import finders
+from zipfile import ZipFile
 
 import re
 import copy
 import itertools
+import StringIO
 
 import os, sys
 import csv
@@ -152,29 +154,35 @@ def graph(request):
         reflectanceDict[item["data_id"]] =  ''.join(stringlist)
 
       # Create the HttpResponse object with the appropriate CSV header
-      response = HttpResponse(content_type='text/csv')
-      response['Content-Disposition'] = 'attachment; filename="metadatafile.csv"'
+      #response = HttpResponse(content_type='text/csv')
+      #response['Content-Disposition'] = 'attachment; filename="metadatafile.csv"'
 
       # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
-      writer = csv.writer(response)
-      writer.writerow([
-        smart_str("Data ID"),
-        smart_str("Sample ID"),
-        smart_str("Date Accessed"),
-        smart_str("Database of Origin"),
-        smart_str("Locality"),
-        smart_str("Mineral Name"),
-        smart_str("Sample Description"),
-        smart_str("Sample Type"),
-        smart_str("Mineral Class"),
-        smart_str("Grain Size"),
-        smart_str("Viewing Geometry"),
-        smart_str("Resolution"),
-        smart_str("Reflectance Range"),
-        smart_str("Formula"),
-        smart_str("Composition"),
-        smart_str("Wavelength v Reflectance"),])
+      #file = StringIO.StringIO()
+      #writer = csv.writer(file)
+      #writer.writerow([
+       # smart_str("Data ID"),
+        #smart_str("Sample ID"),
+        #smart_str("Date Accessed"),
+        #smart_str("Database of Origin"),
+        #smart_str("Locality"),
+        #smart_str("Mineral Name"),
+        #smart_str("Sample Description"),
+        #smart_str("Sample Type"),
+        #smart_str("Mineral Class"),
+        #smart_str("Grain Size"),
+        #smart_str("Viewing Geometry"),
+        #smart_str("Resolution"),
+        #smart_str("Reflectance Range"),
+        #smart_str("Formula"),
+        #smart_str("Composition"),
+        #smart_str("Wavelength v Reflectance"),])
+      files = []
+      #zippy = ""
       for s in samples:
+        #zippy = zippy + "_"+str(s.data_id)
+        file = StringIO.StringIO()
+        writer = csv.writer(file)
         writer.writerow([
           smart_str(s.data_id),
           smart_str(s.sample_id),
@@ -192,6 +200,19 @@ def graph(request):
           smart_str(s.formula),
           smart_str(s.composition),
           smart_str(reflectanceDict[s.data_id]),])
+        file.seek(0)
+        files.append(file)
+
+      zipped_file = StringIO.StringIO()
+      with ZipFile(zipped_file, 'w') as zip:
+        for i, file in enumerate(files):
+          file.seek(0)
+          zip.writestr("{}.csv".format(i), file.read())
+      zipped_file.seek(0)
+      #zippy = zippy+".zip"
+      response = HttpResponse(zipped_file, content_type='application/octet-stream')
+      response['Content-Disposition'] = 'attachment; filename=zippy.zip'
+
 
       return response
 
