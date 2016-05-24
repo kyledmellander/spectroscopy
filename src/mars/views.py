@@ -96,30 +96,33 @@ def meta(request):
     return render_to_response('meta.html', {"metaResults": samples,"reflectancedict":dictionaries,}, context_instance=RequestContext(request))
 
 def search(request):
-	form_class = SearchForm
-	results = Sample.objects.all()
+  form_class = SearchForm
+  results = Sample.objects.all()
 
-	if request.method == 'POST':
-		form = form_class(data=request.POST)
+  if request.method == 'POST':
+    form = form_class(data=request.POST)
 
 	#	if form.is_valid():
-		mName =  request.POST.get('mineral_name')
-		mClass = request.POST.get('mineral_class')
-		mOrigin = request.POST.get('database_of_origin')
+    mName =  request.POST.get('mineral_name')
+    mClass = request.POST.get('mineral_class')
+    mDataId = request.POST.get('mineral_Id')
+    mOrigin = request.POST.get('database_of_origin')
 
-		if mName:
-		  results = results.filter(name__icontains=mName)
-		if mClass:
-			results = results.filter(sample_class__icontains=mClass)
-		if mOrigin:
-			results = results.filter(origin__icontains=mOrigin)
+    if mName:
+      results = results.filter(name__icontains=mName)
+    if mClass:
+      results = results.filter(sample_class__icontains=mClass)
+    if mDataId:
+      results = results.filter(data_id__icontains=mDataId)
+    if mOrigin:
+      results = results.filter(origin__icontains=mOrigin)
 
-		return render_to_response('results.html', {"results": results,}, context_instance=RequestContext(request))
+    return render_to_response('results.html', {"results": results,}, context_instance=RequestContext(request))
 
-	else:
-		return render(request, 'search.html', {
-			'form': form_class,
-		})
+  else:
+    return render(request, 'search.html', {
+      'form': form_class,
+    })
 
 def graph(request):
   if request.method == 'POST':
