@@ -5,7 +5,7 @@ import re
 import copy
 import itertools
 #import numpy as np
-import psycopg2
+#import psycopg2
 
 #Takes in the csv file
 csvFile = sys.argv[1]
@@ -106,6 +106,7 @@ with open(csvFile, 'rU') as cf:
         scale = "microns"
     i = 2
 
+    # Grain size
     while i < len(size):
         arr = []
         if hasNumbers(size[i]) == False:
@@ -269,10 +270,10 @@ with open(csvFile, 'rU') as cf:
     rang = reader.next()
     i = 2
     #print rang[0]
-    if ("um" or "micron") in rang[0]:
-        scale = "microns"
+    if "micron" in rang[0] or "um" in rang[0]:
+        factor = 1000
     else:
-        scale = "nanometers"
+        factor = 1
     while i < len(rang):
         if rang[i] != "":
             temp1 = []
@@ -280,11 +281,11 @@ with open(csvFile, 'rU') as cf:
                 temp = rang[i].split('-')
                 if temp[1].find("um") != -1:
                     ty = temp[1].split("u")
-                    temp1.append(float(temp[0]) * 1000)
-                    temp1.append(float(ty[0]) * 1000)
+                    temp1.append(float(temp[0]) * factor)
+                    temp1.append(float(ty[0]) * factor)
                 else:
-                    temp1.append(float(temp[0]) * 1000)
-                    temp1.append(float(temp[1]) * 1000)
+                    temp1.append(float(temp[0]) * factor)
+                    temp1.append(float(temp[1]) * factor)
             else:
                 temp = rang[i].split('-')
                 if temp[1].find("nm") != -1:
@@ -317,7 +318,7 @@ with open(csvFile, 'rU') as cf:
     while ("Wavelength" not in line[0]):
         line = reader.next()
 
-    if ("microns" or "um") in line:
+    if "microns" in line[0] or "um" in line[0]:
         factor = 1000
     else:
         factor = 1
@@ -329,7 +330,8 @@ with open(csvFile, 'rU') as cf:
     waveDataPt = {}
     for row in reader:
         if hasNumbers(row[0]) == True:
-            waveDataPt[row[0]] = 'NULL'
+            waveDataPt[str(float(row[0]) * factor)] = 'NULL'
+    #print waveDataPt
 
     i = 2
     while i < row_len:
@@ -348,7 +350,7 @@ with open(csvFile, 'rU') as cf:
 #----Database Things Happen Here----
 conn = None
 
-#Need to fill in with correct information
+Need to fill in with correct information
 conn = psycopg2.connect("dbname = 'spectrodb' user = 'myprojectuser' host = localhost password = 'password'")
 
 cur = conn.cursor()
