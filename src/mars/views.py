@@ -119,7 +119,8 @@ def search(request):
     if mDataId:
       results = results.filter(data_id__icontains=mDataId)
     if mOrigin:
-      results = results.filter(origin__icontains=mOrigin)
+      if mOrigin != 'All':
+        results = results.filter(origin__icontains=mOrigin)
 
     return render_to_response('results.html', {"results": results,}, context_instance=RequestContext(request))
 
@@ -222,25 +223,33 @@ def graph(request):
 def upload_file(request):
   if request.method == 'POST':
     form = UploadFileForm(request.POST, request.FILES)
+    mclass = request.POST.get('sample_class')
+    if not mclass:
+      mclass = "NULL"
+    mtype = request.POST.get('sample_type')
+    if not mtype:
+      mtype = "NULL"
+    print mclass
+    print mtype
     if form.is_valid():
-      process_file(request.FILES['file'])
+      process_file(request.FILES['file'], mclass, mtype)
       return HttpResponseRedirect('/admin/mars/sample')
   else:
     form = UploadFileForm()
   return render(request, 'upload.html', {'form': form})
 
-def handle_oaded_file(f):
-  file = '/tmp/somefile.csv'
-  with open(file, 'wb+') as dest:
-    for chunk in f.chunks():
-      dest.write(chunk)
-    process_file(file)
+#def handle_loaded_file(f):
+#  file = '/tmp/somefile.csv'
+#  with open(file, 'wb+') as dest:
+#    for chunk in f.chunks():
+#      dest.write(chunk)
+#    process_file(file)
 
 def hasNumbers(inputString):
   result = bool(re.search(r'\d', inputString))
   return result
 
-def process_file(file):
+def process_file(file, mineral_class, mineral_type):
     dataArray = [] #Array of IDs
     sampArray = [] #Sample IDs
     nameArray = [] #names
@@ -403,11 +412,15 @@ def process_file(file):
             for column in xrange(2,row_len):
               if float(row[column]) > 1.0:
                 dataPoints[column-2][str(float(row[0]) * factor)] = str(float(row[column]) / 100.)
+              
+              # Check for invalid datapoints #
+              elif float(row[column]) < 0.0:
+                continue
+
               else:
                 dataPoints[column-2][str(float(row[0]) * factor)] = row[column]
 
     except Exception, e:
-      print "=====EXCEPTION======="
       print str(e)
 
     size = len(dataArray)
@@ -437,5 +450,5 @@ def process_file(file):
         form = formArray[i]
         comp = compArray[i]
 
-        sample = Sample.create(dataId, sampId, access, origin, 'NULL', name, desc, 'NULL', 'NULL', gr, vGeo, res, tempRan, form, comp, dataPoints[i])
+        sample = Sample.create(dataId, sampId, access, origin, 'NULL', name, desc, mineral_type, mineral_class, gr, vGeo, res, tempRan, form, comp, dataPoints[i])
         sample.save()

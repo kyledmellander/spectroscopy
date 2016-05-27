@@ -26,16 +26,22 @@ class SignUpForm(forms.ModelForm):
 
 class SearchForm(forms.Form):
     mineral_name = forms.CharField(required=True,
-        widget=forms.TextInput(attrs={'placeholder': 'Mineral Name'}))
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. Gypsum'}))
     mineral_class = forms.CharField(
-        widget=forms.TextInput(attrs={'placeholder': 'Mineral Class'}))
+        widget=forms.TextInput(attrs={'placeholder': 'Sulfate'}))
     mineral_Id= forms.CharField(
-        widget=forms.TextInput(attrs={'placeholder': 'Data Id'}))
+        widget=forms.TextInput(attrs={'placeholder': 'Data ID'}))
     querylist=list(Sample.objects.all().values_list('origin', flat=True).distinct())
     querylist=list(map(str, querylist))
     for i in range(len(querylist)):
         querylist[i] = (querylist[i], querylist[i])
+    querylist.append(('All', 'All'))
     database_of_origin = forms.ChoiceField(choices=querylist)
 
 class UploadFileForm(forms.Form):
-  file = forms.FileField()
+    sample_class = forms.CharField(required=False,
+      widget=forms.TextInput(attrs={'placeholder': 'e.g. Sulfate'}))
+    sample_type = forms.CharField(required=False,
+      widget=forms.TextInput(attrs={'placeholder': 'e.g. Tectosilicate'}))
+    file = forms.FileField()
+
