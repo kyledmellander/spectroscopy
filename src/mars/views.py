@@ -9,10 +9,12 @@ from .forms import ContactForm, SignUpForm, SearchForm, UploadFileForm
 from .models import Sample, SignUp
 from django.utils.encoding import smart_str
 from django.contrib.staticfiles import finders
+from zipfile import ZipFile
 
 import re
 import copy
 import itertools
+import StringIO
 
 import os, sys
 import zipfile
@@ -153,16 +155,18 @@ def graph(request):
           stringlist.append(str(key) + ":" +  str(value) + ",")
 
         reflectanceDict[item["data_id"]] =  ''.join(stringlist)
-     
-      
+
+      files = []
+      names = []
+      count = 0
       for s in samples:
         # Create the HttpResponse object with the appropriate CSV header
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename=%s.csv' % s.data_id
-        writer = csv.writer(response)
+        file = StringIO.StringIO()
+        writer = csv.writer(file)
       
         # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
         writer.writerow([smart_str("Data ID"), smart_str(s.data_id),])
+        names.append(smart_str(s.data_id))
         writer.writerow([smart_str("Sample ID"), smart_str(s.sample_id),])
         writer.writerow([smart_str("Date Accessed"), smart_str(s.date_accessed),])
         writer.writerow([smart_str("Database of Origin"), smart_str(s.origin),])
@@ -179,10 +183,21 @@ def graph(request):
         writer.writerow([smart_str("Composition"), smart_str(s.composition),])
         writer.writerow([smart_str("Wavelength"), smart_str("Reflectance"),])
         refl = reflectanceDict[s.data_id].split(',')
+        count = count + 1
         for r in range(0,len(refl)-1):
           line = refl[r].split(':')
           writer.writerow([line[0], line[1],])
-      
+        file.seek(0)
+        files.append(file)
+      zipped_file = StringIO.StringIO()
+      with zipfile.ZipFile(zipped_file, 'w') as zip:
+        for i, file in enumerate(files):
+          file.seek(0)
+          zip.writestr(names[i]+".csv".format(i), file.read())
+      zipped_file.seek(0)
+
+      response = HttpResponse(zipped_file, content_type='application/octet-stream')
+      response['Content-Disposition'] = 'attachment; filename=zippy.zip'
 
       return response
 
