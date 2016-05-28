@@ -28,7 +28,7 @@ class SearchForm(forms.Form):
     mineral_name = forms.CharField(required=True,
         widget=forms.TextInput(attrs={'placeholder': 'e.g. Gypsum'}))
     mineral_class = forms.CharField(
-        widget=forms.TextInput(attrs={'placeholder': 'Sulfate'}))
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. Sulfate'}))
     mineral_Id= forms.CharField(
         widget=forms.TextInput(attrs={'placeholder': 'Data ID'}))
     querylist=list(Sample.objects.all().values_list('origin', flat=True).distinct())
