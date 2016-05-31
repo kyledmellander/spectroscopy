@@ -423,6 +423,8 @@ def process_file(file, mineral_class, mineral_type):
     except Exception, e:
       print str(e)
 
+    size = len(dataArray)
+    
     for i in range(size):
         dataId = dataArray[i]
         sampId = sampArray[i]
@@ -431,11 +433,9 @@ def process_file(file, mineral_class, mineral_type):
         vGeo= vGeoArray[i]
         res = resArray[i]
 
-        tempRan = rangArray[i]
-        if len(tempRan) == 0:
-            low = min([float(w) for w in dataPoints[i]])
-            high = max([float(w) for w in dataPoints[i]])
-            tempRan = [int(round(low, -2)), int(round(high, -2))]
+        low = min([float(w) for w in dataPoints[i]])
+        high = max([float(w) for w in dataPoints[i]])
+        tempRan = [int(round(low, -2)), int(round(high, -2))]
         # for j in range(len(tempRan)):
         #     if tempRan[j] == None:
         #         tempRan[j] = 'NULL'
