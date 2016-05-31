@@ -164,7 +164,7 @@ def graph(request):
         file = StringIO.StringIO()
         writer = csv.writer(file)
         names.append(smart_str(s.data_id))
-      
+
         # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
         writer.writerow([smart_str("Database of Origin"), smart_str(s.origin),])
         writer.writerow([smart_str("Locality"), smart_str(s.locality),])
@@ -268,7 +268,7 @@ def process_file(file, mineral_class, mineral_type):
         desc = reader.next()[1]
         access = reader.next()[1]
         reader.next()
-            
+
         # Data ID
         data = reader.next()
         if data[1] != '':
@@ -324,11 +324,11 @@ def process_file(file, mineral_class, mineral_type):
           scale = "microns"
         i = 2
 
-        #Get grain size  
+        #Get grain size
         while i < len(size):
           grainArray.append(size[i])
           i+=1
-        
+
         scale = "nanometers"
 
         # Viewing Geometry
@@ -338,7 +338,7 @@ def process_file(file, mineral_class, mineral_type):
           vGeoArray.append(vg[i])
           i+=1
 
-        # Resolution 
+        # Resolution
         res = reader.next()
         i = 2
 
@@ -405,14 +405,14 @@ def process_file(file, mineral_class, mineral_type):
         wl = reader.next()
 
         row_len = len(wl)
-        
+
         dataPoints = [{}] * (row_len - 2)
         for row in reader:
           if hasNumbers(row[0]) == True:
             for column in xrange(2,row_len):
               if float(row[column]) > 1.0:
                 dataPoints[column-2][str(float(row[0]) * factor)] = str(float(row[column]) / 100.)
-              
+
               # Check for invalid datapoints #
               elif float(row[column]) < 0.0:
                 continue
@@ -423,9 +423,6 @@ def process_file(file, mineral_class, mineral_type):
     except Exception, e:
       print str(e)
 
-    size = len(dataArray)
-    print "size: ", size
-
     for i in range(size):
         dataId = dataArray[i]
         sampId = sampArray[i]
@@ -434,21 +431,17 @@ def process_file(file, mineral_class, mineral_type):
         vGeo= vGeoArray[i]
         res = resArray[i]
 
-        if vGeo == '':
-            vGeo = 'NULL'
-
-        if res == '':
-            res = 'NULL'
-
         tempRan = rangArray[i]
         if len(tempRan) == 0:
-            tempRan = ['NULL', 'NULL']
-        for j in range(len(tempRan)):
-            if tempRan[j] == None:
-                tempRan[j] = 'NULL'
-        
+            low = min([float(w) for w in dataPoints[i]])
+            high = max([float(w) for w in dataPoints[i]])
+            tempRan = [int(round(low, -2)), int(round(high, -2))]
+        # for j in range(len(tempRan)):
+        #     if tempRan[j] == None:
+        #         tempRan[j] = 'NULL'
+
         form = formArray[i]
         comp = compArray[i]
 
-        sample = Sample.create(dataId, sampId, access, origin, 'NULL', name, desc, mineral_type, mineral_class, gr, vGeo, res, tempRan, form, comp, dataPoints[i])
+        sample = Sample.create(dataId, sampId, access, origin, collection, name, desc, mineral_type, mineral_class, gr, vGeo, res, tempRan, form, comp, dataPoints[i])
         sample.save()
