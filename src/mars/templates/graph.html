@@ -63,7 +63,9 @@
             xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([minX,maxX]),
             yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([minY,maxY]),
             xAxis = d3.svg.axis()
-                .scale(xScale),
+                .orient("bottom")
+                .scale(xScale)
+                .tickFormat(d3.format("d"));
             yAxis = d3.svg.axis()
                 .scale(yScale)
                 .orient("left");
@@ -80,15 +82,16 @@
 
           	vis.append("text")
           	   .attr("class", "x label")
-          	   .attr("text-anchor", "end")
-          	   .attr("x", WIDTH)
-          	   .attr("y", HEIGHT)
+          	   .style("text-anchor", "end")
+          	   .attr("x", WIDTH-400)
+          	   .attr("y", HEIGHT-10)
           	   .text("Wavelength");
 
           	vis.append("text")
           	   .attr("class", "y label")
-          	   .attr("text-anchor", "end")
+          	   .style("text-anchor", "end")
           	   .attr("y", HEIGHT)
+               .attr("x", -200)
           	   .attr("dy", "-45em")
           	   .attr("transform", "rotate(-90)")
           	   .text("Reflectance");
@@ -127,16 +130,16 @@
                 // Line Disappearing nonsense
                 vis.append("text")
                     .attr("x", (lSpace/2)+i*lSpace)
-                    .attr("y", HEIGHT)
+                    .attr("y", HEIGHT+10)
                     .style("fill", "black")
-                    .attr("class","legend")
+                    .attr("class","legiend")
                     .on('click',function() {
                         var active   = d.active ? false : true;
                         var opacity = active ? 0 : 1;
                         d3.select("#line_" + d.data_id).style("opacity", opacity);
                         d.active = active;
                     })
-                    .text(d.data_id);
+                    .text(d.data_id + " ("+ d.name+")" );
             });
 
           }
