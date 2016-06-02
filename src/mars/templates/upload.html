@@ -11,6 +11,13 @@
           <button type="submit" class="btn btn-primary"/>Upload&raquo;</button>
         </p>
       </form>
+      {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+        <p><big><big><big>{{ message }}</big></big></big></p>
+        {% endfor %}
+      </ul>
+      {% endif %}
     </div>
   </div>
 {% endblock %}
