@@ -25,6 +25,7 @@ import subprocess
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.core.serializers.json import DjangoJSONEncoder
+from django.contrib import messages
 
 # Create your views here.
 
@@ -233,7 +234,9 @@ def upload_file(request):
     print mtype
     if form.is_valid():
       process_file(request.FILES['file'], mclass, mtype)
-      return HttpResponseRedirect('/admin/mars/sample')
+      messages.success(request, 'Success!')
+      #return HttpResponseRedirect('/admin/mars/sample')
+      return HttpResponseRedirect('/upload/')
   else:
     form = UploadFileForm()
   return render(request, 'upload.html', {'form': form})
