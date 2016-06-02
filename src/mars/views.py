@@ -225,10 +225,10 @@ def upload_file(request):
     form = UploadFileForm(request.POST, request.FILES)
     mclass = request.POST.get('sample_class')
     if not mclass:
-      mclass = "NULL"
+      mclass = ""
     mtype = request.POST.get('sample_type')
     if not mtype:
-      mtype = "NULL"
+      mtype = ""
     print mclass
     print mtype
     if form.is_valid():
