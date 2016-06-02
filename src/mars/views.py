@@ -119,7 +119,7 @@ def search(request):
     if mDataId:
       results = results.filter(data_id__icontains=mDataId)
     if mOrigin:
-      if mOrigin != 'All':
+      if mOrigin != 'Any':
         results = results.filter(origin__icontains=mOrigin)
 
     return render_to_response('results.html', {"results": results,}, context_instance=RequestContext(request))
