@@ -270,140 +270,79 @@ def process_file(file, mineral_class, mineral_type):
         collection = reader.next()[1]
         desc = reader.next()[1]
         access = reader.next()[1]
-        reader.next()
+        reader.next() # Blank line between header and Data ID row
 
         # Data ID
         data = reader.next()
-        if data[1] != '':
-          i =1
-        else:
-          i = 2
-        idArray = []
-        idStringArray = []
+        start = 1
+        while data[start] == '':
+            start += 1
+
+        i = start
         while i < len(data):
-          id_num = data[i].rsplit("_", 1)
-          if len(id_num) > 1:
-            idStringArray.append(id_num[0])
-            num = int(id_num[1])
-            idArray.append(num)
+            dataArray.append()
             i+=1
-
-        j = 1
-        sizeIdArray = len(idArray)
-        finalIdArray = []
-        finalIdArray.append(idArray[0])
-        while j < sizeIdArray:
-          if idArray[j] == idArray[j-1]:
-            newNum = idArray[j] + 1
-            idArray[j] = newNum
-            finalIdArray.append(newNum)
-          else:
-            finalIdArray.append(idArray[j])
-            j += 1
-
-        k = 0
-        while k < sizeIdArray:
-          newId = str(idStringArray[k]) + "_" + str(finalIdArray[k]).zfill(2)
-          dataArray.append(newId)
-          k += 1
 
         # Sample ID
         samp = reader.next()
-        i = 2
+        i = start
         while i < len(samp):
-          sampArray.append(samp[i])
-          i+=1
+            sampArray.append(samp[i])
+            i+=1
 
         # Mineral name
         name = reader.next()
-        i = 2
+        i = start
         while i < len(name):
-          nameArray.append(name[i])
-          i+=1
+            nameArray.append(name[i])
+            i+=1
 
-        scale = "nanometers"
+        # Grain size
         size = reader.next()
-        if ("um" or "micron") in size[0]:
-          scale = "microns"
-        i = 2
-
-        #Get grain size
+        i = start
         while i < len(size):
-          grainArray.append(size[i])
-          i+=1
-
-        scale = "nanometers"
+            grainArray.append(size[i])
+            i+=1
 
         # Viewing Geometry
         vg = reader.next()
-        i = 2
+        i = start
         while i < len(vg):
-          vGeoArray.append(vg[i])
-          i+=1
+            vGeoArray.append(vg[i])
+            i+=1
 
         # Resolution
         res = reader.next()
-        i = 2
-
+        i = start
         while i < len(res):
-          resArray.append(res[i])
-          i+=1
+            resArray.append(res[i])
+            i+=1
 
-        # Range
-        rang = reader.next()
-        i = 2
-        if "um" in rang[0] or "micron" in rang[0]:
-          factor = 1000
-        else:
-          factor = 1
-        while i < len(rang):
-          if rang[i] != "":
-            temp1 = []
-            if scale == "microns":
-              temp = rang[i].split('-')
-              if temp[1].find("um") != -1:
-                ty = temp[1].split("u")
-                temp1.append(float(temp[0]) * factor)
-                temp1.append(float(ty[0]) * factor)
-              else:
-                temp1.append(float(temp[0]) * factor)
-                temp1.append(float(temp[1]) * factor)
-            else:
-              temp = rang[i].split('-')
-              if temp[1].find("nm") != -1:
-                ty = temp[1].split("n")
-                temp1.append(float(temp[0]))
-                temp1.append(float(ty[0]))
-              else:
-                temp1.append(float(temp[0]))
-                temp1.append(float(temp[1]))
-            rangArray.append(temp1)
-          else:
-            #empty case - don't put in database
-            rangArray.append(rang[i])
-          i+=1
-        scale = "nanometers"
-
+        # Formula
         formula = reader.next()
-        i = 2
-        while i < len(formula):
-          formArray.append(formula[i])
-          i+=1
+        if 'range' in formula[0].lower(): # Check for range (no longer needed)
+            formula = reader.next()
 
+        i = start
+        while i < len(formula):
+            formArray.append(formula[i])
+            i+=1
+
+        # Composition
         comp = reader.next()
-        i = 2
+        i = start
         while i < len(comp):
-          compArray.append(comp[i])
-          i+=1
+            compArray.append(comp[i])
+            i+=1
 
         line = reader.next()
         while ("Wavelength" not in line[0]):
-          line = reader.next()
+            line = reader.next()
 
         if ("microns" or "um") in line:
-          factor = 1000
+            factor = 1000
         else:
-          factor = 1
+            factor = 1
 
         wl = reader.next()
 
@@ -411,23 +350,23 @@ def process_file(file, mineral_class, mineral_type):
 
         dataPoints = [{}] * (row_len - 2)
         for row in reader:
-          if hasNumbers(row[0]) == True:
-            for column in xrange(2,row_len):
-              if float(row[column]) > 1.0:
-                dataPoints[column-2][str(float(row[0]) * factor)] = str(float(row[column]) / 100.)
+            if hasNumbers(row[0]) == True:
+                for column in xrange(2,row_len):
+                    if float(row[column]) > 1.0:
+                        dataPoints[column-2][str(float(row[0]) * factor)] = str(float(row[column]) / 100.)
 
-              # Check for invalid datapoints #
-              elif float(row[column]) < 0.0:
-                continue
+                    # Check for invalid datapoints #
+                    elif float(row[column]) < 0.0:
+                        continue
 
-              else:
-                dataPoints[column-2][str(float(row[0]) * factor)] = row[column]
+                    else:
+                        dataPoints[column-2][str(float(row[0]) * factor)] = row[column]
 
     except Exception, e:
-      print str(e)
+        print str(e)
 
     size = len(dataArray)
-    
+
     for i in range(size):
         dataId = dataArray[i]
         sampId = sampArray[i]
@@ -439,9 +378,6 @@ def process_file(file, mineral_class, mineral_type):
         low = min([float(w) for w in dataPoints[i]])
         high = max([float(w) for w in dataPoints[i]])
         tempRan = [int(round(low, -2)), int(round(high, -2))]
-        # for j in range(len(tempRan)):
-        #     if tempRan[j] == None:
-        #         tempRan[j] = 'NULL'
 
         form = formArray[i]
         comp = compArray[i]
