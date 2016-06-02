@@ -443,5 +443,5 @@ def process_file(file, mineral_class, mineral_type):
         form = formArray[i]
         comp = compArray[i]
 
-        sample = Sample.create(dataId, sampId, access, origin, collection, name, desc, mineral_type, mineral_class, gr, vGeo, res, tempRan, form, comp, dataPoints[i])
+        sample = Sample.create(dataId, sampId, access, origin, collection, name, desc, mineral_type, mineral_class,'', gr, vGeo, res, tempRan, form, comp, dataPoints[i])
         sample.save()
