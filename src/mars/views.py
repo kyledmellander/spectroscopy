@@ -280,7 +280,7 @@ def process_file(file, mineral_class, mineral_type):
 
         i = start
         while i < len(data):
-            dataArray.append()
+            dataArray.append(data[i])
             i+=1
 
         # Sample ID
@@ -339,7 +339,7 @@ def process_file(file, mineral_class, mineral_type):
         while ("Wavelength" not in line[0]):
             line = reader.next()
 
-        if ("microns" or "um") in line:
+        if "microns" in line[0] or "um" in line[0]:
             factor = 1000
         else:
             factor = 1
