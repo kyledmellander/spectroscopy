@@ -31,12 +31,12 @@ class SearchForm(forms.Form):
         widget=forms.TextInput(attrs={'placeholder': 'e.g. Sulfate'}))
     mineral_Id= forms.CharField(
         widget=forms.TextInput(attrs={'placeholder': 'e.g. ASD_SUL_21'}))
-    querylist=list(Sample.objects.all().values_list('origin', flat=True).distinct())
-    querylist=list(map(str, querylist))
-    for i in range(len(querylist)):
-        querylist[i] = (querylist[i], querylist[i])
-    querylist.insert(0, ('Any', 'Any'))
-    database_of_origin = forms.ChoiceField(choices=querylist)
+    database_of_origin = forms.ChoiceField()
+    
+    def __init__(self, *args, **kwargs):
+      super(SearchForm, self).__init__(*args, **kwargs)
+      self.fields['database_of_origin'].choices = [(c, c) for c in Sample.objects.all().values_list('origin', flat=True).distinct()]
+      self.fields['database_of_origin'].choices.insert(0, ('Any','Any'))
 
 class UploadFileForm(forms.Form):
     sample_class = forms.CharField(required=False,
@@ -44,4 +44,3 @@ class UploadFileForm(forms.Form):
     sample_type = forms.CharField(required=False,
       widget=forms.TextInput(attrs={'placeholder': 'e.g. Tectosilicate'}))
     file = forms.FileField()
-
