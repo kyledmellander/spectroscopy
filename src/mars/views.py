@@ -381,6 +381,10 @@ def process_file(file, mineral_class, mineral_type):
 
         form = formArray[i]
         comp = compArray[i]
+        
+        # Check to see if Data ID already exists #
+       # exists = Sample.objects.filter(data_id=dataID)
+          
 
         sample = Sample.create(dataId, sampId, access, origin, collection, name, desc, mineral_type, mineral_class,'', gr, vGeo, res, tempRan, form, comp, dataPoints[i])
         sample.save()
