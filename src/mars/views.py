@@ -374,6 +374,9 @@ def process_file(file, mineral_class, mineral_type):
         for row in reader:
             if hasNumbers(row[0]) == True:
                 for column in xrange(c,row_len):
+                    if row[column] == '':
+                      continue
+
                     if float(row[column]) > 1.0:
                         dataPoints[column-c][str(float(row[0]) * factor)] = str(float(row[column]) / 100.)
 
