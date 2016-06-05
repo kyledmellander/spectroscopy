@@ -2,7 +2,6 @@ from django.shortcuts import render, render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.mail import send_mail
-from .models import Sample
 from django.conf import settings
 from django.template.defaulttags import register
 from .forms import ContactForm, SignUpForm, SearchForm, UploadFileForm
@@ -241,104 +240,123 @@ def upload_file(request):
     form = UploadFileForm()
   return render(request, 'upload.html', {'form': form})
 
-#def handle_loaded_file(f):
-#  file = '/tmp/somefile.csv'
-#  with open(file, 'wb+') as dest:
-#    for chunk in f.chunks():
-#      dest.write(chunk)
-#    process_file(file)
-
 def hasNumbers(inputString):
   result = bool(re.search(r'\d', inputString))
   return result
 
 def process_file(file, mineral_class, mineral_type):
-    dataArray = [] #Array of IDs
-    sampArray = [] #Sample IDs
-    nameArray = [] #names
-    grainArray = []
-    vGeoArray = []
-    resArray = []
-    rangArray = []
-    formArray = []
-    compArray = []
+    dataArray = [] # Array of IDs
+    sampArray = [] # Sample IDs
+    nameArray = [] # Mineral Names
+    collArray = [] # Collection localities
+    grainArray = [] # Grain sizes
+    vGeoArray = [] # Viewing Geometries
+    resArray = [] # Resolutions
+    formArray = [] # Formulas
+    compArray = [] # Compositions
+
+    error_messages = ''
 
     try:
         paramFile = file.read()
         reader = csv.reader(file)
-        origin = reader.next()[1]
-        collection = reader.next()[1]
-        desc = reader.next()[1]
-        access = reader.next()[1]
-        reader.next() # Blank line between header and Data ID row
 
-        # Data ID
-        data = reader.next()
+        # HEADER Section
+        header_line = reader.next()
+        while header_line[0] != '':
+
+            # Database of origin
+            if 'database' in header_line[0].lower():
+                origin = header_line[1]
+
+            # Spreadsheet Description
+            elif 'description' in header_line[0].lower():
+                desc = header_line[1]
+
+            # Date of original database access (YEAR-MONTH-DAY)
+            elif 'accessed' in header_line[0].lower():
+                access = header_line[1]
+
+            else:
+                error_messages += "\"" + header_line[0] + "\" does not contain a known key\n"
+
+            header_line = reader.next()
+
+        # METADATA Section
+        dataIDs = reader.next() # Data ID must come first
         start = 1
-        while data[start] == '':
+        while dataIDs[start] == '':
             start += 1
 
-        i = start
-        while i < len(data):
-            dataArray.append(data[i])
-            i+=1
+        c = start
+        while c < len(dataIDs):
+            dataArray.append(dataIDs[c])
+            c+=1
 
-        # Sample ID
-        samp = reader.next()
-        i = start
-        while i < len(samp):
-            sampArray.append(samp[i])
-            i+=1
+        # Rest of the metadata
+        meta_line = reader.next()
+        while meta_line[0] != '':
+            c = start
 
-        # Mineral name
-        name = reader.next()
-        i = start
-        while i < len(name):
-            nameArray.append(name[i])
-            i+=1
+            # Sample ID
+            if 'sample id' in meta_line[0].lower():
+                while c < len(meta_line):
+                    sampArray.append(meta_line[c])
+                    c+=1
 
-        # Grain size
-        size = reader.next()
-        i = start
-        while i < len(size):
-            grainArray.append(size[i])
-            i+=1
+            # Mineral name
+            elif 'name' in meta_line[0].lower():
+                while c < len(meta_line):
+                    nameArray.append(meta_line[c])
+                    c+=1
 
-        # Viewing Geometry
-        vg = reader.next()
-        i = start
-        while i < len(vg):
-            vGeoArray.append(vg[i])
-            i+=1
+            # Collection Locality
+            elif 'locality' in meta_line[0].lower():
+                while c < len(meta_line):
+                    collArray.append(meta_line[c])
+                    c+=1
 
-        # Resolution
-        res = reader.next()
-        i = start
-        while i < len(res):
-            resArray.append(res[i])
-            i+=1
+            # Grain size
+            elif 'grain size' in meta_line[0].lower():
+                while c < len(meta_line):
+                    grainArray.append(meta_line[c])
+                    c+=1
 
-        # Formula
-        formula = reader.next()
-        if 'range' in formula[0].lower(): # Check for range (no longer needed)
-            formula = reader.next()
+            # Viewing geometry
+            elif 'grain size' in meta_line[0].lower():
+                while c < len(meta_line):
+                    vGeoArray.append(meta_line[c])
+                    c+=1
 
-        i = start
-        while i < len(formula):
-            formArray.append(formula[i])
-            i+=1
+            # Resolution
+            elif 'resolution' in meta_line[0].lower():
+                while c < len(meta_line):
+                    resArray.append(meta_line[c])
+                    c+=1
 
-        # Composition
-        comp = reader.next()
-        i = start
-        while i < len(comp):
-            compArray.append(comp[i])
-            i+=1
+            # Formula
+            elif 'formula' in meta_line[0].lower():
+                while c < len(meta_line):
+                    formArray.append(meta_line[c])
+                    c+=1
 
+            # Composition
+            elif 'composition' in meta_line[0].lower():
+                while c < len(meta_line):
+                    compArray.append(meta_line[c])
+                    c+=1
+            
+            # New metadata fields here
+
+            else:
+                error_messages += "\"" + meta_line[0] + "\" does not contain a known key\n"
+
+            meta_line = reader.next()
+
+        # REFLECTANCE Section
         line = reader.next()
-        while ("Wavelength" not in line[0]):
-            line = reader.next()
 
+        # Figure out units
         if "microns" in line[0] or "um" in line[0]:
             factor = 1000
         else:
@@ -346,31 +364,49 @@ def process_file(file, mineral_class, mineral_type):
 
         wl = reader.next()
 
-        row_len = len(wl)
+        row_len = len(dataIDs)
+        c = start
 
-        dataPoints = [{}] * (row_len - 2)
+        dataPoints = []
+        for d in range(row_len - c):
+            dataPoints.append({})
+
         for row in reader:
             if hasNumbers(row[0]) == True:
-                for column in xrange(2,row_len):
+                for column in xrange(c,row_len):
+                    if row[column] == '':
+                      continue
+
                     if float(row[column]) > 1.0:
-                        dataPoints[column-2][str(float(row[0]) * factor)] = str(float(row[column]) / 100.)
+                        dataPoints[column-c][str(float(row[0]) * factor)] = str(float(row[column]) / 100.)
 
                     # Check for invalid datapoints #
                     elif float(row[column]) < 0.0:
                         continue
 
                     else:
-                        dataPoints[column-2][str(float(row[0]) * factor)] = row[column]
+                        dataPoints[column-c][str(float(row[0]) * factor)] = row[column]
 
     except Exception, e:
         print str(e)
 
     size = len(dataArray)
 
+    # Pad arrays to catch any missing values at end
+    sampArray += [''] * (size - len(sampArray))
+    nameArray += [''] * (size - len(nameArray))
+    collArray += [''] * (size - len(collArray))
+    grainArray += [''] * (size - len(grainArray))
+    vGeoArray += [''] * (size - len(vGeoArray))
+    resArray += [''] * (size - len(resArray))
+    formArray += [''] * (size - len(formArray))
+    compArray += [''] * (size - len(compArray))
+
     for i in range(size):
         dataId = dataArray[i]
         sampId = sampArray[i]
         name = nameArray[i]
+        collection = collArray[i]
         gr = grainArray[i]
         vGeo= vGeoArray[i]
         res = resArray[i]
@@ -381,10 +417,9 @@ def process_file(file, mineral_class, mineral_type):
 
         form = formArray[i]
         comp = compArray[i]
-        
+
         # Check to see if Data ID already exists #
-       # exists = Sample.objects.filter(data_id=dataID)
-          
+        # exists = Sample.objects.filter(data_id=dataID)
 
         sample = Sample.create(dataId, sampId, access, origin, collection, name, desc, mineral_type, mineral_class,'', gr, vGeo, res, tempRan, form, comp, dataPoints[i])
         sample.save()

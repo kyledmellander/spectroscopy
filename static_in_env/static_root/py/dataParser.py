@@ -4,423 +4,173 @@ import json
 import re
 import copy
 import itertools
-#import numpy as np
-import psycopg2
-
-#Takes in the csv file
-csvFile = sys.argv[1]
-
-# Grab Sample_Class (e.g. Magnetite, Sulfate)
-path = sys.argv[1]
-if "Magnetites" in path:
-    sample_cl = "Magnetite"
-elif "Oxides" in path:
-    sample_cl= "Oxide"
-elif "Sulfates" in path:
-    sample_cl = "Sulfate"
-else: sample_cl = 'NULL'
 
 def hasNumbers(inputString):
-    return bool(re.search(r'\d', inputString))
+  result = bool(re.search(r'\d', inputString))
+  return result
 
-dataArray = [] #Array of IDs
-sampArray = [] #Sample IDs
-nameArray = [] #names
-grainArray = []
-vGeoArray = []
-resArray = []
-rangArray = []
-formArray = []
-compArray = []
-dataPts = []  #matrix of num_data_point rows by 1+num_samples columns
-#reflectance = []
-#A = np.array([])
+def process_file(file, mineral_class, mineral_type):
+    dataArray = [] # Array of IDs
+    sampArray = [] # Sample IDs
+    nameArray = [] # Mineral Names
+    collArray = [] # Collection localities
+    grainArray = [] # Grain sizes
+    vGeoArray = [] # Viewing Geometries
+    resArray = [] # Resolutions
+    formArray = [] # Formulas
+    compArray = [] # Compositions
 
+    error_messages = ''
 
-with open(csvFile, 'rU') as cf:
-    reader = csv.reader(cf)
-    origin = reader.next()[1]
-    collection = reader.next()[1]
-    desc = reader.next()[1]
-    access = reader.next()[1]
-    reader.next()
+    try:
+        paramFile = file.read()
+        reader = csv.reader(file)
 
-    # Data ID
-    data = reader.next()
-    if data[1] != None:
-        i =1
-    else:
-        i = 2
-    #i = 2
-    idArray = []
-    idStringArray = []
-    while i < len(data):
-        id_num = data[i].rsplit("_", 1)
-        #print id_num[0]
-        #idStringArray.append(id_num[0])
-        if len(id_num) > 1:
-            idStringArray.append(id_num[0])
-            num = int(id_num[1])
-            idArray.append(num)
-        i+=1
+        # HEADER Section
+        header_line = reader.next()
+        while header_line[0] != '':
 
-    j = 1
-    sizeIdArray = len(idArray)
-    finalIdArray = []
-    finalIdArray.append(idArray[0])
-    while j < sizeIdArray:
-        if idArray[j] == idArray[j-1]:
-            newNum = idArray[j] + 1
-            idArray[j] = newNum
-            finalIdArray.append(newNum)
-        else:
-            finalIdArray.append(idArray[j])
-        j += 1
+            # Database of origin
+            if 'database' in header_line[0].lower():
+                origin = header_line[1]
 
-    k = 0
-    #print idStringArray
-    while k < sizeIdArray:
-        newId = str(idStringArray[k]) + "_" + str(finalIdArray[k]).zfill(2)
-        #print newId
-        dataArray.append(newId)
-        k += 1
+            # Spreadsheet Description
+            elif 'description' in header_line[0].lower():
+                desc = header_line[1]
 
+            # Date of original database access (YEAR-MONTH-DAY)
+            elif 'accessed' in header_line[0].lower():
+                access = header_line[1]
 
-    # Sample ID
-    samp = reader.next()
-    i = 2
-    while i < len(samp):
-        sampArray.append(samp[i])
-        i+=1
-
-    # Mineral name
-    name = reader.next()
-    i = 2
-    while i < len(name):
-        nameArray.append(name[i])
-        i+=1
-
-    scale = "nanometers"
-    size = reader.next()
-    if ("um" or "micron") in size[0]:
-        scale = "microns"
-    i = 2
-
-    while i < len(size):
-        arr = []
-        if hasNumbers(size[i]) == False:
-            grainArray.append(size[i])
-        else:
-            if ("um" or "micron") in size[i]:
-                temp = size[i].split()
-                temp1 = temp[0]
-                if "<" in temp1:
-                    temp2 = temp1.replace("<", "")
-                    if temp2.find("um") != -1:
-                        temp3 = temp2.split("u")
-                        arr.append(str(float(temp3[0])*1000))
-                    else:
-                        temp3 = float(temp2)*1000
-                        arr.append(temp3)
-                elif "-" in temp1:
-                    temp2 = temp1.split("-")
-                    #temp1 = str(float(temp2[0])*1000) + "-" + str(float(temp2[1])*1000)
-                    temp3 = str(float(temp2[0])*1000)
-                    arr.append(temp3)
-
-                    if temp2[1].find("um") != -1:
-                        temp5 = temp2[1].split("u")
-                        temp4 = str(float(temp5[0])*1000)
-                    else:
-                        temp4 = str(float(temp2[1])*1000)
-                    arr.append(temp4)
-                else:
-                    arr.append(temp1)
             else:
-                #grainArray.append(size[i])
-                temp = size[i].split()
-                temp1 = temp[0]
-                if "<" in temp1:
-                    temp1 = temp1.replace("<", "")
-                    if temp1.find("nm") != -1:
-                        temp2 = temp1.split("n")
-                        arr.append(temp2[0])
-                    else:
-                        arr.append(temp1)
-                    #temp1 = "<" + str(temp1)
-                elif "-" in temp1:
-                    temp2 = temp1.split("-")
-                    arr.append(temp2[0])
-                    if temp2[1].find("nm") != -1:
-                        temp3 = temp2[1].split("n")
-                        arr.append(temp3[0])
-                    else:
-                        arr.append(temp2[1])
-                else:
-                    arr.append(temp1)
-            grainArray.append(arr)
-        i+=1
-    scale = "nanometers"
+                error_messages += "\"" + header_line[0] + "\" does not contain a known key\n"
 
-    # Viewing Geometry
-    vg = reader.next()
-    i = 2
-    while i < len(vg):
-        vGeoArray.append(vg[i])
-        i+=1
+            header_line = reader.next()
 
+        # METADATA Section
+        dataIDs = reader.next() # Data ID must come first
+        start = 1
+        while dataIDs[start] == '':
+            start += 1
 
-        # geoArray = [None] * 4
-        # if vg[i] != "" and vg[i].find("unknown") == -1 and vg[i].find("?") == -1: #Question mark check: make more robust? Will there be some ?'s and some data?
-        #     token = vg[i].split('/')
-        #     if token[0].find("|") != -1:
-        #         sl = token[0].split("|")
-        #         geoArray[0] = sl[0]
-        #         geoArray[1] = sl[1]
-        #     else:
-        #         geoArray[0] = token[0]
-        #     if len(token) > 1:
-        #         if token[1].find("|") != -1:
-        #             sr = token[1].split("|")
-        #             if geoArray[1] != None:
-        #                 geoArray[2] = sr[0]
-        #                 geoArray[3] = sr[1]
-        #             else:
-        #                 geoArray[1] = sr[0]
-        #                 geoArray[2] = sr[1]
-        #         else:
-        #             geoArray[1] = token[1]
-        #     vGeoArray.append(geoArray)
-        # else:
-        #     #empty case - don't put in database
-        #     vGeoArray.append(geoArray)
+        c = start
+        while c < len(dataIDs):
+            dataArray.append(dataIDs[c])
+            c+=1
 
-    # Resolution
-    res = reader.next()
-    i = 2
+        # Rest of the metadata
+        meta_line = reader.next()
+        while meta_line[0] != '':
+            c = start
 
-    # if ("um" or "micron") in res[0]:
-    #     scale = "microns"
-    # else:
-    #     scale = "nanometers"
-    while i < len(res):
-        resArray.append(res[i])
-        i+=1
+            # Sample ID
+            if 'sample id' in meta_line[0].lower():
+                while c < len(meta_line):
+                    sampArray.append(meta_line[c])
+                    c+=1
 
-        ############# For making Resolution a searchable array #############
-        # tempArray = [None] * 4
-        # if res[i] != "" and res[i].find("unknown") == -1:
-        #     if res[i].find("/") != -1:
-        #         slash = res[i].split('/')
-        #         if scale == "microns":
-        #             tempArray[0] = float(slash[0]*1000)
-        #         else:
-        #             tempArray[0] = float(slash[0])
-        #         dash = slash[1].split('-')
-        #         if len(dash) > 1:
-        #             if scale == "microns":
-        #                 tempArray[1] = float(dash[0]*1000)
-        #                 tempArray[2] = float(dash[1]*1000)
-        #             else:
-        #                 tempArray[1] = float(dash[0])
-        #                 tempArray[2] = float(dash[1])
-        #     else:
-        #         temp1 = res[i].split('-')
-        #         if len(temp1) > 1:
-        #             first = temp1[0].split('@')
-        #             if len(first) > 1:
-        #                 last = temp1[1].split('@') #Assuming 2@3500-7@3500
-        #                 if last[1].find("nm") != -1:
-        #                     lt = last[1].split("n")
-        #                     scale = "nanometers"
-        #                 else:
-        #                     lt = last[1].split("u")
-        #                     scale = "microns"
-        #                 if scale == "microns":
-        #                     tempArray[0] = float(first[0])*1000
-        #                     tempArray[1] = float(first[1])*1000
-        #                     tempArray[2] = float(last[0])*1000
-        #                     tempArray[3] = float(last[1])*1000
-        #                 else:
-        #                     tempArray[0] = float(first[0])
-        #                     tempArray[1] = float(first[1])
-        #                     tempArray[2] = float(last[0])
-        #                     tempArray[3] = float(last[1])
-        #             else:
-        #                 if scale == "microns":
-        #                     tempArray[0] = float(first[0])*1000
-        #                     tempArray[1] = float(temp1[1])*1000
-        #                 else:
-        #                     tempArray[0] = float(first[0])
-        #                     tempArray[1] = float(temp1[1])
-        #         else:
-        #             #if isinstance(temp1[0], float):
-        #             if hasNumbers(temp1[0]) == True:
-        #                 if scale == "microns":
-        #                     tempArray[0] = float(temp1[0])*1000
-        #                 else:
-        #                     tempArray[0] = float(temp1[0])
-        #     resArray.append(tempArray)
-        # else:
-        #     #empty case- don't put in database
-        #     resArray.append(tempArray)
+            # Mineral name
+            elif 'name' in meta_line[0].lower():
+                while c < len(meta_line):
+                    nameArray.append(meta_line[c])
+                    c+=1
 
-    # Range
-    rang = reader.next()
-    i = 2
-    #print rang[0]
-    if ("um" or "micron") in rang[0]:
-        scale = "microns"
-    else:
-        scale = "nanometers"
-    while i < len(rang):
-        if rang[i] != "":
-            temp1 = []
-            if scale == "microns":
-                temp = rang[i].split('-')
-                if temp[1].find("um") != -1:
-                    ty = temp[1].split("u")
-                    temp1.append(float(temp[0]) * 1000)
-                    temp1.append(float(ty[0]) * 1000)
-                else:
-                    temp1.append(float(temp[0]) * 1000)
-                    temp1.append(float(temp[1]) * 1000)
+            # Collection Locality
+            elif 'locality' in meta_line[0].lower():
+                while c < len(meta_line):
+                    collArray.append(meta_line[c])
+                    c+=1
+
+            # Grain size
+            elif 'grain size' in meta_line[0].lower():
+                while c < len(meta_line):
+                    grainArray.append(meta_line[c])
+                    c+=1
+
+            # Viewing geometry
+            elif 'grain size' in meta_line[0].lower():
+                while c < len(meta_line):
+                    vGeoArray.append(meta_line[c])
+                    c+=1
+
+            # Resolution
+            elif 'resolution' in meta_line[0].lower():
+                while c < len(meta_line):
+                    resArray.append(meta_line[c])
+                    c+=1
+
+            # Formula
+            elif 'formula' in meta_line[0].lower():
+                while c < len(meta_line):
+                    formArray.append(meta_line[c])
+                    c+=1
+
+            # Composition
+            elif 'composition' in meta_line[0].lower():
+                while c < len(meta_line):
+                    compArray.append(meta_line[c])
+                    c+=1
+
+            """
+            Add new metadata fields here
+            """
+
             else:
-                temp = rang[i].split('-')
-                if temp[1].find("nm") != -1:
-                    ty = temp[1].split("n")
-                    temp1.append(float(temp[0]))
-                    temp1.append(float(ty[0]))
-                else:
-                    temp1.append(float(temp[0]))
-                    temp1.append(float(temp[1]))
-            rangArray.append(temp1)
-        else:
-            #empty case - don't put in database
-            rangArray.append(rang[i])
-        i+=1
-    scale = "nanometers"
+                error_messages += "\"" + meta_line[0] + "\" does not contain a known key\n"
 
-    formula = reader.next()
-    i = 2
-    while i < len(formula):
-        formArray.append(formula[i])
-        i+=1
+            meta_line = reader.next()
 
-    comp = reader.next()
-    i = 2
-    while i < len(comp):
-        compArray.append(comp[i])
-        i+=1
-
-    line = reader.next()
-    while ("Wavelength" not in line[0]):
+        # REFLECTANCE Section
         line = reader.next()
 
-    if ("microns" or "um") in line:
-        factor = 1000
-    else:
-        factor = 1
+        # Figure out units
+        if "microns" in line[0] or "um" in line[0]:
+            factor = 1000
+        else:
+            factor = 1
 
-    wl = reader.next()
+        wl = reader.next()
 
-    row_len = len(wl)
+        row_len = len(dataIDs)
+        c = start
 
-    waveDataPt = {}
-    for row in reader:
-        if hasNumbers(row[0]) == True:
-            waveDataPt[row[0]] = 'NULL'
+        dataPoints = [{}] * (row_len - c)
+        for row in reader:
+            if hasNumbers(row[0]) == True:
+                for column in xrange(c,row_len):
+                    if float(row[column]) > 1.0:
+                        dataPoints[column-c][str(float(row[0]) * factor)] = str(float(row[column]) / 100.)
 
-    i = 2
-    while i < row_len:
-        cf.seek(20)
-        currDict = copy.deepcopy(waveDataPt)
+                    # Check for invalid datapoints #
+                    elif float(row[column]) < 0.0:
+                        continue
 
-        for row in itertools.islice(reader, 21, len(currDict)):
-            if hasNumbers(row[0]) == True and row[i] != '':
-                if float(row[i]) > 1.0:
-                    row[i] = float(row[i]) / 100.
-                currDict[row[0]] = row[i]
+                    else:
+                        dataPoints[column-c][str(float(row[0]) * factor)] = row[column]
 
-        dataPts.append(currDict)
-        i += 1
+    except Exception, e:
+        print str(e)
 
-#----Database Things Happen Here----
-conn = None
+    size = len(dataArray)
 
-#Need to fill in with correct information
-conn = psycopg2.connect("dbname = 'spectrodb' user = 'myprojectuser' host = localhost password = 'password'")
+    for i in range(size):
+        dataId = dataArray[i]
+        sampId = sampArray[i]
+        name = nameArray[i]
+        collection = collArray[i]
+        gr = grainArray[i]
+        vGeo= vGeoArray[i]
+        res = resArray[i]
 
-cur = conn.cursor()
+        low = min([float(w) for w in dataPoints[i]])
+        high = max([float(w) for w in dataPoints[i]])
+        tempRan = [int(round(low, -2)), int(round(high, -2))]
 
-size = len(dataArray)
-for i in range(size):
-    dataId = dataArray[i]
-    sampId = sampArray[i]
-    name = nameArray[i]
-    gr = grainArray[i]
-    vGeo= vGeoArray[i]
-    res = resArray[i]
+        form = formArray[i]
+        comp = compArray[i]
 
-    # tempVG = vGeoArray[i]
-    # for j in range(len(tempVG)):
-    #     if tempVG[j] == None:
-    #         tempVG[j] = 'NULL'
-    # vg = '{' + str(tempVG[0]).strip() + ', ' + str(tempVG[1]).strip() + ', ' + str(tempVG[2]).strip() + ', ' + str(tempVG[3]).strip() + '}'
+        # Check to see if Data ID already exists #
+        # exists = Sample.objects.filter(data_id=dataID)
 
-    # tempRes = resArray[i]
-    # for j in range(len(tempRes)):
-    #     if tempRes[j] == None:
-    #         tempRes[j] = 'NULL'
-    # res = '{' + str(tempRes[0]).strip() + ', ' + str(tempRes[1]).strip() + ', ' + str(tempRes[2]).strip() + ', ' + str(tempRes[3]).strip() + '}'
-
-    if vGeo == '':
-        vGeo = 'NULL'
-
-    if res == '':
-        res = 'NULL'
-
-    tempRan = rangArray[i]
-    if len(tempRan) == 0:
-        tempRan = ['NULL', 'NULL']
-    for j in range(len(tempRan)):
-        if tempRan[j] == None:
-            tempRan[j] = 'NULL'
-    ran = '{' + str(tempRan[0]).strip() + ', ' + str(tempRan[1]).strip() + '}'
-
-    finalDataPts = copy.deepcopy(dataPts)
-
-    for j in range(len(dataPts)):
-        for key in dataPts[j]:
-            if dataPts[j][key] == "NULL":
-                del finalDataPts[j][key]
-
-    form = formArray[i]
-    comp = compArray[i]
-    reflect = json.dumps(finalDataPts[i])
-    query = "INSERT INTO mars_sample (DATA_ID, SAMPLE_ID, DATE_ACCESSED, ORIGIN, LOCALITY, NAME, SAMPLE_CLASS, SAMPLE_DESC, GRAIN_SIZE, VIEW_GEOM, RESOLUTION, REFL_RANGE, FORMULA, COMPOSITION, REFLECTANCE) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-    data = (dataId, sampId, access, origin, collection, name, sample_cl, desc, gr, vGeo, res, ran, form, comp, reflect)
-    try:
-        cur.execute(query, data)
-        conn.commit()
-    except psycopg2.IntegrityError:
-        print dataId + " already in database. Commit of sample aborted."
-        conn.rollback()
-        # query = "UPDATE mars_sample SET SAMPLE_ID = %s, SAMPLE_CLASS = %s WHERE DATA_ID = %s"
-        # data = (sample_cl, dataId)
-        # cur.execute(query, data)
-
-conn.commit()
-conn.close()
-
-# f = open('marsdb.sql', 'w')
-# insert = "INSERT INTO mars_sample (data_id, sample_id, date_accessed, origin, name, grain_size, view_geom)"
-#
-# for i in range(len(dataArray)):
-#     line = insert + " VALUES ('" + dataArray[i] + "', '" \
-#     + sampArray[i] + "', '" + access + "', '" + origin + "', '" \
-#     + nameArray[i] + "', '" + grainArray[i] + "', '{" + str(vGeoArray[i][0]) \
-#     + ', ' + str(vGeoArray[i][1]) + "}');"
-#     f.write(line + '\n')
-#
-# f.close()
+        sample = Sample.create(dataId, sampId, access, origin, collection, name, desc, mineral_type, mineral_class,'', gr, vGeo, res, tempRan, form, comp, dataPoints[i])
+        sample.save()
