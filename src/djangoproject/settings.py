@@ -140,8 +140,6 @@ STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_in_env","static_ro
 # Static files are sent to the root file, which could be on a different server
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static_in_pro","our_static"),
-    #os.path.join(BASE_DIR, "static_in_env")
-    #'/var/www/static/',
 ]
 
 # This is for uploaded files

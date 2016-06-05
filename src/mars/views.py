@@ -345,10 +345,8 @@ def process_file(file, mineral_class, mineral_type):
                 while c < len(meta_line):
                     compArray.append(meta_line[c])
                     c+=1
-
-            """
-            Add new metadata fields here
-            """
+            
+            # New metadata fields here
 
             else:
                 error_messages += "\"" + meta_line[0] + "\" does not contain a known key\n"
@@ -390,6 +388,16 @@ def process_file(file, mineral_class, mineral_type):
         print str(e)
 
     size = len(dataArray)
+
+    # Pad arrays to catch any missing values at end
+    sampArray += [''] * (size - len(sampArray))
+    nameArray += [''] * (size - len(nameArray))
+    collArray += [''] * (size - len(collArray))
+    grainArray += [''] * (size - len(grainArray))
+    vGeoArray += [''] * (size - len(vGeoArray))
+    resArray += [''] * (size - len(resArray))
+    formArray += [''] * (size - len(formArray))
+    compArray += [''] * (size - len(compArray))
 
     for i in range(size):
         dataId = dataArray[i]
