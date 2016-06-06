@@ -122,6 +122,7 @@ def search(request):
       if mOrigin != 'Any':
         results = results.filter(origin__icontains=mOrigin)
 
+    results = results.sort(key=lambda x: x.name.lower())
     return render_to_response('results.html', {"results": results,}, context_instance=RequestContext(request))
 
   else:
