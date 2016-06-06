@@ -1,14 +1,39 @@
-
+<style>
+	.chart-container {
+		display:inline-block;
+		position:relative;
+		width:100%;
+		height:100%;
+		left:10px;
+		padding-bottom:145%;
+		border:1px dotted silver;
+		overflow:visible;
+	}
+	.svg-content-responsive {
+		display:inline-block;
+		position:absolute;
+		top:10px;
+		left:50px;
+		bottom:10px;
+		right:10px;
+	}
+  .axis path,
+  .axis line {
+    fill:none;
+    stroke: #000;
+    shape-rendering:crispEdges;
+  }
+</style>
 {% extends "layouts/base.html" %}
 {% block content %}
 <body>
 {% if graphResults %}
 <!-- load the d3.js library -->
 	<div class="container">
-  	<div class="jumbotron" id="graphJtron">
-    	<svg id="visualisation" width="1000" height="500"></svg>
-
+  	<div class="chart-container" id="graphJtron"></div>
       	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        
+        
         <script>
         	function InitChart() {
             //Change JSON string to object
@@ -16,23 +41,20 @@
 
             var color = d3.scale.category10();
 
-
             var jumbowidth = document.getElementById("graphJtron").offsetWidth;
-            console.log(jumbowidth);
-            var jumboheight = document.getElementById("graphJtron").offsetHeight;
-            console.log(jumboheight);
 
-            var vis = d3.select("#visualisation"),
-                WIDTH = jumbowidth *.8,
-                HEIGHT = jumboheight*.8,
-                MARGINS = {
-                    top: 50,
-                    right: 20,
+            WIDTH =	Math.floor(jumbowidth*.8); 
+            HEIGHT = Math.floor(WIDTH*.6);
+            MARGINS = {
+            				top: 50,
+                    right: 0,
                     bottom: 50,
-                    left: 50
+                    left: 80
                 },
-								lSpace = WIDTH/GRAPH.length;
 
+								lSpace = WIDTH/GRAPH.length;
+            
+            //Scale the graph Y Axix based on the min and max of your graphs
             var minX = Number.MAX_VALUE;
             var minY = Number.MAX_VALUE;
             var maxX = Number.MIN_VALUE;
@@ -44,6 +66,7 @@
               var reflectance = d3.entries(d.reflectance);
               var curX = 0;
               var cury = 0;
+
               for (var i=reflectance.length-1; i>=0; i--) {
                 curX = parseFloat(reflectance[i].key);
                 curY = parseFloat(reflectance[i].value);
@@ -60,8 +83,8 @@
             maxX = maxX * 1.05;
             maxY = maxY * 1.05;
 
-            xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([minX,maxX]),
-            yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([minY,maxY]),
+            xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([minX,maxX]).clamp(true),
+            yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([minY,maxY]).clamp(true),
             xAxis = d3.svg.axis()
                 .orient("bottom")
                 .scale(xScale)
@@ -69,7 +92,15 @@
             yAxis = d3.svg.axis()
                 .scale(yScale)
                 .orient("left");
-
+            
+            var vis = d3.select(".chart-container").append("svg")
+							.attr("width", '100%')
+							.attr("height", '100%')
+              .attr("pointer-events","all")
+              .call(d3.behavior.zoom().y(yScale).x(xScale).on("zoom",zoomed))
+							.classed("svg-content-responsive",true);
+            
+            
             vis.append("svg:g")
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
@@ -85,15 +116,12 @@
           	   .style("text-anchor", "end")
           	   .attr("x", WIDTH-400)
           	   .attr("y", HEIGHT-10)
-          	   .text("Wavelength");
+          	   .text("Wavelength (nm)");
 
           	vis.append("text")
           	   .attr("class", "y label")
-          	   .style("text-anchor", "end")
-          	   .attr("y", HEIGHT)
-               .attr("x", -200)
-          	   .attr("dy", "-45em")
-          	   .attr("transform", "rotate(-90)")
+          	   .style("text-anchor", "middle")
+          	   .attr("transform", "translate(" + (10) + "," + (HEIGHT/2) +") rotate(-90)")
           	   .text("Reflectance");
 
             var lineGen = d3.svg.line()
@@ -113,41 +141,62 @@
               }
             }
 
-            GRAPH.forEach(function(d,i) {
+            var zoom = d3.behavior.zoom()
+              .on("zoom",zoomed);
+
+
+            var drawLines = GRAPH.forEach(function(d,i) {
                 //Creates an array of objects with key-value pairs, sorted by keys
                 var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
 
                 //Append path to graph
                 vis.append('svg:path')
-                .attr('d', lineGen(reflectanceKV))   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
-                .attr('stroke', function(d,j) {
-                        return "hsl(" + Math.random() * 360 + ",50%,50%)";
-                })
-                .attr('stroke-width', 2)
-                .attr('id', 'line_'+d.data_id)
-                .attr('fill','none');
+                  .attr('d', lineGen(reflectanceKV))   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
+                  .attr('stroke', function(d,j) {
+                          return "hsl(" + ((360/GRAPH.length+1) + (i*(360/GRAPH.length+1)))  + ",80%,30%)";
+                        })
+                  .attr('stroke-width', 1.25)
+                  .attr('id', 'line_mcline' + i)
+                  .attr('fill', 'none');
+                  
 
                 // Line Disappearing nonsense
                 vis.append("text")
-                    .attr("x", (lSpace/2)+i*lSpace)
-                    .attr("y", HEIGHT+10)
-                    .style("fill", "black")
+                    .attr("x", 50)
+                    .attr("y", HEIGHT+20+20*i)
+                    .style("fill", function(d,j) {
+                            return "hsl(" + ((360/GRAPH.length+1) + (i*(360/GRAPH.length+1)))  + ",80%,30%)";
+                		      })
                     .attr("class","legiend")
-                    .on('click',function() {
+                    .on('click', function() {
                         var active   = d.active ? false : true;
+												var color = "hsl(" + ((360/GRAPH.length+1) + (i*(360/GRAPH.length+1)))  + ",80%,30%)"
                         var opacity = active ? 0 : 1;
-                        d3.select("#line_" + d.data_id).style("opacity", opacity);
+                        console.log(d3.select(this));
+                        d3.select("path#line_mcline"+i).style("opacity",opacity);
+                        console.log(d3.select("path#line_mcline"));
                         d.active = active;
+												active ? d3.select(this).style("fill","gray") : d3.select(this).style("fill",color) 
                     })
-                    .text(d.data_id + " ("+ d.name+")" );
+                    .text("Click to activate/deactivate: " + d.data_id + " ("+ d.name+")" );
             });
 
+            function zoomed() {
+              vis.select(".x.axis").call(xAxis);
+              vis.select(".y.axis").call(yAxis);
+              GRAPH.forEach (function(d,i) { 
+                var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
+                d3.select("path#line_mcline"+i)
+                  .attr('d', lineGen(reflectanceKV));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
+                });
+              }
           }
 
           InitChart();
 
-          </script>
-      </div>
+          </script> 
+			<br>	
+			<br>
       <br>
       <br>
       <br>
