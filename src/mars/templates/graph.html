@@ -125,7 +125,6 @@
           	   .text("Reflectance");
 
             var lineGen = d3.svg.line()
-
                 .x(function(d) {
                     return xScale(d.key);
                 })
@@ -144,6 +143,20 @@
             var zoom = d3.behavior.zoom()
               .on("zoom",zoomed);
 
+            var focus = vis.append("g")
+              .attr("class", "focus")
+              .style("display","null");
+
+            focus.append("circle")
+              .attr("r", 4)
+              .attr("fill","none")
+              .attr("stroke-width",1.25)
+              .attr("stroke","gray");
+            
+            focus.append("text")
+              .attr("dx",8)
+              .attr("dy", "1em");
+
 
             var drawLines = GRAPH.forEach(function(d,i) {
                 //Creates an array of objects with key-value pairs, sorted by keys
@@ -157,8 +170,48 @@
                         })
                   .attr('stroke-width', 1.25)
                   .attr('id', 'line_mcline' + i)
-                  .attr('fill', 'none');
+                  .attr('fill', 'none')
+                  .on("mouseover", function() {
+                    var mouseX = xScale.invert(d3.mouse(this)[0]);
+                    var mouseY = yScale.invert(d3.mouse(this)[1]);
+                    var coord = findClosest(reflectanceKV, mouseX);
+                    focus.attr("transform", "translate(" + xScale(coord[0]) +
+                                            "," + yScale(coord[1]) + ")");
+                    focus.select("text")
+                      .text(coord[0]+", " + coord[1]);                         
+                    console.log("mouse: " + mouseX + ", " + mouseY); 
+                    console.log("coord: " + coord); 
+                  });
+                
+                // This function uses binary search to find the closest
+                // X value within an array of x y coordinates
+                // and returns the cooresponding coordinates
+                function findClosest(graph, mouseX) {
+                  var min = 0;
+                      max = graph.length - 1;
+                      mid = Math.floor((max+min)/2);
+                      nearestX = graph[mid].key;
+                      nearestY = graph[mid].value;
+                      dx = Math.abs(mouseX - nearestX)
+                      diff = dx;
                   
+                  while (diff != 0 && (max-min) > 1) {
+                    if (graph[mid].key > mouseX) {
+                      max = mid; 
+                    } else {
+                      min = mid; 
+                    }
+
+                    mid = Math.floor((max+min)/2);
+                    diff = (Math.abs(graph[mid].key - mouseX));
+                    if (diff < dx) {
+                      dx = diff;
+                      nearestX = graph[mid].key;
+                      nearestY = graph[mid].value;
+                    }
+                  }
+                  return [nearestX, nearestY];
+                }
 
                 // Line Disappearing nonsense
                 vis.append("text")
@@ -172,14 +225,14 @@
                         var active   = d.active ? false : true;
 												var color = "hsl(" + ((360/GRAPH.length+1) + (i*(360/GRAPH.length+1)))  + ",80%,30%)"
                         var opacity = active ? 0 : 1;
-                        console.log(d3.select(this));
                         d3.select("path#line_mcline"+i).style("opacity",opacity);
-                        console.log(d3.select("path#line_mcline"));
                         d.active = active;
 												active ? d3.select(this).style("fill","gray") : d3.select(this).style("fill",color) 
                     })
                     .text("Click to activate/deactivate: " + d.data_id + " ("+ d.name+")" );
+               
             });
+
 
             function zoomed() {
               vis.select(".x.axis").call(xAxis);
@@ -190,6 +243,7 @@
                   .attr('d', lineGen(reflectanceKV));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
                 });
               }
+
           }
 
           InitChart();
