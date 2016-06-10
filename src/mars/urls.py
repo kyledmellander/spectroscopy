@@ -13,5 +13,6 @@ urlpatterns = [
     url(r'^admin/login/$', views.login),
     url(r'^export/$', views.graph, name="export"),
     url(r'^upload/$', views.upload_file, name="upload"),
+    url(r'^logout/$', views.logout_view, name="logout"),
     url(r'^$', views.search, name='home'),
 ]

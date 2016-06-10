@@ -9,6 +9,7 @@ from .models import Sample, SignUp
 from django.utils.encoding import smart_str
 from django.contrib.staticfiles import finders
 from zipfile import ZipFile
+from django.contrib.auth import logout
 
 import re
 import copy
@@ -79,6 +80,10 @@ from django.contrib import messages
 # def about(request):
 # 	context = RequestContext(request)
 # 	return render(request, 'about.html', context_instance=context)
+
+def logout_view(request):
+  logout(request)
+  return redirect('/')
 
 @register.filter
 def get_reflectance(dictionary, key):
