@@ -172,25 +172,20 @@ def graph(request):
 
         # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
         writer.writerow([smart_str("Database of Origin"), smart_str(s.origin),])
-        writer.writerow([smart_str("Locality"), smart_str(s.locality),])
         writer.writerow([smart_str("Sample Description"), smart_str(s.sample_desc),])
         writer.writerow([smart_str("Date Accessed"), smart_str(s.date_accessed),])
         writer.writerow([])
         writer.writerow([smart_str("Data ID"), smart_str(s.data_id),])
         writer.writerow([smart_str("Sample ID"), smart_str(s.sample_id),])
         writer.writerow([smart_str("Mineral Name"), smart_str(s.name),])
-        writer.writerow([smart_str("Sample Type"), smart_str(s.sample_type),])
-        writer.writerow([smart_str("Mineral Class"), smart_str(s.sample_class),])
+        writer.writerow([smart_str("Locality"), smart_str(s.locality),])
         writer.writerow([smart_str("Grain Size"), smart_str(s.grain_size),])
         writer.writerow([smart_str("Viewing Geometry"), smart_str(s.view_geom),])
         writer.writerow([smart_str("Resolution"), smart_str(s.resolution),])
-        writer.writerow([smart_str("Reflectance Range"), smart_str(s.refl_range),])
         writer.writerow([smart_str("Formula"), smart_str(s.formula),])
         writer.writerow([smart_str("Composition"), smart_str(s.composition),])
         writer.writerow([])
-        writer.writerow([])
-        writer.writerow([])
-        writer.writerow([smart_str("Wavelength"), smart_str("Reflectance"),])
+        writer.writerow([smart_str("Wavelength"),])
         refl = reflectanceDict[s.data_id].split(',')
         count = count + 1
         for r in range(0,len(refl)-1):
@@ -206,7 +201,7 @@ def graph(request):
       zipped_file.seek(0)
 
       response = HttpResponse(zipped_file, content_type='application/octet-stream')
-      response['Content-Disposition'] = 'attachment; filename=zippy.zip'
+      response['Content-Disposition'] = 'attachment; filename=samples.zip'
 
       return response
 
