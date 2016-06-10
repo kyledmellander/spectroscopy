@@ -159,7 +159,7 @@ def graph(request):
       dictionaries = [obj.as_dict() for obj in samples]
       reflectanceDict = {}
       for item in dictionaries:
-        sortedList = sorted(item["reflectance"].iteritems())
+        sortedList = sorted(item["reflectance"].iteritems(), key=lambda(x,y):float(x))
         stringlist = []
         for key,value in sortedList:
           stringlist.append(str(key) + ":" +  str(value) + ",")
