@@ -97,9 +97,11 @@
               </ul>
             </li> -->
           </ul>
-          <!-- <ul class="nav navbar-nav navbar-right">
-            <li><a href="/admin">Admin Login</a></li>
-          </ul> -->
+          <ul class="nav navbar-nav navbar-right">
+            {% if user.is_authenticated %}
+            <li><a href="/logout">Logout</a></li>
+            {% endif %}
+          </ul>
         </div><!--/.nav-collapse -->
     </nav>
 
