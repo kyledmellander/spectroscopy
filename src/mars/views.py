@@ -21,6 +21,7 @@ import StringIO
 import csv
 import json
 import subprocess
+import operator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.core.serializers.json import DjangoJSONEncoder
@@ -101,7 +102,9 @@ def meta(request):
 
 def search(request):
   form_class = SearchForm
-  results = Sample.objects.all()
+  #results = Sample.objects.order_by('data_id')
+  results = Sample.objects.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name', 'data_id')
+  #results = results.extra(select={'name_is_null': 'name IS NULL'}).order_by('name_is_null')
 
   if request.method == 'POST':
     form = form_class(data=request.POST)
@@ -122,6 +125,8 @@ def search(request):
       if mOrigin != 'Any':
         results = results.filter(origin__icontains=mOrigin)
 
+    #results = results.sort(key=lambda x: x.name.lower())
+    #ordered = sorted(results, key=operator.attrgetter('name').lower())
     return render_to_response('results.html', {"results": results,}, context_instance=RequestContext(request))
 
   else:
@@ -167,25 +172,25 @@ def graph(request):
 
         # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
         writer.writerow([smart_str("Database of Origin"), smart_str(s.origin),])
-        writer.writerow([smart_str("Description"), smart_str(s.sample_desc),])
+        writer.writerow([smart_str("Sample Description"), smart_str(s.sample_desc),])
         writer.writerow([smart_str("Date Accessed"), smart_str(s.date_accessed),])
         writer.writerow([])
-        writer.writerow([smart_str("Data ID"), ' ', smart_str(s.data_id),])
-        writer.writerow([smart_str("Sample ID"), ' ', smart_str(s.sample_id),])
-        writer.writerow([smart_str("Name"), ' ', smart_str(s.name),])
-        writer.writerow([smart_str("Locality"), ' ', smart_str(s.locality),])
-        writer.writerow([smart_str("Grain Size"), ' ', smart_str(s.grain_size),])
-        writer.writerow([smart_str("Viewing Geometry"), ' ', smart_str(s.view_geom),])
-        writer.writerow([smart_str("Resolution"), ' ', smart_str(s.resolution),])
-        writer.writerow([smart_str("Formula"), ' ', smart_str(s.formula),])
-        writer.writerow([smart_str("Composition"), ' ', smart_str(s.composition),])
+        writer.writerow([smart_str("Data ID"), smart_str(s.data_id),])
+        writer.writerow([smart_str("Sample ID"), smart_str(s.sample_id),])
+        writer.writerow([smart_str("Mineral Name"), smart_str(s.name),])
+        writer.writerow([smart_str("Locality"), smart_str(s.locality),])
+        writer.writerow([smart_str("Grain Size"), smart_str(s.grain_size),])
+        writer.writerow([smart_str("Viewing Geometry"), smart_str(s.view_geom),])
+        writer.writerow([smart_str("Resolution"), smart_str(s.resolution),])
+        writer.writerow([smart_str("Formula"), smart_str(s.formula),])
+        writer.writerow([smart_str("Composition"), smart_str(s.composition),])
         writer.writerow([])
-        writer.writerow([smart_str("Wavelength (nm)"),])
+        writer.writerow([smart_str("Wavelength"),])
         refl = reflectanceDict[s.data_id].split(',')
         count = count + 1
         for r in range(0,len(refl)-1):
           line = refl[r].split(':')
-          writer.writerow([line[0], ' ', line[1],])
+          writer.writerow([line[0], line[1],])
         file.seek(0)
         files.append(file)
       zipped_file = StringIO.StringIO()
@@ -227,8 +232,10 @@ def upload_file(request):
     print mclass
     print mtype
     if form.is_valid():
-      process_file(request.FILES['file'], mclass, mtype)
+      overwrite = process_file(request.FILES['file'], mclass, mtype)
       messages.success(request, 'Success!')
+      if len(overwrite) != 0:
+        messages.warning(request, 'WARNING: The following data IDs were overwritten. If this was not the intended behavior, please check for non-unique data IDs. ' + ', '.join(overwrite))
       #return HttpResponseRedirect('/admin/mars/sample')
       return HttpResponseRedirect('/upload/')
   else:
@@ -396,7 +403,8 @@ def process_file(file, mineral_class, mineral_type):
     resArray += [''] * (size - len(resArray))
     formArray += [''] * (size - len(formArray))
     compArray += [''] * (size - len(compArray))
-
+    
+    overwritten = []
     for i in range(size):
         dataId = dataArray[i]
         sampId = sampArray[i]
@@ -414,7 +422,10 @@ def process_file(file, mineral_class, mineral_type):
         comp = compArray[i]
 
         # Check to see if Data ID already exists #
-        # exists = Sample.objects.filter(data_id=dataID)
+        if Sample.objects.filter(data_id=dataId).exists():
+          overwritten.append(dataId)
 
         sample = Sample.create(dataId, sampId, access, origin, collection, name, desc, mineral_type, mineral_class,'', gr, vGeo, res, tempRan, form, comp, dataPoints[i])
         sample.save()
+
+    return overwritten

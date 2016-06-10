@@ -18,33 +18,38 @@
              <button type="submit" name="meta" formaction="/meta/" class="btn btn-success">View Metadata</button><br>
              <br>
              <input type="checkbox" name="selection" onClick="toggle(this)" style="height:15px; width:15px;"><b> Select All</b>
-              <table class="table table-hover">
-              <thead>
-               <tr>
-                 <th>Select</th>
-                 <th>ID</th>
-                 <th>Name</th>
-	               <th>Class</th>
-                 <th>Origin</th>
-                 <th>Grain Size</th>
-                 <th>Reflectance Range</th>
-               </tr>
-               </thead>
-               <tbody>
-               <tr>
-                {% for result in results %}
-                  <td> <input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} style="height:15px; width:15px;"> </td>
-                  <td><label for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
-                  <td><label for="option{{ result.data_id }}"> {{ result.name }} </label></td>
-                  <td><label for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
-                  <td><label for="option{{ result.data_id }}"> {{ result.origin }} </label></td>
-                  <td><label for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
-                  <td><label for="option{{ result.data_id }}"> {{ result.refl_range }} </label></td>
+              <div class="table-responsive">
+              <table class="table table-striped table-hover table-condensed">
+                <thead>
                   <tr>
-                {% endfor %}
-              </tr>
-              </tbody>
-            </table>
+                    <th width="5%">Select</th>
+                    <th width="10%">ID</th>
+                    <th width="15%">Name</th>
+	                  <th width="15%">Class</th>
+                    <th width="25%">Origin</th>
+                    <th width="15%">Grain Size</th>
+                    <th width="15%">Reflectance Range</th>
+                  </tr>
+                </thead>
+              </table>
+              <div class="bodycontainer scrollable">
+              <table class="table table-hover table-striped table-condensed table-scrollable">
+                <tbody>
+                  {% for result in results %}
+                    <tr>
+                      <td width="5%"> <input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} style="height:15px; width:15px;"> </td>
+                      <td width="10%"><label for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
+                      <td width="15%"><label for="option{{ result.data_id }}"> {{ result.name }} </label></td>
+                      <td width="15%"><label for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
+                      <td width="25%"><label for="option{{ result.data_id }}"> {{ result.origin }} </label></td>
+                      <td width="15%"><label for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
+                      <td width="15%"><label for="option{{ result.data_id }}"> {{ result.refl_range }} </label></td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              </div>
+            </div>
             <button type="submit" name="graphForm" formaction="/graph/" class="btn btn-success">Graph</button>
             <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button>
             <button type="submit" name="meta" formaction="/meta/" class="btn btn-success">View metadata</button><br>
