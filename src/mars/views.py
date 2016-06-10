@@ -190,7 +190,7 @@ def graph(request):
         count = count + 1
         for r in range(0,len(refl)-1):
           line = refl[r].split(':')
-          writer.writerow([line[0], ' ', line[1],])
+          writer.writerow([line[0], line[1],])
         file.seek(0)
         files.append(file)
       zipped_file = StringIO.StringIO()
