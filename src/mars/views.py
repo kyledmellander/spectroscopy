@@ -232,8 +232,9 @@ def upload_file(request):
     print mclass
     print mtype
     if form.is_valid():
-      process_file(request.FILES['file'], mclass, mtype)
+      overwrite = process_file(request.FILES['file'], mclass, mtype)
       messages.success(request, 'Success!')
+      messages.warning(request, 'WARNING: The following data IDs were overwritten. If this was not the intended behavior, please check for non-unique data IDs. ' + ', '.join(overwrite))
       #return HttpResponseRedirect('/admin/mars/sample')
       return HttpResponseRedirect('/upload/')
   else:
@@ -401,7 +402,8 @@ def process_file(file, mineral_class, mineral_type):
     resArray += [''] * (size - len(resArray))
     formArray += [''] * (size - len(formArray))
     compArray += [''] * (size - len(compArray))
-
+    
+    overwritten = []
     for i in range(size):
         dataId = dataArray[i]
         sampId = sampArray[i]
@@ -419,7 +421,11 @@ def process_file(file, mineral_class, mineral_type):
         comp = compArray[i]
 
         # Check to see if Data ID already exists #
-        # exists = Sample.objects.filter(data_id=dataID)
+        exists = Sample.objects.filter(data_id=dataId)
+        if exists != None:
+          overwritten.append(dataId)
 
         sample = Sample.create(dataId, sampId, access, origin, collection, name, desc, mineral_type, mineral_class,'', gr, vGeo, res, tempRan, form, comp, dataPoints[i])
         sample.save()
+
+    return overwritten
