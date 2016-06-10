@@ -21,6 +21,7 @@ import StringIO
 import csv
 import json
 import subprocess
+import operator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.core.serializers.json import DjangoJSONEncoder
@@ -101,7 +102,9 @@ def meta(request):
 
 def search(request):
   form_class = SearchForm
-  results = Sample.objects.all()
+  #results = Sample.objects.order_by('data_id')
+  results = Sample.objects.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name', 'data_id')
+  #results = results.extra(select={'name_is_null': 'name IS NULL'}).order_by('name_is_null')
 
   if request.method == 'POST':
     form = form_class(data=request.POST)
@@ -122,6 +125,8 @@ def search(request):
       if mOrigin != 'Any':
         results = results.filter(origin__icontains=mOrigin)
 
+    #results = results.sort(key=lambda x: x.name.lower())
+    #ordered = sorted(results, key=operator.attrgetter('name').lower())
     return render_to_response('results.html', {"results": results,}, context_instance=RequestContext(request))
 
   else:
