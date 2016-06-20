@@ -206,7 +206,7 @@ def graph(request):
       zipped_file.seek(0)
 
       response = HttpResponse(zipped_file, content_type='application/octet-stream')
-      response['Content-Disposition'] = 'attachment; filename=samples.zip'
+      response['Content-Disposition'] = 'attachment; filename=spectra.zip'
 
       return response
 
