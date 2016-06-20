@@ -173,7 +173,7 @@ def graph(request):
         # Create the HttpResponse object with the appropriate CSV header
         file = StringIO.StringIO()
         writer = csv.writer(file)
-        names.append(smart_str(s.data_id))
+        names.append(smart_str(s.data_id.strip()))
 
         # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
         writer.writerow([smart_str("Database of Origin"), smart_str(s.origin),])
