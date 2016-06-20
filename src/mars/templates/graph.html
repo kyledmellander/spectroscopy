@@ -96,7 +96,7 @@
             var vis = d3.select(".chart-container").append("svg")
 							.attr("width", '100%')
 							.attr("height", '100%')
-              .attr("pointer-events","all")
+              //.attr("pointer-events","all")
               .call(d3.behavior.zoom().y(yScale).x(xScale).on("zoom",zoomed))
 							.classed("svg-content-responsive",true);
             
@@ -143,24 +143,89 @@
             var zoom = d3.behavior.zoom()
               .on("zoom",zoomed);
 
+
+            //Add the text and the circle from zooming
             var focus = vis.append("g")
               .attr("class", "focus")
               .style("display","null");
 
             focus.append("circle")
-              .attr("r", 4)
+              .attr("r", 3)
               .attr("fill","none")
               .attr("stroke-width",1.25)
               .attr("stroke","gray");
             
             focus.append("text")
+              .attr("opacity",.5)
               .attr("dx",8)
               .attr("dy", "1em");
+
+
+            //Lines will hold each individual line's data
+            var lines = [];
+            var lineActive = [];
+            
+            //Given an array of lines, find the closest X, Y point on the graph
+            function findClosestLinePoint(lineArray, mouseX, mouseY) {
+              var closestDistance = Number.MAX_VALUE;
+              var closestPoint = null;
+              
+              lineArray.forEach(function(line,index) {
+                if (lineActive[index] == false) {
+                  var point = findClosestPoint(line,mouseX);
+                  var yDistance = distance(mouseX,point[1],mouseX, mouseY);
+                  var xDistance = distance(point[0], mouseY, mouseX, mouseY); 
+                  if (xDistance < 20) {
+                    if (yDistance < closestDistance) {
+                      closestPoint = point; 
+                      closestDistance = yDistance;
+                    }
+                  }
+                }
+              });
+              return closestPoint;
+            }
+
+            function distance (x1,y1,x2,y2) {
+              return Math.sqrt(Math.pow((x1-x2),2) + Math.pow((y1-y2),2)); 
+            }
+            
+            //Given a line, find the closet x point to your mouse
+            //and return the x,y coordinate
+            function findClosestPoint(line, mouseX) {  
+              var min = 0,
+                  max = line.length - 1,
+                  mid = Math.floor((max+min)/2),
+                  nearestX = line[mid].key,
+                  nearestY = line[mid].value,
+                  dx = Math.abs(mouseX - nearestX),
+                  diff = dx;
+              
+              while (diff != 0 && (max-min) > 1) {
+                if (line[mid].key > mouseX) {
+                  max = mid; 
+                } else {
+                  min = mid; 
+                }
+
+                mid = Math.floor((max+min)/2);
+                diff = (Math.abs(line[mid].key - mouseX));
+                if (diff < dx) {
+                  dx = diff;
+                  nearestX = line[mid].key;
+                  nearestY = line[mid].value;
+                }
+              }
+              return [nearestX, nearestY];
+            }
 
 
             var drawLines = GRAPH.forEach(function(d,i) {
                 //Creates an array of objects with key-value pairs, sorted by keys
                 var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
+                lines.push(reflectanceKV);
+                lineActive.push(false);
+                console.log(i);
 
                 //Append path to graph
                 vis.append('svg:path')
@@ -170,48 +235,8 @@
                         })
                   .attr('stroke-width', 1.25)
                   .attr('id', 'line_mcline' + i)
-                  .attr('fill', 'none')
-                  .on("mouseover", function() {
-                    var mouseX = xScale.invert(d3.mouse(this)[0]);
-                    var mouseY = yScale.invert(d3.mouse(this)[1]);
-                    var coord = findClosest(reflectanceKV, mouseX);
-                    focus.attr("transform", "translate(" + xScale(coord[0]) +
-                                            "," + yScale(coord[1]) + ")");
-                    focus.select("text")
-                      .text(coord[0]+", " + coord[1]);                         
-                    console.log("mouse: " + mouseX + ", " + mouseY); 
-                    console.log("coord: " + coord); 
-                  });
-                
-                // This function uses binary search to find the closest
-                // X value within an array of x y coordinates
-                // and returns the cooresponding coordinates
-                function findClosest(graph, mouseX) {
-                  var min = 0;
-                      max = graph.length - 1;
-                      mid = Math.floor((max+min)/2);
-                      nearestX = graph[mid].key;
-                      nearestY = graph[mid].value;
-                      dx = Math.abs(mouseX - nearestX)
-                      diff = dx;
+                  .attr('fill', 'none');
                   
-                  while (diff != 0 && (max-min) > 1) {
-                    if (graph[mid].key > mouseX) {
-                      max = mid; 
-                    } else {
-                      min = mid; 
-                    }
-
-                    mid = Math.floor((max+min)/2);
-                    diff = (Math.abs(graph[mid].key - mouseX));
-                    if (diff < dx) {
-                      dx = diff;
-                      nearestX = graph[mid].key;
-                      nearestY = graph[mid].value;
-                    }
-                  }
-                  return [nearestX, nearestY];
-                }
 
                 // Line Disappearing nonsense
                 vis.append("text")
@@ -227,23 +252,44 @@
                         var opacity = active ? 0 : 1;
                         d3.select("path#line_mcline"+i).style("opacity",opacity);
                         d.active = active;
+                        lineActive[i] = active;
 												active ? d3.select(this).style("fill","gray") : d3.select(this).style("fill",color) 
                     })
                     .text("Click to activate/deactivate: " + d.data_id + " ("+ d.name+")" );
                
             });
 
+            vis.append("rect")
+              .attr("pointer-events", "all")
+              .attr("fill", "none")
+              .attr("width", WIDTH)
+              .attr("height", HEIGHT)
+              .on("mouseover", function() { focus.style("display", null);})
+              .on("mouseout", function() { focus.style("display", "none");})
+              .on("mousemove", mousemove);
+
+            function mousemove() {
+              focus.style("display",null);
+              var mouseX = xScale.invert(d3.mouse(this)[0]);
+              var mouseY = yScale.invert(d3.mouse(this)[1]);
+              var coord = findClosestLinePoint(lines, mouseX, mouseY);
+              focus.attr("transform", "translate(" + xScale(coord[0]) +
+                                            "," + yScale(coord[1]) + ")");
+              focus.select("text")
+                .text(Math.round(coord[0])+", " + parseFloat(coord[1]).toFixed(3));                         
+            }
+
 
             function zoomed() {
               vis.select(".x.axis").call(xAxis);
               vis.select(".y.axis").call(yAxis);
+              focus.style("display","none");
               GRAPH.forEach (function(d,i) { 
                 var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
                 d3.select("path#line_mcline"+i)
                   .attr('d', lineGen(reflectanceKV));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
                 });
               }
-
           }
 
           InitChart();
