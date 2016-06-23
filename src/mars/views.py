@@ -186,13 +186,14 @@ def upload_file(request):
     print mclass
     print mtype
     if form.is_valid():
-      error_msg, warning_msg, overwrite = process_file(request.FILES['file'], mclass, mtype)
+      error_msg, warning_msgs, overwrite = process_file(request.FILES['file'], mclass, mtype)
       if error_msg != '':
         messages.error(request, 'ERROR: ' + error_msg)
       else:
         messages.success(request, 'Success!')
-        if warning_msg != '':
-          messages.warning(request, 'WARNING: ' + warning_msg)
+        if len(warning_msgs) != 0:
+          for warning_msg in warning_msgs:
+            messages.warning(request, 'WARNING: ' + warning_msg)
         if len(overwrite) != 0:
           messages.warning(request, 'WARNING: The following data IDs were overwritten. If this was not the intended behavior, please check for non-unique data IDs. ' + ', '.join(overwrite))
       #return HttpResponseRedirect('/admin/mars/sample')
@@ -217,7 +218,7 @@ def process_file(file, mineral_class, mineral_type):
     compArray = [] # Compositions
 
     error_messages = ''
-    warning_messages = ''
+    warning_messages = []
     overwritten = []
 
     try:
@@ -244,15 +245,15 @@ def process_file(file, mineral_class, mineral_type):
                 access = header_line[1]
 
             else:
-                warning_messages += "\"" + header_line[0] + "\" does not contain a known key. Row ignored.  "
+                warning_messages.append("\"" + header_line[0] + "\" does not contain a known key. Row ignored.")
 
             header_line = reader.next()
         
         # Check for mandatory header fields
         if origin == None:
-            warning_messages += "Database of origin not provided.  "
+            warning_messages.append("Database of origin not provided.")
         if access == None:
-            warning_messages += "Date accessed not provided.  "
+            warning_messages.append("Date accessed not provided.")
 
         # METADATA Section
         dataIDs = reader.next() # Data ID must come first
@@ -325,7 +326,7 @@ def process_file(file, mineral_class, mineral_type):
             # New metadata fields here
 
             else:
-                warning_messages += "\"" + meta_line[0] + "\" does not contain a known key. Row ignored.  "
+                warning_messages.append("\"" + meta_line[0] + "\" does not contain a known key. Row ignored.")
 
             meta_line = reader.next()
 
