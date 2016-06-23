@@ -244,11 +244,15 @@ def process_file(file, mineral_class, mineral_type):
                 access = header_line[1]
 
             else:
-                warning_messages += "\"" + header_line[0] + "\" does not contain a known key. Row ignored."
+                warning_messages += "\"" + header_line[0] + "\" does not contain a known key. Row ignored.  "
 
             header_line = reader.next()
         
         # Check for mandatory header fields
+        if origin == None:
+            warning_messages += "Database of origin not provided.  "
+        if access == None:
+            warning_messages += "Date accessed not provided.  "
 
         # METADATA Section
         dataIDs = reader.next() # Data ID must come first
@@ -321,7 +325,7 @@ def process_file(file, mineral_class, mineral_type):
             # New metadata fields here
 
             else:
-                warning_messages += "\"" + meta_line[0] + "\" does not contain a known key. Row ignored."
+                warning_messages += "\"" + meta_line[0] + "\" does not contain a known key. Row ignored.  "
 
             meta_line = reader.next()
 
