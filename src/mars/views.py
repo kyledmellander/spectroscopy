@@ -30,57 +30,6 @@ from django.contrib import messages
 
 # Create your views here.
 
-# def home(request):
-# 	title = "Welcome"
-# 	if request.user.is_authenticated():
-# 		title = "Hello again, %s" %(request.user)
-# 	form = SignUpForm(request.POST or None)
-#
-# 	context = {
-# 		"template_title": title,
-# 		"form": form,
-# 	}
-#
-# 	if form.is_valid():
-# 		instance = form.save(commit=False)
-# 		instance.save()
-# 		print(instance)
-#
-# 		context = {
-# 			"template_title": "Thank You"
-# 		}
-# 	return render(request,"home.html",context)
-
-# def contact(request):
-#     form_class = ContactForm
-#
-#     if request.method == 'POST':
-#         form = form_class(data=request.POST)
-#
-#         if form.is_valid():
-#           try:
-#             send_mail(
-#                 request.POST.get('subject', ''),
-#                 request.POST.get('message', ''),
-#                 request.POST.get('your_email', ''),
-#                 ['digren@students.wwu.edu'],
-#             )
-#             return HttpResponseRedirect('sent/')
-#           except Exception, err:
-#             return HttpResponse(str(err))
-#
-#     return render(request, 'contact.html', {
-#         'form': form_class,
-#     })
-
-# def sent(request):
-# 	context = RequestContext(request)
-# 	return render(request, 'sent.html', context_instance=context)
-#
-# def about(request):
-# 	context = RequestContext(request)
-# 	return render(request, 'about.html', context_instance=context)
-
 def logout_view(request):
   logout(request)
   return redirect('/')
@@ -237,10 +186,15 @@ def upload_file(request):
     print mclass
     print mtype
     if form.is_valid():
-      overwrite = process_file(request.FILES['file'], mclass, mtype)
-      messages.success(request, 'Success!')
-      if len(overwrite) != 0:
-        messages.warning(request, 'WARNING: The following data IDs were overwritten. If this was not the intended behavior, please check for non-unique data IDs. ' + ', '.join(overwrite))
+      error_msg, warning_msg, overwrite = process_file(request.FILES['file'], mclass, mtype)
+      if error_msg != '':
+        messages.error(request, 'ERROR: ' + error_msg)
+      else:
+        messages.success(request, 'Success!')
+        if warning_msg != '':
+          messages.warning(request, 'WARNING: ' + warning_msg)
+        if len(overwrite) != 0:
+          messages.warning(request, 'WARNING: The following data IDs were overwritten. If this was not the intended behavior, please check for non-unique data IDs. ' + ', '.join(overwrite))
       #return HttpResponseRedirect('/admin/mars/sample')
       return HttpResponseRedirect('/upload/')
   else:
@@ -263,12 +217,17 @@ def process_file(file, mineral_class, mineral_type):
     compArray = [] # Compositions
 
     error_messages = ''
+    warning_messages = ''
+    overwritten = []
 
     try:
         paramFile = file.read()
         reader = csv.reader(file)
 
         # HEADER Section
+        origin = None
+        desc = None
+        access = None
         header_line = reader.next()
         while header_line[0] != '':
 
@@ -285,12 +244,18 @@ def process_file(file, mineral_class, mineral_type):
                 access = header_line[1]
 
             else:
-                error_messages += "\"" + header_line[0] + "\" does not contain a known key\n"
+                warning_messages += "\"" + header_line[0] + "\" does not contain a known key. Row ignored."
 
             header_line = reader.next()
+        
+        # Check for mandatory header fields
 
         # METADATA Section
         dataIDs = reader.next() # Data ID must come first
+        if 'data id' not in dataIDs[0].lower():
+            error_messages += 'Data ID must come first in metadata section. Check that there is only one (1) blank row between each section.'
+            return error_messages, warning_messages, overwritten
+
         start = 1
         while dataIDs[start] == '':
             start += 1
@@ -330,7 +295,7 @@ def process_file(file, mineral_class, mineral_type):
                     c+=1
 
             # Viewing geometry
-            elif 'grain size' in meta_line[0].lower():
+            elif 'viewing geometry' in meta_line[0].lower():
                 while c < len(meta_line):
                     vGeoArray.append(meta_line[c])
                     c+=1
@@ -356,12 +321,16 @@ def process_file(file, mineral_class, mineral_type):
             # New metadata fields here
 
             else:
-                error_messages += "\"" + meta_line[0] + "\" does not contain a known key\n"
+                warning_messages += "\"" + meta_line[0] + "\" does not contain a known key. Row ignored."
 
             meta_line = reader.next()
 
         # REFLECTANCE Section
         line = reader.next()
+
+        if line[0] == '':
+            error_messages += 'Check that there is only one (1) blank row between each section.'
+            return error_messages, warning_messages, overwritten
 
         # Figure out units
         if "microns" in line[0] or "um" in line[0]:
@@ -409,7 +378,6 @@ def process_file(file, mineral_class, mineral_type):
     formArray += [''] * (size - len(formArray))
     compArray += [''] * (size - len(compArray))
     
-    overwritten = []
     for i in range(size):
         dataId = dataArray[i]
         sampId = sampArray[i]
@@ -433,4 +401,4 @@ def process_file(file, mineral_class, mineral_type):
         sample = Sample.create(dataId, sampId, access, origin, collection, name, desc, mineral_type, mineral_class,'', gr, vGeo, res, tempRan, form, comp, dataPoints[i])
         sample.save()
 
-    return overwritten
+    return error_messages, warning_messages, overwritten
