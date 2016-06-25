@@ -234,15 +234,21 @@ def process_file(file, mineral_class, mineral_type):
 
             # Database of origin
             if 'database' in header_line[0].lower():
-                origin = header_line[1]
+                for col in header_line[1:]:
+                    if col != '':
+                        origin = col
 
             # Spreadsheet Description
             elif 'description' in header_line[0].lower():
-                desc = header_line[1]
+                for col in header_line[1:]:
+                    if col != '':
+                      desc = col
 
             # Date of original database access (YEAR-MONTH-DAY)
             elif 'accessed' in header_line[0].lower():
-                access = header_line[1]
+                for col in header_line[1:]:
+                    if col != '':
+                        access = col
 
             else:
                 warning_messages.append("\"" + header_line[0] + "\" does not contain a known key. Row ignored.")
