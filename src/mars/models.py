@@ -4,6 +4,7 @@ from django.db.models import Q
 import json
 
 #Create your models here.
+
 class SignUp(models.Model):
   email = models.EmailField(primary_key=True)
   firstName = models.CharField(max_length = 120)
@@ -17,7 +18,7 @@ class SignUp(models.Model):
 class Sample(models.Model):
     data_id = models.CharField(max_length=20, unique=True, primary_key=True)
     sample_id = models.CharField(max_length=30)
-    date_accessed = models.DateTimeField(auto_now_add = False, auto_now = False)
+    date_added = models.DateTimeField(auto_now=True)
     origin = models.CharField(max_length=100)
     locality = models.CharField(max_length=100, null=True, blank=True)
     name = models.CharField(max_length=100)
@@ -55,6 +56,6 @@ class Sample(models.Model):
 
 
     @classmethod
-    def create(cls, data_id, sample_id, date_accessed, origin, locality, name, sample_desc, sample_type, sample_class, sub_class, grain_size, view_geom, resolution, refl_range, formula, composition, reflectance):
-      sample = cls(data_id=data_id,sample_id=sample_id,date_accessed=date_accessed,origin=origin,locality=locality,name=name,sample_desc=sample_desc,sample_type=sample_type,sample_class=sample_class,sub_class=sub_class,grain_size=grain_size,view_geom=view_geom,resolution=resolution,refl_range=refl_range,formula=formula,composition=composition,reflectance=reflectance)
+    def create(cls, data_id, sample_id, origin, locality, name, sample_desc, sample_type, sample_class, sub_class, grain_size, view_geom, resolution, refl_range, formula, composition, reflectance):
+      sample = cls(data_id=data_id,sample_id=sample_id,origin=origin,locality=locality,name=name,sample_desc=sample_desc,sample_type=sample_type,sample_class=sample_class,sub_class=sub_class,grain_size=grain_size,view_geom=view_geom,resolution=resolution,refl_range=refl_range,formula=formula,composition=composition,reflectance=reflectance)
       return sample

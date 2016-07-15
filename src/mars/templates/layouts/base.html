@@ -25,15 +25,15 @@
     <link href="{% static 'footer.css' %}" rel="stylesheet">
     <link href="{% static 'table_header.css' %}" rel="stylesheet">
 
-    <script src="/usr/home/aytone/marsproject/src/static_in_pro/our_static/js/staticsorttable.js" type="text/javascript"></script>
     <script language="JavaScript">
       function toggle(source){
         checkboxes = document.getElementsByName("selection");
         for(var i=0, n=checkboxes.length; i<n; i++){
           checkboxes[i].checked = source.checked;
-          }
+        }
       }
-      </script>
+    </script>
+
     <style>
       #footer {
       position: fixed;
@@ -68,7 +68,7 @@
 
     <!-- Static navbar -->
     <nav class="navbar navbar-inverse navbar-static-top">
-     <a href="http://www.wwu.edu"><img class="pull-left" style="padding-bottom:5px;padding-top:5px;padding-left:10px;height:50px;width:120px;" src="{%static 'img/westernlogo.jpg'%}"></a>
+     <a href="http://www.wwu.edu"><img class="pull-left" style="padding-bottom:0px;padding-top:0px;padding-left:5px;height:60px;width:120px;" src="{%static 'img/westernlogo.jpg'%}"></a>
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
