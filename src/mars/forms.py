@@ -1,15 +1,15 @@
 from django import forms
 
-from .models import SignUp, Sample
+from .models import Sample, SignUp
 
-class ContactForm(forms.Form):
-    your_full_name = forms.CharField(required=True)
-    your_email = forms.EmailField(required=True)
-    subject = forms.CharField(required=True)
-    message = forms.CharField(
-        required=True,
-        widget=forms.Textarea
-    )
+#class ContactForm(forms.Form):
+#    your_full_name = forms.CharField(required=True)
+#    your_email = forms.EmailField(required=True)
+#    subject = forms.CharField(required=True)
+#    message = forms.CharField(
+#        required=True,
+#        widget=forms.Textarea
+#    )
 
 class SignUpForm(forms.ModelForm):
     class Meta:

@@ -4,7 +4,7 @@ from django.template import RequestContext
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.defaulttags import register
-from .forms import ContactForm, SignUpForm, SearchForm, UploadFileForm
+from .forms import SignUpForm, SearchForm, UploadFileForm
 from .models import Sample, SignUp
 from django.utils.encoding import smart_str
 from django.contrib.staticfiles import finders
@@ -17,6 +17,7 @@ import itertools
 import StringIO
 
 import os, sys
+#import unicodedata
 import zipfile
 import StringIO
 import csv
@@ -49,8 +50,8 @@ def meta(request):
   if request.method == 'POST':
     if 'meta' in request.POST:
       selections = request.POST.getlist('selection')
+#      selections = [unicodedata.normalize('NFKD', s).encode('ascii','ignore') for s in selections]
       samples = Sample.objects.filter(data_id__in=selections)
-    samples
     dictionaries = [ obj.as_dict() for obj in samples]
     return render_to_response('meta.html', {"metaResults": samples,"reflectancedict":dictionaries,}, context_instance=RequestContext(request))
 
@@ -127,7 +128,7 @@ def graph(request):
         # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
         writer.writerow([smart_str("Database of Origin"), smart_str(s.origin),])
         writer.writerow([smart_str("Sample Description"), smart_str(s.sample_desc),])
-        writer.writerow([smart_str("Date Accessed"), smart_str(s.date_accessed),])
+        writer.writerow([smart_str("Date Added"), smart_str(s.date_added),])
         writer.writerow([])
         writer.writerow([smart_str("Data ID"), smart_str(s.data_id),])
         writer.writerow([smart_str("Sample ID"), smart_str(s.sample_id),])
@@ -216,6 +217,7 @@ def process_file(file, mineral_class, mineral_type):
     resArray = [] # Resolutions
     formArray = [] # Formulas
     compArray = [] # Compositions
+    dataPoints = []
 
     error_messages = ''
     warning_messages = []
@@ -228,9 +230,8 @@ def process_file(file, mineral_class, mineral_type):
         # HEADER Section
         origin = None
         desc = None
-        access = None
         header_line = reader.next()
-        while header_line[0] != '':
+        while len(header_line) > 0 and header_line[0] != '':
 
             # Database of origin
             if 'database' in header_line[0].lower():
@@ -244,12 +245,6 @@ def process_file(file, mineral_class, mineral_type):
                     if col != '':
                       desc = col
 
-            # Date of original database access (YEAR-MONTH-DAY)
-            elif 'accessed' in header_line[0].lower():
-                for col in header_line[1:]:
-                    if col != '':
-                        access = col
-
             else:
                 warning_messages.append("\"" + header_line[0] + "\" does not contain a known key. Row ignored.")
 
@@ -258,8 +253,6 @@ def process_file(file, mineral_class, mineral_type):
         # Check for mandatory header fields
         if origin == None:
             warning_messages.append("Database of origin not provided.")
-        if access == None:
-            warning_messages.append("Date accessed not provided.")
 
         # METADATA Section
         dataIDs = reader.next() # Data ID must come first
@@ -273,12 +266,12 @@ def process_file(file, mineral_class, mineral_type):
 
         c = start
         while c < len(dataIDs):
-            dataArray.append(dataIDs[c])
+            dataArray.append(dataIDs[c].replace(" ",""))
             c+=1
 
         # Rest of the metadata
         meta_line = reader.next()
-        while meta_line[0] != '':
+        while len(meta_line) > 0 and meta_line[0] != '':
             c = start
 
             # Sample ID
@@ -354,7 +347,6 @@ def process_file(file, mineral_class, mineral_type):
         row_len = len(dataIDs)
         c = start
 
-        dataPoints = []
         for d in range(row_len - c):
             dataPoints.append({})
 
@@ -375,7 +367,7 @@ def process_file(file, mineral_class, mineral_type):
                         dataPoints[column-c][str(float(row[0]) * factor)] = row[column]
 
     except Exception, e:
-        print str(e)
+        error_messages += str(e)
 
     size = len(dataArray)
 
@@ -409,7 +401,7 @@ def process_file(file, mineral_class, mineral_type):
         if Sample.objects.filter(data_id=dataId).exists():
           overwritten.append(dataId)
 
-        sample = Sample.create(dataId, sampId, access, origin, collection, name, desc, mineral_type, mineral_class,'', gr, vGeo, res, tempRan, form, comp, dataPoints[i])
+        sample = Sample.create(dataId, sampId, origin, collection, name, desc, mineral_type, mineral_class,'', gr, vGeo, res, tempRan, form, comp, dataPoints[i])
         sample.save()
 
     return error_messages, warning_messages, overwritten
