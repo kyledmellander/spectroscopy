@@ -96,7 +96,7 @@ def graph(request):
             del obj["reflectance"][key]
       json_string = json.dumps(dictionaries)
 
-      return render_to_response('graph.html', {"graphResults": samples,"graphJSON":json_string,}, context_instance=RequestContext(request))
+      return render(request, 'graph.html', {"graphResults": samples,"graphJSON":json_string,}, context_instance=RequestContext(request))
 
     elif 'export' in request.POST:
       selections = request.POST.getlist('selection')
@@ -155,54 +155,43 @@ def graph(request):
 
       return response
 
-#def my_view(request):
- # username = request.POST['username']
-  #password = request.POST['password']
- # user = authenticate(username=username, password=password)
- # if user is not None:
- #   if user.is_active:
- #     login(request, user)
- #     return redirect('%s?next=%s') % (settings.LOGIN_URL, request.path))
- #   else:
- #     print("The password is valid, but the account has been disabled!")
- # else:
- #   print("The user and password were incorrect.")
-
 
 @login_required(login_url='/admin/login/')
 def upload_file(request):
-  if request.method == 'POST':
-    form = UploadFileForm(request.POST, request.FILES)
-    mclass = request.POST.get('sample_class')
-    if not mclass:
-      mclass = ""
-    mtype = request.POST.get('sample_type')
-    if not mtype:
-      mtype = ""
-    print (mclass)
-    print (mtype)
-    if form.is_valid():
-      error_msg, warning_msgs, overwrite = process_file(request.FILES['file'], mclass, mtype)
-      if error_msg != '':
-        messages.error(request, 'ERROR: ' + error_msg)
-      else:
-        messages.success(request, 'Success!')
-        if len(warning_msgs) != 0:
-          for warning_msg in warning_msgs:
-            messages.warning(request, 'WARNING: ' + warning_msg)
-        if len(overwrite) != 0:
-          messages.warning(request, 'WARNING: The following data IDs were overwritten. If this was not the intended behavior, please check for non-unique data IDs. ' + ', '.join(overwrite))
-      #return HttpResponseRedirect('/admin/mars/sample')
-      return HttpResponseRedirect('/upload/')
-  else:
-    form = UploadFileForm()
-  return render(request, 'upload.html', {'form': form})
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        mclass = request.POST.get('sample_class')
+        if not mclass:
+            mclass = ""
+        mtype = request.POST.get('sample_type')
+        if not mtype:
+            mtype = ""
+        print (mclass)
+        print (mtype)
+        if form.is_valid():
+            for uploadedFile in request.FILES.getlist('files'):
+                error_msg, warning_msgs, overwrite = process_file(uploadedFile, mclass, mtype)
+                if error_msg != '':
+                    messages.error(request, 'ERROR: ' + error_msg)
+                else:
+                    messages.success(request, 'Success!')
+                    if len(warning_msgs) != 0:
+                        for warning_msg in warning_msgs:
+                            messages.warning(request, 'WARNING: ' + warning_msg)
+                    if len(overwrite) != 0:
+                        messages.warning(request, 'WARNING: The following data IDs were overwritten. If this was not the intended behavior, please check for non-unique data IDs. ' + ', '.join(overwrite))
+        #return HttpResponseRedirect('/admin/mars/sample')
+        return HttpResponseRedirect('/upload/')
+    else:
+        form = UploadFileForm()
+    return render(request, 'upload.html', {'form': form})
 
 def hasNumbers(inputString):
-  result = bool(re.search(r'\d', inputString))
-  return result
+    result = bool(re.search(r'\d', inputString))
+    return result
 
 def process_file(file, mineral_class, mineral_type):
+    print(file)
     dataArray = [] # Array of IDs
     sampArray = [] # Sample IDs
     nameArray = [] # Mineral Names

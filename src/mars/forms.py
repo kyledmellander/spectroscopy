@@ -44,4 +44,4 @@ class UploadFileForm(forms.Form):
       widget=forms.TextInput(attrs={'placeholder': 'e.g. Sulfate'}))
     sample_type = forms.CharField(required=False,
       widget=forms.TextInput(attrs={'placeholder': 'e.g. Tectosilicate'}))
-    file = forms.FileField()
+    files = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple':True}))
