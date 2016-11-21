@@ -14,12 +14,10 @@ from django.contrib.auth import logout
 import re
 import copy
 import itertools
-import StringIO
 
 import os, sys
 #import unicodedata
 import zipfile
-import StringIO
 import csv
 import json
 import subprocess
@@ -64,7 +62,6 @@ def search(request):
   if request.method == 'POST':
     form = form_class(data=request.POST)
 
-	#	if form.is_valid():
     mName =  request.POST.get('mineral_name')
     mClass = request.POST.get('mineral_class')
     mDataId = request.POST.get('mineral_Id')
@@ -80,9 +77,7 @@ def search(request):
       if mOrigin != 'Any':
         results = results.filter(origin__icontains=mOrigin)
 
-    #results = results.sort(key=lambda x: x.name.lower())
-    #ordered = sorted(results, key=operator.attrgetter('name').lower())
-    return render_to_response('results.html', {"results": results,}, context_instance=RequestContext(request))
+    return render (request, 'results.html', {"results": results})
 
   else:
     return render(request, 'search.html', {
@@ -109,7 +104,7 @@ def graph(request):
       dictionaries = [obj.as_dict() for obj in samples]
       reflectanceDict = {}
       for item in dictionaries:
-        sortedList = sorted(item["reflectance"].iteritems(), key=lambda(x,y):float(x))
+        sortedList = sorted(item["reflectance"].iteritems(), key = lambda x,y:float(x))
         stringlist = []
         for key,value in sortedList:
           stringlist.append(str(key) + ":" +  str(value) + ",")
@@ -184,8 +179,8 @@ def upload_file(request):
     mtype = request.POST.get('sample_type')
     if not mtype:
       mtype = ""
-    print mclass
-    print mtype
+    print (mclass)
+    print (mtype)
     if form.is_valid():
       error_msg, warning_msgs, overwrite = process_file(request.FILES['file'], mclass, mtype)
       if error_msg != '':
@@ -249,7 +244,7 @@ def process_file(file, mineral_class, mineral_type):
                 warning_messages.append("\"" + header_line[0] + "\" does not contain a known key. Row ignored.")
 
             header_line = reader.next()
-        
+
         # Check for mandatory header fields
         if origin == None:
             warning_messages.append("Database of origin not provided.")
@@ -321,7 +316,7 @@ def process_file(file, mineral_class, mineral_type):
                 while c < len(meta_line):
                     compArray.append(meta_line[c])
                     c+=1
-            
+
             # New metadata fields here
 
             else:
@@ -366,7 +361,7 @@ def process_file(file, mineral_class, mineral_type):
                     else:
                         dataPoints[column-c][str(float(row[0]) * factor)] = row[column]
 
-    except Exception, e:
+    except (Exception, e):
         error_messages += str(e)
 
     size = len(dataArray)
@@ -380,7 +375,7 @@ def process_file(file, mineral_class, mineral_type):
     resArray += [''] * (size - len(resArray))
     formArray += [''] * (size - len(formArray))
     compArray += [''] * (size - len(compArray))
-    
+
     for i in range(size):
         dataId = dataArray[i]
         sampId = sampArray[i]
