@@ -1,6 +1,7 @@
 Database Setup:
 1. Install postgresql if you haven't
    >sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib
+  
 2. Install psycopg2
 3. Set up the postgresql user, myprojectuser with CREATEDB permissions
    >psql
