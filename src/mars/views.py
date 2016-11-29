@@ -96,7 +96,7 @@ def graph(request):
             del obj["reflectance"][key]
       json_string = json.dumps(dictionaries)
 
-      return render(request, 'graph.html', {"graphResults": samples,"graphJSON":json_string,}, context_instance=RequestContext(request))
+      return render(request, 'graph.html', {"graphResults": samples,"graphJSON":json_string})
 
     elif 'export' in request.POST:
       selections = request.POST.getlist('selection')

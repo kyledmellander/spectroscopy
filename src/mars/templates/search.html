@@ -1,21 +1,104 @@
-{% extends "layouts/base.html" %}
+<!doctype html>
+{% load staticfiles %}
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-{% block content %}
+        <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
 
- <h1><center>  Mineral Search </center></h1>
-  <div class="container">
-    <div class="well">
-      <h4> Mineral Search </h4>
-      <div class="form-inline">
-        <form method="POST">
-          {% csrf_token %}
-          {{ form.as_p }}
-          <p align="right">
-            <button type="submit" class="btn btn-primary"/>Search&raquo;</button>
-          </p>
-        </form>
-      </div>
-    </div>
-  </div>
+        <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+        <link rel="stylesheet" href="{% static 'css/main.css' %}">
+        <link rel="stylesheet" href="{% static 'css/materialize.min.css' %}">
+        <script src="{% static 'js/vendor/modernizr-2.8.3.min.js' %}"></script>
+    </head>
+    <body>
+        <!-- Add your site or application content here -->
+        <h1><center>  Mineral Search </center></h1>
+        <div class="container" id = "content">
 
-{% endblock %}
+          <!-- Search box -->
+          <ul class="collapsible" data-collapsible="expandable" id="myList">
+            <li>
+              <div class="collapsible-header active">Search 1</div>
+              <div class="collapsible-body">
+                  <form method="POST">
+                  <div class="mine" style="margin: 20px">
+                    {% csrf_token %}
+                    {{ form.as_ul }}
+                </div>
+                </div>
+            </li>
+            <li id="addSearch">
+              <div class="collapsible-header" onclick="addInput('myList','addSearch');">
+                <span class="left">Add a Search</span>
+                <span class="right">+</span>
+              </div>
+            </li>
+
+            <li>
+              <div class="collapsible-header">
+                <div class="center-align" style="margin:20px">
+                    <button type="submit" class="btn waves-effect waves-light"/>
+                      Search
+                    </button>
+                </div>
+              </div>
+            </li>
+          </form>
+          </ul>
+
+          <div class = "row">
+            <div class = "col s12">
+              <div class = "card">
+                <div class = "card-content">
+                  <a href="https://google.com">Need Help?</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+
+        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+        <script>window.jQuery || document.write('<script src="{% static 'js/vendor/jquery-1.12.0.min.js' %}"><\/script>')</script>
+        <script src="{% static 'js/plugins.js' %}"></script>
+        <script src="{% static 'js/main.js' %}"></script>
+        <script src="{% static 'js/materialize.min.js' %}"></script>
+
+        <script>
+          $(document).ready(function() {
+            $('select').material_select();
+          });
+
+          var counter = 2;
+          var limit = 10;
+          function addInput(divName, elementBelow) {
+            if (counter <= limit) {
+              var nodeToAdd = document.createElement('li');
+              var childNode = document.getElementById(elementBelow)
+              nodeToAdd.innerHTML= "<div class='collapsible-header'>Search " + counter + " </div>"
+                + "<div class='collapsible-body'>" + "<li>Hello</>" + "</div>";
+              document.getElementById(divName).insertBefore(nodeToAdd,childNode)
+
+              counter++;
+            }
+          }
+
+        </script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='https://www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+        </script>
+    </body>
+</html>
