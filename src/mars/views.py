@@ -53,41 +53,8 @@ def meta(request):
     dictionaries = [ obj.as_dict() for obj in samples]
     return render_to_response('meta.html', {"metaResults": samples,"reflectancedict":dictionaries,}, context_instance=RequestContext(request))
 
-'''
-def search(request):
-  results = Sample.objects.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name', 'data_id')
-
-  # Create the set of forms
-  SearchFormSet = formset_factory(SearchForm)
-
-  if request.method == 'POST':
-    form = SearchForm(data=request.POST)
-    search_formset = SearchFormSet(request.POST)
-
-    mName =  request.POST.get('mineral_name')
-    mClass = request.POST.get('mineral_class')
-    mDataId = request.POST.get('mineral_Id')
-    mOrigin = request.POST.get('database_of_origin')
-
-    if mName:
-      results = results.filter(name__icontains=mName)
-    if mClass:
-      results = results.filter(sample_class__icontains=mClass)
-    if mDataId:
-      results = results.filter(data_id__icontains=mDataId)
-    if mOrigin:
-      if mOrigin != 'Any':
-        results = results.filter(origin__icontains=mOrigin)
-
-    return render (request, 'results.html', {"results": results})
-  else:
-    return render(request, 'search.html', {
-      'form': SearchForm,
-    })
-'''
 def search(request):
     allSamples = Sample.objects.order_by('data_id')
-    #allSamples = Sample.objects.(select={'lower_name': 'lower(name)'}).order_by('lower_name', 'data_id')
 
   # Create the set of forms
     SearchFormSet = formset_factory(SearchForm, extra=2)
@@ -122,8 +89,6 @@ def search(request):
                     formResults = formResults.filter(origin__icontains=mOrigin)
 
                 results = results | formResults
-            else:
-                print("Invalid form?")
 
         return render (request, 'results.html', {"results": results})
     else:
