@@ -102,6 +102,14 @@ def search(request):
                 mDataId = search_form.cleaned_data.get('mineral_Id')
                 mOrigin = search_form.cleaned_data.get('database_of_origin')
 
+                # Remove 'Any' from choice field
+                if mOrigin == 'Any':
+                    mOrigin = None
+
+                # Don't search if no input is given
+                if not (mName or mClass or mDataId or mOrigin):
+                    continue
+
                 formResults = allSamples.filter()
 
                 if mName:
@@ -110,7 +118,7 @@ def search(request):
                     formResults = formResults.filter(sample_class__icontains=mClass)
                 if mDataId:
                     formResults = formResults.filter(data_id__icontains=mDataId)
-                if mOrigin != 'Any':
+                if mOrigin:
                     formResults = formResults.filter(origin__icontains=mOrigin)
 
                 results = results | formResults
