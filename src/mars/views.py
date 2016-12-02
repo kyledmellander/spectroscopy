@@ -1,15 +1,19 @@
-from django.shortcuts import render, render_to_response, redirect
-from django.http import HttpResponseRedirect, HttpResponse
-from django.template import RequestContext
-from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.staticfiles import finders
+from django.core.mail import send_mail
+from django.forms.formsets import formset_factory
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, render_to_response, redirect
+from django.template import RequestContext
 from django.template.defaulttags import register
+from django.utils.encoding import smart_str
+
 from .forms import SignUpForm, SearchForm, UploadFileForm
 from .models import Sample, SignUp
-from django.utils.encoding import smart_str
-from django.contrib.staticfiles import finders
 from zipfile import ZipFile
-from django.contrib.auth import logout
 
 import re
 import copy
@@ -22,10 +26,6 @@ import csv
 import json
 import subprocess
 import operator
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
-from django.core.serializers.json import DjangoJSONEncoder
-from django.contrib import messages
 
 # Create your views here.
 
@@ -53,14 +53,16 @@ def meta(request):
     dictionaries = [ obj.as_dict() for obj in samples]
     return render_to_response('meta.html', {"metaResults": samples,"reflectancedict":dictionaries,}, context_instance=RequestContext(request))
 
+'''
 def search(request):
-  form_class = SearchForm
-  #results = Sample.objects.order_by('data_id')
   results = Sample.objects.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name', 'data_id')
-  #results = results.extra(select={'name_is_null': 'name IS NULL'}).order_by('name_is_null')
+
+  # Create the set of forms
+  SearchFormSet = formset_factory(SearchForm)
 
   if request.method == 'POST':
-    form = form_class(data=request.POST)
+    form = SearchForm(data=request.POST)
+    search_formset = SearchFormSet(request.POST)
 
     mName =  request.POST.get('mineral_name')
     mClass = request.POST.get('mineral_class')
@@ -78,11 +80,49 @@ def search(request):
         results = results.filter(origin__icontains=mOrigin)
 
     return render (request, 'results.html', {"results": results})
-
   else:
     return render(request, 'search.html', {
-      'form': form_class,
+      'form': SearchForm,
     })
+'''
+def search(request):
+    allSamples = Sample.objects.order_by('data_id')
+    #allSamples = Sample.objects.(select={'lower_name': 'lower(name)'}).order_by('lower_name', 'data_id')
+
+  # Create the set of forms
+    SearchFormSet = formset_factory(SearchForm, extra=2)
+
+    if request.method == 'POST':
+        search_formset = SearchFormSet(request.POST)
+        results = Sample.objects.none()
+        for search_form in search_formset:
+            if search_form.is_valid():
+                mName =  search_form.cleaned_data.get('mineral_name')
+                mClass = search_form.cleaned_data.get('mineral_class')
+                mDataId = search_form.cleaned_data.get('mineral_Id')
+                mOrigin = search_form.cleaned_data.get('database_of_origin')
+
+                formResults = allSamples.filter()
+
+                if mName:
+                    formResults = formResults.filter(name__icontains=mName)
+                if mClass:
+                    formResults = formResults.filter(sample_class__icontains=mClass)
+                if mDataId:
+                    formResults = formResults.filter(data_id__icontains=mDataId)
+                if mOrigin != 'Any':
+                    formResults = formResults.filter(origin__icontains=mOrigin)
+
+                results = results | formResults
+            else:
+                print("Invalid form?")
+
+        return render (request, 'results.html', {"results": results})
+    else:
+        return render(request, 'search.html', {
+            'search_formset': SearchFormSet,
+            })
+
 
 def graph(request):
   if request.method == 'POST':

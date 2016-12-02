@@ -34,14 +34,14 @@ class SearchForm(forms.Form):
     database_of_origin = forms.ChoiceField()
 
     def __init__(self, *args, **kwargs):
-      super(SearchForm, self).__init__(*args, **kwargs)
-      self.fields['database_of_origin'].choices = [(c, c) for c in Sample.objects.all().values_list('origin', flat=True).distinct()]
-      # Allow any database to be selected
-      self.fields['database_of_origin'].choices.insert(0, ('Any','Any'))
+        super(SearchForm, self).__init__(*args, **kwargs)
+        self.fields['database_of_origin'].choices = [(c, c) for c in Sample.objects.all().values_list('origin', flat=True).distinct()]
+        # Allow any database to be selected
+        self.fields['database_of_origin'].choices.insert(0, ('Any','Any'))
 
 class UploadFileForm(forms.Form):
     sample_class = forms.CharField(required=False,
-      widget=forms.TextInput(attrs={'placeholder': 'e.g. Sulfate'}))
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. Sulfate'}))
     sample_type = forms.CharField(required=False,
-      widget=forms.TextInput(attrs={'placeholder': 'e.g. Tectosilicate'}))
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. Tectosilicate'}))
     files = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple':True}))
