@@ -10,60 +10,62 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
         <link rel="stylesheet" href="{% static 'css/main.css' %}">
-        <link rel="stylesheet" href="{% static 'css/materialize.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/materialize.css' %}">
         <script src="{% static 'js/vendor/modernizr-2.8.3.min.js' %}"></script>
     </head>
     <body>
       <!-- Navbar -->
-      <nav style="opacity:.6">
-        <div class="nav-wrapper grey darken-3 white-text">
-          <a href="#" class="brand-logo container">Mineral Search</a>
+      <nav style:"background:rgba(0,0,0,0.7)">
+        <div class="container white-text">
+          <ul id="nav-mobile" class="left">
+            <li class="left"><a href="/">Search</a></li>
+          </ul>
           <ul id="nav-mobile" class="right hide-on-small-and-down">
-            <li><a href="sass.html">Sass</a></li>
-            <li><a href="badges.html">Components</a></li>
-            <li><a href="collapsible.html">JavaScript</a></li>
+            <li><a href="/upload">Upload</a></li>
+            <li><a href="badges.html">About</a></li>
+            <li><a href="collapsible.html">Log In</a></li>
           </ul>
         </div>
       </nav>
 
         <!-- Add your site or application content here -->
         <div class="container section" id="content" >
-          <!-- Search box -->
           <form method="POST">
-          {% csrf_token %}
-          {{search_formset.management_form}}
-          <ul class="collapsible" data-collapsible="accordion" id="myList" >
+            {% csrf_token %}
+            {{search_formset.management_form}}
 
-            {% for search_form in search_formset %}
-            <li>
-              <div class="collapsible-header active center" style="background-color:White;">
-                <span class="left">Search {{forloop.counter}}</span>
-              </div>
-              <div class="collapsible-body" style="background-color:White; opacity:0.90">
-                <div class="mine" style="padding: 20px">
-                  {{ search_form}}
+            <!--- Search Forms --->
+            <ul class="collapsible" data-collapsible="expandable" id="myList" >
+              {% for search_form in search_formset %}
+              <li class="search-form">
+                <div class="collapsible-header active center" style="background-color:White;">
+                  <span class="left head">Search {{forloop.counter}}</span>
                 </div>
-              </div>
-            </li>
-            {% endfor %}
-
-            <li>
-              <div class="collapsible-header">
-                <div class="center-align" style="padding:20px">
-
-                    <div class="btn waves-effect waves-light" id="addSearch" onclick="addInput('myList','addSearch');">
-                        Add a Search +
-                    </div>
-                    <button type="submit" class="btn red waves-effect waves-light"/>
-                      Search
-                    </button>
+                <div class="collapsible-body" style="background:rgba(255,255,255,0.9); ">
+                  <div class="mine" style="padding: 20px">
+                    {{ search_form}}
+                  </div>
                 </div>
-              </div>
-            </li>
-          </ul>
+              </li>
+              {% endfor %}
+
+              <!--- Submit and Add Search Buttons --->
+              <li>
+                <div class="collapsible-header">
+                  <div class="center-align" style="padding:20px">
+
+                      <div class="btn waves-effect waves-light" id="addSearch" onclick="addInput('myList','addSearch');">
+                          Add a Search +
+                      </div>
+                      <button type="submit" class="btn red waves-effect waves-light"/>
+                        Search
+                      </button>
+                  </div>
+                </div>
+              </li>
+            </ul>
           </form>
 
           <div class = "row">
@@ -85,25 +87,47 @@
         <script src="{% static 'js/main.js' %}"></script>
         <script src="{% static 'js/materialize.min.js' %}"></script>
 
+        <script type="text/html" id="search-template">
+              <li id ="form-__prefix__" class="search-form">
+                <div class="collapsible-header center active" style="background-color:White;">
+                  <span class="left head">Search __count__</span>
+                </div>
+                <div class="collapsible-body" style="background:rgba(255,255,255,0.9); ">
+                  <div class="mine" style="padding: 20px">
+                    {{ search_formset.empty_form }}
+                  </div>
+                </div>
+              </li>
+        </script>
+
         <script>
           $(document).ready(function() {
             $('select').material_select();
             $(".button-collapse").sideNav();
           });
 
-          var counter = 2;
           var limit = 10;
           function addInput(divName, elementBelow) {
-            if (counter <= limit) {
-              var nodeToAdd = document.createElement('li');
-              var childNode = document.getElementById(elementBelow);
-              nodeToAdd.innerHTML= "<div class='collapsible-header'>Search " + counter
-                + "<i class='material-icons right'>delete</i> </div>"
-                + "<div class='collapsible-body' style='background-color:White; opacity:0.90'>"
-                + "<div style='padding:20px'>" + `{{csrf_token}}{{form}}` + "</div></div>";
-              document.getElementById(divName).insertBefore(nodeToAdd,childNode);
+            var formCount = $('.search-form').length;
 
-              counter++;
+            console.log(formCount);
+            if (formCount <= limit) {
+              $(".collapsible-header").removeClass(function(){
+                return "active";
+              });
+              $(".collapsible").collapsible({accordion: true});
+              $(".collapsible").collapsible({accordion: false});
+              $(".collapsible").collapsible({accordion: true});
+
+              //Clone a form
+              var searchTemplate = $('#search-template').html().replace(/__prefix__/g, formCount).replace(/__count__/g, formCount + 1);
+              // Insert it into the row after the last
+              $(searchTemplate).removeAttr('id').insertAfter(".search-form:last").slideDown(300);
+              $(searchTemplate).find(".head").html("Search " + (formCount + 1));
+              $('#id_form-TOTAL_FORMS').val(formCount + 1);
+
+              $('select').material_select();
+              $('.collapsible').collapsible();
             }
           }
 

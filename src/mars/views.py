@@ -56,18 +56,21 @@ def meta(request):
 def search(request):
     allSamples = Sample.objects.order_by('data_id')
 
-  # Create the set of forms
-    SearchFormSet = formset_factory(SearchForm, extra=2)
+    # Create the set of forms
+    SearchFormSet = formset_factory(SearchForm)
 
     if request.method == 'POST':
         search_formset = SearchFormSet(request.POST)
         results = Sample.objects.none()
+        print(len(search_formset));
         for search_form in search_formset:
             if search_form.is_valid():
                 mName =  search_form.cleaned_data.get('mineral_name')
                 mClass = search_form.cleaned_data.get('mineral_class')
                 mDataId = search_form.cleaned_data.get('mineral_Id')
                 mOrigin = search_form.cleaned_data.get('database_of_origin')
+                print(mName, mClass, mDataId, mOrigin);
+                print(search_form.cleaned_data);
 
                 # Remove 'Any' from choice field
                 if mOrigin == 'Any':
