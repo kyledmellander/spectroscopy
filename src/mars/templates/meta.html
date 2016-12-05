@@ -21,7 +21,7 @@
             <br>
             <br>
             <input type="checkbox" name="selection" onClick="toggle(this)" style="height:15px; width:15px;"><b> Select All</b>
-          </div> 
+          </div>
           <!---<table class="table table-hover"> -->
               {% for result in metaResults %}
                 <table class="table table-hover">
@@ -35,7 +35,6 @@
                 <p><b>Formula:</b>            {{ result.formula }} </p>
                 <p><b> Description:</b>        {{ result.sample_desc }} </p>
                 <p><b> Database of origin:</b> {{ result.origin }} </p>
-                <p><b> Date accessed:</b>      {{ result.date_accessed }} </p>
                 <p><b> Locality:</b>           {{ result.locality }} </p>
                 <p><b> Grain size:</b>         {{ result.grain_size }} </p>
                 <p><b> Viewing geometry:</b>   {{ result.view_geom }} </p>
@@ -46,9 +45,9 @@
                 <div id="scroll" style="overflow-y:scroll; height:250px; width:500px;">
                   <p>     {{ reflectancedict|get_reflectance:result.data_id }} </p>
                 </div> -->
-                
+
                 </td>
-              
+
                 <br>
                 </tr>
                 </table>
