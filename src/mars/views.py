@@ -51,7 +51,7 @@ def meta(request):
 #      selections = [unicodedata.normalize('NFKD', s).encode('ascii','ignore') for s in selections]
       samples = Sample.objects.filter(data_id__in=selections)
     dictionaries = [ obj.as_dict() for obj in samples]
-    return render_to_response('meta.html', {"metaResults": samples,"reflectancedict":dictionaries,}, context_instance=RequestContext(request))
+    return render(request, 'meta.html', {"metaResults": samples,"reflectancedict":dictionaries,})
 
 def search(request):
     allSamples = Sample.objects.order_by('data_id')
@@ -104,6 +104,7 @@ def graph(request):
   if request.method == 'POST':
     if 'graphForm' in request.POST:
       selections = request.POST.getlist('selection')
+      print(selections)
       samples = Sample.objects.filter(data_id__in=selections)
       dictionaries = [ obj.as_dict() for obj in samples]
       for obj in dictionaries:

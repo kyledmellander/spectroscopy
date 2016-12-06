@@ -1,25 +1,47 @@
 {% extends "layouts/base.html" %}
-
+{% load staticfiles %}
 {% block content %}
-  <div id="upload" class="container" style="margin-left:10px">
-    <p><b> Please specify a CSV file </b></p>
-    <div class="form-inline"> <!-- style="margin-left:10px">-->
-      <form enctype="multipart/form-data" method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <p align="left">
-          <button type="submit" class="btn btn-primary"/>Upload&raquo;</button>
-        </p>
-      </form>
-      {% if messages %}
-      <ul class="messages">
-        {% for message in messages %}
-        <p><big><big><big>{{ message }}</big></big></big></p>
-        {% endfor %}
-      </ul>
-      {% endif %}
+  <div id="upload" class="section container">
+    <div class="card section">
+      <div class="container">
+        <p><b> Please specify a CSV file </b></p>
+        <form enctype="multipart/form-data" method="POST">
+          {% csrf_token %}
+          <p>{{form.sample_class.label_tag}}</p>
+          <p>{{form.sample_class}}</p>
+          <p>{{form.sample_type.label_tag}}</p>
+          <p>{{form.sample_type}}</p>
+          <div class="file-field input-field">
+            <div class="btn">
+              <span>File</span>
+              <input id="id_files" name="files" type="file" multiple required>
+            </div>
+            <div class="file-path-wrapper">
+              <input class="file-path validate" type="text" placeholder="Upload one or more csv files">
+            </div>
+          </div>
+          <p align="left" class="section">
+            <button type="submit" class="btn red btn-primary"/>Upload&raquo;</button>
+          </p>
+        </form>
+        {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+          <p class="flow-text">{{ message }}</p>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
     </div>
   </div>
+
+  <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+  <script>window.jQuery || document.write('<script src="{% static 'js/vendor/jquery-1.12.0.min.js' %}"><\/script>')</script>
+  <script src="{% static 'js/plugins.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/materialize.min.js' %}"></script>
+
+
 {% endblock %}
 
   <!--<form method="POST">
@@ -31,5 +53,3 @@
       <input type="submit" value="Upload">
     </div>
   </form>-->
-
-
