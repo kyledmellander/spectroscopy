@@ -1,108 +1,39 @@
 {% load staticfiles %}
 
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="{% static 'img/favicon.ico' %}">
+<html class="no-js" lang="" style="background-size:cover">
 
-    <title>Spectroscopy Database</title>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap core CSS -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="{% static 'css/ie10-viewport-bug-workaround.css' %}" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="{% static 'navbar-static-top.css' %}" rel="stylesheet">
-    <link href="{% static 'dropdown.css' %}" rel="stylesheet">
-    <link href="{% static 'footer.css' %}" rel="stylesheet">
-    <link href="{% static 'table_header.css' %}" rel="stylesheet">
-
-    <script language="JavaScript">
-      function toggle(source){
-        checkboxes = document.getElementsByName("selection");
-        for(var i=0, n=checkboxes.length; i<n; i++){
-          checkboxes[i].checked = source.checked;
-        }
-      }
-    </script>
-
-    <style>
-      #footer {
-      position: fixed;
-      overflow: hidden;
-      bottom: 0;
-      height : 65px;
-      margin-top: 80px;
-      background-color:black;
-      color:white;
-      clear:both;
-      padding: 5px;
-      text-align:center;
-      width: 100%;
-      }
-      #meta2 {
-        padding-left: 380px;
-      }
-      #meta {
-        padding-left: 10px;
-      }
-      #label {
-        display: block;
-      }
-      #upload {
-        padding-left: 380px;
-      }
-    </style>
-    <!-- <script src="/usr/home/aytone/marsproject/src/static_in_pro/our_static/js/sorttable.js"></script> -->
-  </head>
-
-  <body>
-
-    <!-- Static navbar -->
-    <nav class="navbar navbar-inverse navbar-static-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">Spectroscopy Database</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
+        <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+        <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+        <link rel="stylesheet" href="{% static 'css/main.css' %}">
+        <link rel="stylesheet" href="{% static 'css/materialize.css' %}">
+        <script src="{% static 'js/vendor/modernizr-2.8.3.min.js' %}"></script>
+    </head>
+    <body>
+      <!-- Navbar -->
+      <nav style:"background:rgba(0,0,0,0.7)">
+        <div class="container white-text">
+          <ul id="nav-mobile" class="left">
+            <li class="left"><a href="/">Search</a></li>
+          </ul>
+          <ul id="nav-mobile" class="right hide-on-small-and-down">
             <li><a href="/upload">Upload</a></li>
-            <!-- <li><a href="/about">About</a></li> -->
-            <!-- <li><a href="/contact">Contact</a></li> -->
-            <!-- <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li role="separator" class="divider"></li>
-                <li class="dropdown-header">Nav header</li>
-                <li><a href="#">Separated link</a></li>
-                <li><a href="#">One more separated link</a></li>
-              </ul>
-            </li> -->
+              {% if user.is_authenticated %}
+                <li><a href="/admin/login">Admin</a></li>
+                <li><a href="/logout">Log Out</a>
+              {% else %}
+                <li><a href="/admin/login">Admin</a></li>
+              {% endif %}
           </ul>
-          <ul class="nav navbar-nav navbar-right">
-            {% if user.is_authenticated %}
-            <li><a href="/logout">Logout</a></li>
-            {% endif %}
-          </ul>
-        </div><!--/.nav-collapse -->
-    </nav>
+        </div>
+      </nav>
 
     <div id="title">
       {% block title %}{% endblock %}
@@ -110,13 +41,6 @@
     <div id="content">
       {% block content %}{% endblock %}
     </div>
-
-    <div id="footer">
-    <!--<footer> -->
-      <p> Contact information: Melissa[dot]Rice[at]wwu[dot]edu.</p>
-      <p> Developed by students from Western Washington University Computer Science Department. </p>
-    </div>
-    <!--</footer> -->
 
     <!-- Bootstrap core JavaScript
     ================================================== -->

@@ -1,12 +1,10 @@
 <style>
 	.chart-container {
 		display:inline-block;
-		position:relative;
+		position:absolute;
 		width:100%;
 		height:100%;
 		left:10px;
-		padding-bottom:145%;
-		border:1px dotted silver;
 		overflow:visible;
 	}
 	.svg-content-responsive {
@@ -17,10 +15,11 @@
 		bottom:10px;
 		right:10px;
 	}
+
   .axis path,
   .axis line {
     fill:none;
-    stroke: #000;
+    stroke: #BBBBBB;
     shape-rendering:crispEdges;
   }
 </style>
@@ -30,278 +29,270 @@
 {% if graphResults %}
 <!-- load the d3.js library -->
 	<div class="container">
-  	<div class="chart-container" id="graphJtron"></div>
-      	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-        
-        
-        <script>
-        	function InitChart() {
-            //Change JSON string to object
-            var GRAPH = JSON.parse('{{graphJSON|safe}}');
+  	<div class="card chart-container center" id="graphJtron" style="background:rgba(255,255,255,.9)"></div>
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
-            var color = d3.scale.category10();
+		<script>
+		function InitChart() {
+			//Change JSON string to object
+			var GRAPH = JSON.parse('{{graphJSON|safe}}');
 
-            var jumbowidth = document.getElementById("graphJtron").offsetWidth;
+			var color = d3.scale.category10();
 
-            WIDTH =	Math.floor(jumbowidth*.8); 
-            HEIGHT = Math.floor(WIDTH*.6);
-            MARGINS = {
-            				top: 50,
-                    right: 0,
-                    bottom: 50,
-                    left: 80
-                },
+			var jumbowidth = document.getElementById("graphJtron").offsetWidth;
 
-								lSpace = WIDTH/GRAPH.length;
-            
-            //Scale the graph Y Axix based on the min and max of your graphs
-            var minX = Number.MAX_VALUE;
-            var minY = Number.MAX_VALUE;
-            var maxX = Number.MIN_VALUE;
-            var maxY = Number.MIN_VALUE;
+			WIDTH =	Math.floor(jumbowidth*.75);
+			HEIGHT = Math.floor(WIDTH*.6);
+			MARGINS = {
+				top: 50,
+				right: 0,
+				bottom: 50,
+				left: 80
+			},
 
-            //Update the min and maxX
-            GRAPH.forEach(function (d,i) {
-              //Creates an array of objects with key-value pairs, sorted by keys
-              var reflectance = d3.entries(d.reflectance);
-              var curX = 0;
-              var cury = 0;
+			lSpace = WIDTH/GRAPH.length;
 
-              for (var i=reflectance.length-1; i>=0; i--) {
-                curX = parseFloat(reflectance[i].key);
-                curY = parseFloat(reflectance[i].value);
+			//Scale the graph Y Axix based on the min and max of your graphs
+			var minX = Number.MAX_VALUE;
+			var minY = Number.MAX_VALUE;
+			var maxX = Number.MIN_VALUE;
+			var maxY = Number.MIN_VALUE;
 
-                if (curX > maxX) maxX = curX;
-                if (curX < minX) minX = curX;
-                if (curY > maxY) maxY = curY;
-                if (curY < minY) minY = curY;
-              }
-            });
+			//Update the min and maxX
+			GRAPH.forEach(function (d,i) {
+				//Creates an array of objects with key-value pairs, sorted by keys
+				var reflectance = d3.entries(d.reflectance);
+				var curX = 0;
+				var cury = 0;
 
-            minX = minX *.95;
-            minY = minY *.95;
-            maxX = maxX * 1.05;
-            maxY = maxY * 1.05;
+				for (var i=reflectance.length-1; i>=0; i--) {
+					curX = parseFloat(reflectance[i].key);
+					curY = parseFloat(reflectance[i].value);
 
-            xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([minX,maxX]).clamp(true),
-            yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([minY,maxY]).clamp(true),
-            xAxis = d3.svg.axis()
-                .orient("bottom")
-                .scale(xScale)
-                .tickFormat(d3.format("d"));
-            yAxis = d3.svg.axis()
-                .scale(yScale)
-                .orient("left");
-            
-            var vis = d3.select(".chart-container").append("svg")
-							.attr("width", '100%')
-							.attr("height", '100%')
-              //.attr("pointer-events","all")
-              .call(d3.behavior.zoom().y(yScale).x(xScale).on("zoom",zoomed))
-							.classed("svg-content-responsive",true);
-            
-            
-            vis.append("svg:g")
-                .attr("class", "x axis")
-                .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
-                .call(xAxis);
+					if (curX > maxX) maxX = curX;
+					if (curX < minX) minX = curX;
+					if (curY > maxY) maxY = curY;
+					if (curY < minY) minY = curY;
+				}
+			});
 
-            vis.append("svg:g")
-                .attr("class", "y axis")
-                .attr("transform", "translate(" + (MARGINS.left) + ",0)")
-                .call(yAxis);
+			minX = minX *.90;
+			minY = minY *.90;
+			maxX = maxX * 1.10;
+			maxY = maxY * 1.10;
 
-          	vis.append("text")
-          	   .attr("class", "x label")
-          	   .style("text-anchor", "end")
-          	   .attr("x", WIDTH-400)
-          	   .attr("y", HEIGHT-10)
-          	   .text("Wavelength (nm)");
+			xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([minX,maxX]).clamp(true),
+			yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([minY,maxY]).clamp(true),
+			xAxis = d3.svg.axis()
+			.orient("bottom")
+			.scale(xScale)
+			.tickFormat(d3.format("d"));
+			yAxis = d3.svg.axis()
+			.scale(yScale)
+			.orient("left");
 
-          	vis.append("text")
-          	   .attr("class", "y label")
-          	   .style("text-anchor", "middle")
-          	   .attr("transform", "translate(" + (10) + "," + (HEIGHT/2) +") rotate(-90)")
-          	   .text("Reflectance");
-
-            var lineGen = d3.svg.line()
-                .x(function(d) {
-                    return xScale(d.key);
-                })
-                .y(function(d) {
-                    return yScale(d.value);
-                })
-                .interpolate("linear");
-
-            //Define the function that sorts the data
-            function keySort (sortfunc,field) {
-              return function (a,b) {
-                return sortfunc(parseFloat(a[field]),parseFloat(b[field]));
-              }
-            }
-
-            var zoom = d3.behavior.zoom()
-              .on("zoom",zoomed);
+			var vis = d3.select(".chart-container").append("svg")
+			.attr("width", '100%')
+			.attr("height", '100%')
+			.call(d3.behavior.zoom().y(yScale).x(xScale).on("zoom",zoomed))
+			.classed("svg-content-responsive",true);
 
 
-            //Add the text and the circle from zooming
-            var focus = vis.append("g")
-              .attr("class", "focus")
-              .style("display","null");
+			vis.append("svg:g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+			.call(xAxis);
 
-            focus.append("circle")
-              .attr("r", 3)
-              .attr("fill","none")
-              .attr("stroke-width",1.25)
-              .attr("stroke","gray");
-            
-            focus.append("text")
-              .attr("opacity",.5)
-              .attr("dx",8)
-              .attr("dy", "1em");
+			vis.append("svg:g")
+			.attr("class", "y axis")
+			.attr("transform", "translate(" + (MARGINS.left) + ",0)")
+			.call(yAxis);
 
+			vis.append("text")
+			.attr("class", "x label")
+			.style("text-anchor", "end")
+			.attr("x", WIDTH-400)
+			.attr("y", HEIGHT-10)
+			.text("Wavelength (nm)");
 
-            //Lines will hold each individual line's data
-            var lines = [];
-            var lineActive = [];
-            
-            //Given an array of lines, find the closest X, Y point on the graph
-            function findClosestLinePoint(lineArray, mouseX, mouseY) {
-              var closestDistance = Number.MAX_VALUE;
-              var closestPoint = null;
-              
-              lineArray.forEach(function(line,index) {
-                if (lineActive[index] == false) {
-                  var point = findClosestPoint(line,mouseX);
-                  var yDistance = distance(mouseX,point[1],mouseX, mouseY);
-                  var xDistance = distance(point[0], mouseY, mouseX, mouseY); 
-                  if (xDistance < 20) {
-                    if (yDistance < closestDistance) {
-                      closestPoint = point; 
-                      closestDistance = yDistance;
-                    }
-                  }
-                }
-              });
-              return closestPoint;
-            }
+			vis.append("text")
+			.attr("class", "y label")
+			.style("text-anchor", "middle")
+			.attr("transform", "translate(" + 20 + "," + (HEIGHT/2) +") rotate(-90)")
+			.text("Reflectance");
 
-            function distance (x1,y1,x2,y2) {
-              return Math.sqrt(Math.pow((x1-x2),2) + Math.pow((y1-y2),2)); 
-            }
-            
-            //Given a line, find the closet x point to your mouse
-            //and return the x,y coordinate
-            function findClosestPoint(line, mouseX) {  
-              var min = 0,
-                  max = line.length - 1,
-                  mid = Math.floor((max+min)/2),
-                  nearestX = line[mid].key,
-                  nearestY = line[mid].value,
-                  dx = Math.abs(mouseX - nearestX),
-                  diff = dx;
-              
-              while (diff != 0 && (max-min) > 1) {
-                if (line[mid].key > mouseX) {
-                  max = mid; 
-                } else {
-                  min = mid; 
-                }
+			var lineGen = d3.svg.line()
+			.x(function(d) {
+				return xScale(d.key);
+			})
+			.y(function(d) {
+				return yScale(d.value);
+			})
+			.interpolate("linear");
 
-                mid = Math.floor((max+min)/2);
-                diff = (Math.abs(line[mid].key - mouseX));
-                if (diff < dx) {
-                  dx = diff;
-                  nearestX = line[mid].key;
-                  nearestY = line[mid].value;
-                }
-              }
-              return [nearestX, nearestY];
-            }
+			//Define the function that sorts the data
+			function keySort (sortfunc,field) {
+				return function (a,b) {
+					return sortfunc(parseFloat(a[field]),parseFloat(b[field]));
+				}
+			}
+
+			var zoom = d3.behavior.zoom()
+			.on("zoom",zoomed);
 
 
-            var drawLines = GRAPH.forEach(function(d,i) {
-                //Creates an array of objects with key-value pairs, sorted by keys
-                var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
-                lines.push(reflectanceKV);
-                lineActive.push(false);
-                console.log(i);
+			//Add the text and the circle from zooming
+			var focus = vis.append("g")
+			.attr("class", "focus")
+			.style("display","null");
 
-                //Append path to graph
-                vis.append('svg:path')
-                  .attr('d', lineGen(reflectanceKV))   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
-                  .attr('stroke', function(d,j) {
-                          return "hsl(" + ((360/GRAPH.length+1) + (i*(360/GRAPH.length+1)))  + ",80%,30%)";
-                        })
-                  .attr('stroke-width', 1.25)
-                  .attr('id', 'line_mcline' + i)
-                  .attr('fill', 'none');
-                  
+			focus.append("circle")
+			.attr("r", 3)
+			.attr("fill","none")
+			.attr("stroke-width",1.25)
+			.attr("stroke","gray");
 
-                // Line Disappearing nonsense
-                vis.append("text")
-                    .attr("x", 50)
-                    .attr("y", HEIGHT+20+20*i)
-                    .style("fill", function(d,j) {
-                            return "hsl(" + ((360/GRAPH.length+1) + (i*(360/GRAPH.length+1)))  + ",80%,30%)";
-                		      })
-                    .attr("class","legiend")
-                    .on('click', function() {
-                        var active   = d.active ? false : true;
-												var color = "hsl(" + ((360/GRAPH.length+1) + (i*(360/GRAPH.length+1)))  + ",80%,30%)"
-                        var opacity = active ? 0 : 1;
-                        d3.select("path#line_mcline"+i).style("opacity",opacity);
-                        d.active = active;
-                        lineActive[i] = active;
-												active ? d3.select(this).style("fill","gray") : d3.select(this).style("fill",color) 
-                    })
-                    .text("Click to activate/deactivate: " + d.data_id + " ("+ d.name+")" );
-               
-            });
-
-            vis.append("rect")
-              .attr("pointer-events", "all")
-              .attr("fill", "none")
-              .attr("width", WIDTH)
-              .attr("height", HEIGHT)
-              .on("mouseover", function() { focus.style("display", null);})
-              .on("mouseout", function() { focus.style("display", "none");})
-              .on("mousemove", mousemove);
-
-            function mousemove() {
-              focus.style("display",null);
-              var mouseX = xScale.invert(d3.mouse(this)[0]);
-              var mouseY = yScale.invert(d3.mouse(this)[1]);
-              var coord = findClosestLinePoint(lines, mouseX, mouseY);
-              focus.attr("transform", "translate(" + xScale(coord[0]) +
-                                            "," + yScale(coord[1]) + ")");
-              focus.select("text")
-                .text(Math.round(coord[0])+", " + parseFloat(coord[1]).toFixed(3));                         
-            }
+			focus.append("text")
+			.attr("opacity",.5)
+			.attr("dx",8)
+			.attr("dy", "1em");
 
 
-            function zoomed() {
-              vis.select(".x.axis").call(xAxis);
-              vis.select(".y.axis").call(yAxis);
-              focus.style("display","none");
-              GRAPH.forEach (function(d,i) { 
-                var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
-                d3.select("path#line_mcline"+i)
-                  .attr('d', lineGen(reflectanceKV));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
-                });
-              }
-          }
+			//Lines will hold each individual line's data
+			var lines = [];
+			var lineActive = [];
 
-          InitChart();
+			//Given an array of lines, find the closest X, Y point on the graph
+			function findClosestLinePoint(lineArray, mouseX, mouseY) {
+				var closestDistance = Number.MAX_VALUE;
+				var closestPoint = null;
 
-          </script> 
-			<br>	
-			<br>
-      <br>
-      <br>
-      <br>
-      <br>
-  </div>
+				lineArray.forEach(function(line,index) {
+					if (lineActive[index] == false) {
+						var point = findClosestPoint(line,mouseX);
+						var yDistance = distance(mouseX,point[1],mouseX, mouseY);
+						var xDistance = distance(point[0], mouseY, mouseX, mouseY);
+						if (xDistance < 20) {
+							if (yDistance < closestDistance) {
+								closestPoint = point;
+								closestDistance = yDistance;
+							}
+						}
+					}
+				});
+				return closestPoint;
+			}
+
+			function distance (x1,y1,x2,y2) {
+				return Math.sqrt(Math.pow((x1-x2),2) + Math.pow((y1-y2),2));
+			}
+
+			//Given a line, find the closet x point to your mouse
+			//and return the x,y coordinate
+			function findClosestPoint(line, mouseX) {
+				var min = 0,
+				max = line.length - 1,
+				mid = Math.floor((max+min)/2),
+				nearestX = line[mid].key,
+				nearestY = line[mid].value,
+				dx = Math.abs(mouseX - nearestX),
+				diff = dx;
+
+				while (diff != 0 && (max-min) > 1) {
+					if (line[mid].key > mouseX) {
+						max = mid;
+					} else {
+						min = mid;
+					}
+
+					mid = Math.floor((max+min)/2);
+					diff = (Math.abs(line[mid].key - mouseX));
+					if (diff < dx) {
+						dx = diff;
+						nearestX = line[mid].key;
+						nearestY = line[mid].value;
+					}
+				}
+				return [nearestX, nearestY];
+			}
+
+
+			var drawLines = GRAPH.forEach(function(d,i) {
+				//Creates an array of objects with key-value pairs, sorted by keys
+				var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
+				lines.push(reflectanceKV);
+				lineActive.push(false);
+				console.log(i);
+
+				//Append path to graph
+				vis.append('svg:path')
+				.attr('d', lineGen(reflectanceKV))   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
+				.attr('stroke', function(d,j) {
+					return "hsl(" + ((360/GRAPH.length+1) + (i*(360/GRAPH.length+1)))  + ",80%,30%)";
+				})
+				.attr('stroke-width', 1.25)
+				.attr('id', 'line_mcline' + i)
+				.attr('fill', 'none');
+
+
+				// Line Disappearing nonsense
+				vis.append("text")
+				.attr("x", 50)
+				.attr("y", HEIGHT+20+20*i)
+				.style("fill", function(d,j) {
+					return "hsl(" + ((360/GRAPH.length+1) + (i*(360/GRAPH.length+1)))  + ",80%,30%)";
+				})
+				.attr("class","legiend")
+				.on('click', function() {
+					var active   = d.active ? false : true;
+					var color = "hsl(" + ((360/GRAPH.length+1) + (i*(360/GRAPH.length+1)))  + ",80%,30%)"
+					var opacity = active ? 0 : 1;
+					d3.select("path#line_mcline"+i).style("opacity",opacity);
+					d.active = active;
+					lineActive[i] = active;
+					active ? d3.select(this).style("fill","gray") : d3.select(this).style("fill",color)
+				})
+				.text("Click to activate/deactivate: " + d.data_id + " ("+ d.name+")" );
+
+			});
+
+			vis.append("rect")
+			.attr("pointer-events", "all")
+			.attr("fill", "none")
+			.attr("width", WIDTH)
+			.attr("height", HEIGHT)
+			.on("mouseover", function() { focus.style("display", null);})
+			.on("mouseout", function() { focus.style("display", "none");})
+			.on("mousemove", mousemove);
+
+			function mousemove() {
+				focus.style("display",null);
+				var mouseX = xScale.invert(d3.mouse(this)[0]);
+				var mouseY = yScale.invert(d3.mouse(this)[1]);
+				var coord = findClosestLinePoint(lines, mouseX, mouseY);
+				focus.attr("transform", "translate(" + xScale(coord[0]) +
+				"," + yScale(coord[1]) + ")");
+				focus.select("text")
+				.text(Math.round(coord[0])+", " + parseFloat(coord[1]).toFixed(3));
+			}
+
+
+			function zoomed() {
+				vis.select(".x.axis").call(xAxis);
+				vis.select(".y.axis").call(yAxis);
+				focus.style("display","none");
+				GRAPH.forEach (function(d,i) {
+					var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
+					d3.select("path#line_mcline"+i)
+					.attr('d', lineGen(reflectanceKV));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
+				});
+			}
+		}
+
+		InitChart();
+
+		</script>
+	</div>
 {% else%}
   <div id="meta">
     <h3><b> Please select a sample to graph.</b></h3>
