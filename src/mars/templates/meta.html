@@ -11,45 +11,55 @@
   </style>
   {% if metaResults %}
     <div id="meta2">
-      <div class = "form-inline">
-        <form method="POST" name="resultsform">
-          {% csrf_token %}
-          <div id="meta">
-            <button type="submit" name="graphForm" formaction="/graph/" class="btn btn-success">Graph</button>
-            <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button>
-            <br>
-            <br>
-            <input type="checkbox" name="selection" onClick="toggle(this)" style="height:15px; width:15px;"><b> Select All</b>
-          </div>
-          <!---<table class="table table-hover"> -->
-              {% for result in metaResults %}
-                <table class="table table-hover">
-                <tr>
-                <td><input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} style="height:15px; width:15px;"></td>
-                <td> <p><b> Data ID:</b>            {{ result.data_id }} </p>
-                <p><b> Sample ID:</b>          {{ result.sample_id }} </p>
-                <p><b> Mineral name:</b>       {{ result.name }} </p>
-                <p><b> Mineral class:</b>      {{ result.sample_class }} </p>
-                <p><b> Mineral type:</b>       {{ result.sample_type }} </p>
-                <p><b>Formula:</b>            {{ result.formula }} </p>
-                <p><b> Description:</b>        {{ result.sample_desc }} </p>
-                <p><b> Database of origin:</b> {{ result.origin }} </p>
-                <p><b> Locality:</b>           {{ result.locality }} </p>
-                <p><b> Grain size:</b>         {{ result.grain_size }} </p>
-                <p><b> Viewing geometry:</b>   {{ result.view_geom }} </p>
-                <p><b> Resolution:</b>         {{ result.resolution }} </p>
-                <p><b> Reflectance range:</b>  {{ result.refl_range }} </p>
-                <p><b> Composition: </b>        {{ result.composition }} </p>
-                </td>
+      <div class = "container section">
+        <div class = "card section">
+          <form method="POST" name="resultsform">
+            {% csrf_token %}
+            <div id="meta" class = "section center-align">
+              <button type="submit" name="graphForm" formaction="/graph/" class="btn btn-success">Graph</button>
+              <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button>
+            </div>
 
-                <br>
-                </tr>
-                </table>
-              {% endfor %}
-          <!--</table> -->
-          <br>
-          <br>
-        </form>
+            <div class="container section">
+              <input id="selectAllBox" type="checkbox" name="selection" onClick="toggle(this)"/>
+              <label name="selectAllLabel" for="selectAllBox" > Select All</label>
+            </div>
+
+            <div class= "container section">
+            <!---<table class="table table-hover"> -->
+                {% for result in metaResults %}
+                  <table class="table table-hover">
+                  <tr>
+                    <td>
+                      <input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}}/>
+                      <label for="option{{result.data_id }}"></label>
+                    </td>
+                    <td> <p><b> Data ID:</b>            {{ result.data_id }} </p>
+                    <p><b> Sample ID:</b>          {{ result.sample_id }} </p>
+                    <p><b> Mineral name:</b>       {{ result.name }} </p>
+                    <p><b> Mineral class:</b>      {{ result.sample_class }} </p>
+                    <p><b> Mineral type:</b>       {{ result.sample_type }} </p>
+                    <p><b>Formula:</b>            {{ result.formula }} </p>
+                    <p><b> Description:</b>        {{ result.sample_desc }} </p>
+                    <p><b> Database of origin:</b> {{ result.origin }} </p>
+                    <p><b> Locality:</b>           {{ result.locality }} </p>
+                    <p><b> Grain size:</b>         {{ result.grain_size }} </p>
+                    <p><b> Viewing geometry:</b>   {{ result.view_geom }} </p>
+                    <p><b> Resolution:</b>         {{ result.resolution }} </p>
+                    <p><b> Reflectance range:</b>  {{ result.refl_range }} </p>
+                    <p><b> Composition: </b>        {{ result.composition }} </p>
+                    </td>
+                    <div class="divider"></div>
+
+                  </tr>
+                  </table>
+                {% endfor %}
+            <!--</table> -->
+          </div>
+            <br>
+            <br>
+          </form>
+        </div>
       </div>
     </div>
   {% else %}
@@ -57,4 +67,14 @@
       <h3><b> Please select a sample to view the meta data.</b></h3>
     </div>
   {% endif %}
+
+
+  <script language="JavaScript">
+    function toggle(source){
+      checkboxes = document.getElementsByName("selection");
+      for(var i=0, n=checkboxes.length; i<n; i++){
+        checkboxes[i].checked = source.checked;
+      }
+    }
+  </script>
 {% endblock %}
