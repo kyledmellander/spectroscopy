@@ -26,7 +26,7 @@ import csv
 import json
 import subprocess
 import operator
-
+import StringIO
 # Create your views here.
 
 def logout_view(request):
@@ -121,7 +121,7 @@ def graph(request):
       dictionaries = [obj.as_dict() for obj in samples]
       reflectanceDict = {}
       for item in dictionaries:
-        sortedList = sorted(item["reflectance"].iteritems(), key = lambda x,y:float(x))
+        sortedList = sorted(item["reflectance"].iteritems(), key = lambda x:float(x[0]))
         stringlist = []
         for key,value in sortedList:
           stringlist.append(str(key) + ":" +  str(value) + ",")
