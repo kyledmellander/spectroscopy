@@ -1,28 +1,6 @@
 from django import forms
 
-from .models import Sample, SignUp
-
-#class ContactForm(forms.Form):
-#    your_full_name = forms.CharField(required=True)
-#    your_email = forms.EmailField(required=True)
-#    subject = forms.CharField(required=True)
-#    message = forms.CharField(
-#        required=True,
-#        widget=forms.Textarea
-#    )
-
-class SignUpForm(forms.ModelForm):
-    class Meta:
-        model = SignUp
-        fields = ('firstName','lastName','email',)
-
-    def clean_email(self):
-    	cleaned = self.cleaned_data.get('email')
-    	email_base, provider = cleaned.split('@')
-    	domain, extension = provider.split('.')
-    	if not "edu" in extension:
-    		raise forms.ValidationError("Please use a valid .edu email address.")
-    	return cleaned
+from .models import Sample
 
 class SearchForm(forms.Form):
     mineral_name = forms.CharField(required=False,

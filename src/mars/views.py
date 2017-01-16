@@ -11,8 +11,8 @@ from django.template import RequestContext
 from django.template.defaulttags import register
 from django.utils.encoding import smart_str
 
-from .forms import SignUpForm, SearchForm, UploadFileForm
-from .models import Sample, SignUp
+from .forms import SearchForm, UploadFileForm
+from .models import Sample
 from zipfile import ZipFile
 
 import re
