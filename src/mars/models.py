@@ -5,7 +5,7 @@ import json
 
 #Create your models here.
 class SampleType(models.Model):
-    typeOfSample = models.CharField(verbose_name='Type Of Sample', max_length=20, unique=True, primary_key=True)
+    typeOfSample = models.CharField(verbose_name='Type Of Sample', max_length=20, unique=True, primary_key=True, blank=False)
 
     class Meta:
         verbose_name= "Sample Type"
@@ -34,7 +34,6 @@ class Sample(models.Model):
     reflectance = JSONField(default = {})
     sample_type = models.ForeignKey(SampleType, null=True)
 
-
     def as_dict(self):
         return {
         "data_id": self.data_id,
@@ -54,9 +53,3 @@ class Sample(models.Model):
         "formula" : self.formula,
         "composition" : self.composition,
         }
-
-
-    @classmethod
-    def create(cls, data_id, sample_id, origin, locality, name, sample_desc, mineral_type, sample_class, sub_class, grain_size, view_geom, resolution, refl_range, formula, composition, reflectance):
-      sample = cls(data_id=data_id,sample_id=sample_id,origin=origin,locality=locality,name=name,sample_desc=sample_desc,mineral_type=mineral_type,sample_class=sample_class,sub_class=sub_class,grain_size=grain_size,view_geom=view_geom,resolution=resolution,refl_range=refl_range,formula=formula,composition=composition,reflectance=reflectance)
-      return sample

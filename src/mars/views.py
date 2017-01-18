@@ -12,7 +12,7 @@ from django.template.defaulttags import register
 from django.utils.encoding import smart_str
 
 from .forms import SearchForm, UploadFileForm
-from .models import Sample
+from .models import Sample,SampleType
 from zipfile import ZipFile
 
 import re
@@ -187,7 +187,7 @@ def upload_file(request):
         print (mtype)
         if form.is_valid():
             for uploadedFile in request.FILES.getlist('files'):
-                error_msg, warning_msgs, overwrite = process_file(uploadedFile, mclass, mtype)
+                error_msg, warning_msgs, conflictingIds, conflictingSamples = process_file(uploadedFile, mclass, mtype)
                 if error_msg != '':
                     messages.error(request, 'ERROR: ' + error_msg)
                 else:
@@ -195,8 +195,8 @@ def upload_file(request):
                     if len(warning_msgs) != 0:
                         for warning_msg in warning_msgs:
                             messages.warning(request, 'WARNING: ' + warning_msg)
-                    if len(overwrite) != 0:
-                        messages.warning(request, 'WARNING: The following data IDs were overwritten. If this was not the intended behavior, please check for non-unique data IDs. ' + ', '.join(overwrite))
+                    elif len(conflictingIds) != 0:
+                        messages.warning(request, 'WARNING: The following data IDs conflict. Please either change the new samples, or remove the conflicting samples from the database. ' + ', '.join(conflictingIds))
         #return HttpResponseRedirect('/admin/mars/sample')
         return HttpResponseRedirect('/upload/')
     else:
@@ -218,11 +218,16 @@ def process_file(file, mineral_class, mineral_type):
     resArray = [] # Resolutions
     formArray = [] # Formulas
     compArray = [] # Compositions
-    dataPoints = []
+    classArray = [] # Sample Class
+    subClassArray = [] # Sample Subclass
+    sampleTypeArray = [] #Sample Type: e.g. Mineral, Coating, Volatile, ...
+    mineralTypeArray = [] # Mineral Type: e.g. Tectosilicate
+    dataPoints = [] # Samples graph data
 
     error_messages = ''
     warning_messages = []
-    overwritten = []
+    conflictingIds = []
+    conflictingSamples = []
 
     try:
         paramFile = file.read()
@@ -259,7 +264,7 @@ def process_file(file, mineral_class, mineral_type):
         dataIDs = reader.next() # Data ID must come first
         if 'data id' not in dataIDs[0].lower():
             error_messages += 'Data ID must come first in metadata section. Check that there is only one (1) blank row between each section.'
-            return error_messages, warning_messages, overwritten
+            return error_messages, warning_messages, conflictingIds, conflictingSamples
 
         start = 1
         while dataIDs[start] == '':
@@ -323,6 +328,30 @@ def process_file(file, mineral_class, mineral_type):
                     compArray.append(meta_line[c])
                     c+=1
 
+            # Class
+            elif 'class' in meta_line[0].lower():
+                while c < len(meta_line):
+                    classArray.append(meta_line[c])
+                    c+=1
+
+            # SubClass
+            elif 'Sub class' in meta_line[0].lower():
+                while c < len(meta_line):
+                    subClassArray.append(meta_line[c])
+                    c+=1
+
+            # Mineral Type
+            elif 'mineral type' in meta_line[0].lower():
+                while c < len(meta_line):
+                    mineralTypeArray.append(meta_line[c])
+                    c+=1
+
+            # Sample Type
+            elif 'sample type' in meta_line[0].lower():
+                while c < len(meta_line):
+                    sampleTypeArray.append(meta_line[c])
+                    c+=1
+
             # New metadata fields here
 
             else:
@@ -335,7 +364,7 @@ def process_file(file, mineral_class, mineral_type):
 
         if line[0] == '':
             error_messages += 'Check that there is only one (1) blank row between each section.'
-            return error_messages, warning_messages, overwritten
+            return error_messages, warning_messages, conflictingIds, conflictingSamples
 
         # Figure out units
         if "microns" in line[0] or "um" in line[0]:
@@ -381,6 +410,10 @@ def process_file(file, mineral_class, mineral_type):
     resArray += [''] * (size - len(resArray))
     formArray += [''] * (size - len(formArray))
     compArray += [''] * (size - len(compArray))
+    mineralTypeArray += [''] * (size - len(mineralTypeArray))
+    classArray += [''] * (size - len(classArray))
+    subClassArray += [''] * (size - len(subClassArray))
+    sampleTypeArray += [''] * (size - len(sampleTypeArray))
 
     for i in range(size):
         dataId = dataArray[i]
@@ -390,19 +423,46 @@ def process_file(file, mineral_class, mineral_type):
         gr = grainArray[i]
         vGeo= vGeoArray[i]
         res = resArray[i]
+        mineralType = mineralTypeArray[i]
+        sampleClass = classArray[i]
+        subClass = subClassArray[i]
+        sampleType = SampleType() 
+        # Get or Create the sample type
+        if(sampleTypeArray[i]):
+            sampleType = SampleType(typeOfSample=sampleTypeArray[i])
+            sampleType.save()
 
         low = min([float(w) for w in dataPoints[i]])
         high = max([float(w) for w in dataPoints[i]])
-        tempRan = [int(round(low, -2)), int(round(high, -2))]
+        tempRan = [int(round(low, 0)), int(round(high, 0))]
 
         form = formArray[i]
         comp = compArray[i]
 
+
+        sample = Sample(
+            data_id=dataId,
+            sample_id=sampId,
+            origin=origin,
+            locality=collection,
+            name=name,
+            sample_desc=desc,
+            mineral_type=mineralType,
+            sample_class=sampleClass,
+            sub_class=subClass,
+            grain_size=gr,
+            view_geom=vGeo,
+            resolution=res,
+            refl_range=tempRan,
+            formula=form,
+            composition=comp,
+            reflectance=dataPoints[i],
+            sample_type=sampleType)
         # Check to see if Data ID already exists #
         if Sample.objects.filter(data_id=dataId).exists():
-          overwritten.append(dataId)
+            conflictingIds.append(dataId)
+            conflictingSamples.append(sample)
+        else:
+            sample.save()
 
-        sample = Sample.create(dataId, sampId, origin, collection, name, desc, mineral_type, mineral_class,'', gr, vGeo, res, tempRan, form, comp, dataPoints[i])
-        sample.save()
-
-    return error_messages, warning_messages, overwritten
+    return error_messages, warning_messages, conflictingIds, conflictingSamples
