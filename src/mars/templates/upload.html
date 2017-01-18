@@ -7,10 +7,6 @@
         <p><b> Please specify a CSV file </b></p>
         <form enctype="multipart/form-data" method="POST">
           {% csrf_token %}
-          <p>{{form.sample_class.label_tag}}</p>
-          <p>{{form.sample_class}}</p>
-          <p>{{form.sample_type.label_tag}}</p>
-          <p>{{form.sample_type}}</p>
           <div class="file-field input-field">
             <div class="btn">
               <span>File</span>

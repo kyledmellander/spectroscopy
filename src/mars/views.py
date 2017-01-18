@@ -177,17 +177,9 @@ def graph(request):
 def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
-        mclass = request.POST.get('sample_class')
-        if not mclass:
-            mclass = ""
-        mtype = request.POST.get('sample_type')
-        if not mtype:
-            mtype = ""
-        print (mclass)
-        print (mtype)
         if form.is_valid():
             for uploadedFile in request.FILES.getlist('files'):
-                error_msg, warning_msgs, conflictingIds, conflictingSamples = process_file(uploadedFile, mclass, mtype)
+                error_msg, warning_msgs, conflictingIds, conflictingSamples = process_file(uploadedFile)
                 if error_msg != '':
                     messages.error(request, 'ERROR: ' + error_msg)
                 else:
@@ -207,7 +199,7 @@ def hasNumbers(inputString):
     result = bool(re.search(r'\d', inputString))
     return result
 
-def process_file(file, mineral_class, mineral_type):
+def process_file(file):
     print(file)
     dataArray = [] # Array of IDs
     sampArray = [] # Sample IDs
@@ -426,7 +418,7 @@ def process_file(file, mineral_class, mineral_type):
         mineralType = mineralTypeArray[i]
         sampleClass = classArray[i]
         subClass = subClassArray[i]
-        sampleType = SampleType() 
+        sampleType = SampleType()
         # Get or Create the sample type
         if(sampleTypeArray[i]):
             sampleType = SampleType(typeOfSample=sampleTypeArray[i])
