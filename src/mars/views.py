@@ -69,7 +69,9 @@ def search(request):
                 mClass = search_form.cleaned_data.get('mineral_class')
                 mDataId = search_form.cleaned_data.get('mineral_Id')
                 mOrigin = search_form.cleaned_data.get('database_of_origin')
-                print(mName, mClass, mDataId, mOrigin);
+                xMin = search_form.cleaned_data.get('min_included_range')
+                xMax = search_form.cleaned_data.get('max_included_range')
+                print(xMax, xMin);
                 print(search_form.cleaned_data);
 
                 # Remove 'Any' from choice field
@@ -90,13 +92,20 @@ def search(request):
                     formResults = formResults.filter(data_id__icontains=mDataId)
                 if mOrigin:
                     formResults = formResults.filter(origin__icontains=mOrigin)
+                if (xMax < 30000):
+                    print("here")
+                    formResults = formResults.filter(refl_range__1__lte=xMax)
+                if (xMin > 0):
+                    formResults = formResults.filter(refl_range__0__gte=xMin)
 
                 results = results | formResults
 
         return render (request, 'results.html', {"results": results})
     else:
+        dataBaseChoices = [(c, c) for c in Sample.objects.all().values_list('origin', flat=True).distinct()]
+        dataBaseChoices.insert(0, ('Any','Any'))
         return render(request, 'search.html', {
-            'search_formset': SearchFormSet,
+            'search_formset': SearchFormSet, 'database_choices': dataBaseChoices,
             })
 
 

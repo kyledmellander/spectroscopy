@@ -13,8 +13,10 @@
         <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
         <link rel="stylesheet" href="{% static 'css/main.css' %}">
         <link rel="stylesheet" href="{% static 'css/materialize.css' %}">
+        <link rel="stylesheet" href="{% static 'css/nouislider.css' %}">
         <script src="{% static 'js/vendor/modernizr-2.8.3.min.js' %}"></script>
     </head>
+
     <body>
       <!-- Navbar -->
       <nav style:"background:rgba(0,0,0,0.7)">
@@ -42,14 +44,34 @@
 
             <!--- Search Forms --->
             <ul class="collapsible" data-collapsible="expandable" id="myList" >
-              {% for search_form in search_formset %}
+              {% for search_form in search_formset.forms %}
               <li class="search-form">
                 <div class="collapsible-header active center" style="background-color:White;">
                   <span class="left head">Search {{forloop.counter}}</span>
                 </div>
                 <div class="collapsible-body" style="background:rgba(255,255,255,0.9); ">
-                  <div class="mine" style="padding: 20px">
-                    {{ search_form}}
+                  <div class="container">
+                    <div class="row" style="padding: 20px">
+                      <div class="col s6">{{search_form.mineral_name.errors}}
+                                          {{search_form.mineral_name.label_tag}}
+                                          {{search_form.mineral_name}}</div>
+                      <div class="col s6">{{search_form.mineral_class.errors}}
+                                          {{search_form.mineral_class.label_tag}}
+                                          {{search_form.mineral_class}}</div>
+                      <div class="col s12">{{search_form.mineral_Id.errors}}
+                                          {{search_form.mineral_Id.label_tag}}
+                                          {{search_form.mineral_Id}}</div>
+                      <div class="col s12"><label for="id_slider-{{forloop.counter}}">Contained in range:</label><div class="slider" id="id_slider-{{forloop.counter}}" style="margin-top:15px; margin-bottom:15px"></div></div>
+                      <div class="col s6">{{search_form.min_included_range.errors}}
+                                          {{search_form.min_included_range.label_tag}}
+                                          {{search_form.min_included_range}}</div>
+                      <div class="col s6">{{search_form.max_included_range.errors}}
+                                          {{search_form.max_included_range.label_tag}}
+                                          {{search_form.max_included_range}}</div>
+                      <div class="col s12">{{search_form.database_of_origin.errors}}
+                                          {{search_form.database_of_origin.label_tag}}
+                                          {{search_form.database_of_origin}}</div>
+                    </div>
                   </div>
                 </div>
               </li>
@@ -90,8 +112,36 @@
         <script src="{% static 'js/plugins.js' %}"></script>
         <script src="{% static 'js/main.js' %}"></script>
         <script src="{% static 'js/materialize.min.js' %}"></script>
+        <script src="{% static 'js/nouislider.min.js' %}"></script>
 
+        <!-- Template for the search form. Copied to generate more
+             with the javascript below -->
         <script type="text/html" id="search-template">
+              <li id ="form-__prefix__" class="search-form">
+                <div class="collapsible-header center active" style="background-color:White;">
+                  <span class="left head">Search __count__</span>
+                </div>
+                <div class="collapsible-body" style="background:rgba(255,255,255,0.9); ">
+                  <div class="container">
+                    <div class="row" style="padding: 20px">
+                      <div class="col s6"><label for="id_form-__prefix__-mineral_name">Mineral name:</label></th><td><input id="id_form-__prefix__-mineral_name" name="form-__prefix__-mineral_name" placeholder="e.g. Gypsum" type="text" /></div>
+                      <div class="col s6"><label for="id_form-__prefix__-mineral_class">Mineral class:</label><input id="id_form-__prefix__-mineral_class" name="form-__prefix__-mineral_class" placeholder="e.g. Sulfate" type="text" /></div>
+                      <div class="col s12"><label for="id_form-__prefix__-mineral_Id">Mineral id:</label><input id="id_form-__prefix__-mineral_Id" name="form-__prefix__-mineral_Id" placeholder="e.g. ASD_SUL_21" type="text" /></div>
+                      <div class="col s12"><label for="id_slider-__count__">Contained in range:</label><div class="slider" id="id_slider-__count__" style="margin-top:15px; margin-bottom:15px"></div></div>
+                      <div class="col s6"><label for="id_form-__prefix__-min_included_range">Min X (nm):</label><input id="id_form-__prefix__-min_included_range" name="form-__prefix__-min_included_range" type="number" /></div>
+                      <div class="col s6"><label for="id_form-__prefix__-max_included_range">Max X (nm):</label><input id="id_form-__prefix__-max_included_range" name="form-__prefix__-max_included_range" type="number" /></div>
+                      <div class="col s12"><label for="id_form-__prefix__-database_of_origin">Database of origin:</label> <select id="id_form-__prefix__-database_of_origin" name="form-__prefix__-database_of_origin">
+                          {% for k,v in database_choices %}
+                          <option value="{{k}}">{{v}}</option>
+                          {% endfor %}
+                      </select></div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+        </script>
+
+        <script type="text/html" id="search-template-2">
               <li id ="form-__prefix__" class="search-form">
                 <div class="collapsible-header center active" style="background-color:White;">
                   <span class="left head">Search __count__</span>
@@ -104,18 +154,49 @@
               </li>
         </script>
 
+
         <script>
           $(document).ready(function() {
             $('select').material_select();
             $(".button-collapse").sideNav();
+
           });
 
+          var slider = document.getElementById('id_slider-1');
+          var minX = document.getElementById('id_form-0-min_included_range');
+          var maxX = document.getElementById('id_form-0-max_included_range');
+          noUiSlider.create(slider, {
+            start: [0, 30000],
+            connect: true,
+            step: 1,
+            range: {
+              'min': 0,
+              '50%': 1000,
+              '65%': 3000,
+              'max': 30000
+            },
+            tooltips: [false,false],
+          });
+
+          //Slider events
+          slider.noUiSlider.on('update', function() {
+              minX.value = Math.round(slider.noUiSlider.get()[0]);
+              maxX.value = Math.round(slider.noUiSlider.get()[1]);
+          });
+
+          minX.addEventListener('change', function() {
+            slider.noUiSlider.set([this.value, null])
+          });
+
+          maxX.addEventListener('change', function() {
+            slider.noUiSlider.set([null, this.value])
+          });
+          // Script for adding in search elements
           var limit = 10;
           function addInput(divName, elementBelow) {
             var formCount = $('.search-form').length;
 
-            console.log(formCount);
-            if (formCount <= limit) {
+            if (formCount < limit) {
               $(".collapsible-header").removeClass(function(){
                 return "active";
               });
@@ -128,10 +209,43 @@
               $(searchTemplate).removeAttr('id').insertAfter(".search-form:last").slideDown(300);
               $(searchTemplate).find(".head").html("Search " + (formCount + 1));
               $('#id_form-TOTAL_FORMS').val(formCount + 1);
+              console.log(searchTemplate);
+              console.log(formCount);
 
-              $('select').material_select();
-              $('.collapsible').collapsible();
+              //Slider forms
+              var slider = document.getElementById('id_slider-'+ (formCount + 1));
+              var minX = document.getElementById('id_form-' + formCount + '-min_included_range')
+              var maxX = document.getElementById('id_form-' + formCount + '-max_included_range')
+              noUiSlider.create(slider, {
+                start: [0, 30000],
+                connect: true,
+                step: 1,
+                range: {
+                  'min': 0,
+                  '50%': 1000,
+                  '65%': 3000,
+                  'max': 30000
+                },
+                tooltips: [false,false],
+              });
+
+              //Slider events
+              slider.noUiSlider.on('update', function() {
+                  minX.value = Math.round(slider.noUiSlider.get()[0]);
+                  maxX.value = Math.round(slider.noUiSlider.get()[1]);
+              });
+
+              minX.addEventListener('change', function() {
+                slider.noUiSlider.set([this.value, null])
+              });
+
+              maxX.addEventListener('change', function() {
+                slider.noUiSlider.set([null, this.value])
+              });
             }
+
+            $('select').material_select();
+            $('.collapsible').collapsible();
           }
 
         </script>
