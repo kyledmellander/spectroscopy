@@ -61,7 +61,17 @@
                       <div class="col s12">{{search_form.mineral_Id.errors}}
                                           {{search_form.mineral_Id.label_tag}}
                                           {{search_form.mineral_Id}}</div>
-                      <div class="col s12"><label for="id_slider-{{forloop.counter}}">Contained in range:</label><div class="slider" id="id_slider-{{forloop.counter}}" style="margin-top:15px; margin-bottom:15px"></div></div>
+                      <div class="col s4">
+                        <div class="switch">
+                          <label>
+                            Exclusive Data
+                            {{search_form.any_data}}
+                            <span class="lever"></span>
+                            Any Data
+                          </label>
+                        </div>
+                      </div>
+                      <div class="col s8"><div class="slider" id="id_slider-{{forloop.counter}}" style="margin-top:15px; margin-bottom:15px"></div></div>
                       <div class="col s6">{{search_form.min_included_range.errors}}
                                           {{search_form.min_included_range.label_tag}}
                                           {{search_form.min_included_range}}</div>
@@ -166,14 +176,16 @@
           var minX = document.getElementById('id_form-0-min_included_range');
           var maxX = document.getElementById('id_form-0-max_included_range');
           noUiSlider.create(slider, {
-            start: [0, 30000],
+            start: [0, 300000],
             connect: true,
             step: 1,
             range: {
               'min': 0,
               '50%': 1000,
               '65%': 3000,
-              'max': 30000
+              '80%': 50000,
+              '90%': 150000,
+              'max': 300000
             },
             tooltips: [false,false],
           });
@@ -217,14 +229,16 @@
               var minX = document.getElementById('id_form-' + formCount + '-min_included_range')
               var maxX = document.getElementById('id_form-' + formCount + '-max_included_range')
               noUiSlider.create(slider, {
-                start: [0, 30000],
+                start: [0, 300000],
                 connect: true,
                 step: 1,
                 range: {
                   'min': 0,
                   '50%': 1000,
                   '65%': 3000,
-                  'max': 30000
+                  '80%': 50000,
+                  '90%': 150000,
+                  'max': 300000
                 },
                 tooltips: [false,false],
               });

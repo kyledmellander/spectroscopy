@@ -4,6 +4,7 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles import finders
 from django.core.mail import send_mail
+from django.db.models import Q
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response, redirect
@@ -69,9 +70,10 @@ def search(request):
                 mClass = search_form.cleaned_data.get('mineral_class')
                 mDataId = search_form.cleaned_data.get('mineral_Id')
                 mOrigin = search_form.cleaned_data.get('database_of_origin')
+                anyData = search_form.cleaned_data.get('any_data')
                 xMin = search_form.cleaned_data.get('min_included_range')
                 xMax = search_form.cleaned_data.get('max_included_range')
-                print(xMax, xMin);
+                print(anyData, xMax, xMin);
                 print(search_form.cleaned_data);
 
                 # Remove 'Any' from choice field
@@ -79,7 +81,7 @@ def search(request):
                     mOrigin = None
 
                 # Don't search if no input is given
-                if not (mName or mClass or mDataId or mOrigin):
+                if not (mName or mClass or mDataId or mOrigin or (xMin != 0) or (xMax != 30000)):
                     continue
 
                 formResults = allSamples.filter()
@@ -92,11 +94,15 @@ def search(request):
                     formResults = formResults.filter(data_id__icontains=mDataId)
                 if mOrigin:
                     formResults = formResults.filter(origin__icontains=mOrigin)
-                if (xMax < 30000):
-                    print("here")
-                    formResults = formResults.filter(refl_range__1__lte=xMax)
-                if (xMin > 0):
-                    formResults = formResults.filter(refl_range__0__gte=xMin)
+                if not anyData:
+                    if (xMax < 300000):
+                        formResults = formResults.filter(refl_range__1__lte=xMax)
+                    if (xMin > 0):
+                        formResults = formResults.filter(refl_range__0__gte=xMin)
+                else:
+                    formResults = formResults.filter( (Q(refl_range__1__lte=xMax) & Q(refl_range__1__gte=xMin))
+                                                    | (Q(refl_range__0__lte=xMax) & Q(refl_range__0__gte=xMin))
+                                                    | (Q(refl_range__0__lte=xMin) & Q(refl_range__1__gte=xMax)))
 
                 results = results | formResults
 

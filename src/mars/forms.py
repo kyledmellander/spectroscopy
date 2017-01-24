@@ -9,7 +9,7 @@ class SearchForm(forms.Form):
         widget=forms.TextInput(attrs={'placeholder': 'e.g. Sulfate'}))
     mineral_Id= forms.CharField(required=False,
         widget=forms.TextInput(attrs={'placeholder': 'e.g. ASD_SUL_21'}))
-
+    any_data = forms.BooleanField(required=False)
     min_included_range = forms.IntegerField(required = False,
         widget = forms.NumberInput(), label='Min X (nm)')
     max_included_range = forms.IntegerField(required = False,
