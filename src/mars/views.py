@@ -4,6 +4,7 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles import finders
 from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, HttpResponse
@@ -54,65 +55,80 @@ def meta(request):
     dictionaries = [ obj.as_dict() for obj in samples]
     return render(request, 'meta.html', {"metaResults": samples,"reflectancedict":dictionaries,})
 
-def search(request):
+def results(request):
     allSamples = Sample.objects.order_by('data_id')
 
     # Create the set of forms
     SearchFormSet = formset_factory(SearchForm)
-
     if request.method == 'POST':
-        search_formset = SearchFormSet(request.POST)
         results = Sample.objects.none()
-        print(len(search_formset));
-        for search_form in search_formset:
-            if search_form.is_valid():
-                mName =  search_form.cleaned_data.get('mineral_name')
-                mClass = search_form.cleaned_data.get('mineral_class')
-                mDataId = search_form.cleaned_data.get('mineral_Id')
-                mOrigin = search_form.cleaned_data.get('database_of_origin')
-                anyData = search_form.cleaned_data.get('any_data')
-                xMin = search_form.cleaned_data.get('min_included_range')
-                xMax = search_form.cleaned_data.get('max_included_range')
-                print(anyData, xMax, xMin);
-                print(search_form.cleaned_data);
 
-                # Remove 'Any' from choice field
-                if mOrigin == 'Any':
-                    mOrigin = None
+        # If using a previous search, get the saved results
+        if (request.POST.get("results_string", False)):
+            resultsString = request.POST.get("results_string")
+            idList = resultsString.split(",")
+            results = allSamples.filter(data_id__in=idList)
+        else:
+            search_formset = SearchFormSet(request.POST)
+            idList = []
+            for search_form in search_formset:
+                if search_form.is_valid():
+                    mName =  search_form.cleaned_data.get('mineral_name')
+                    mClass = search_form.cleaned_data.get('mineral_class')
+                    mDataId = search_form.cleaned_data.get('mineral_Id')
+                    mOrigin = search_form.cleaned_data.get('database_of_origin')
+                    anyData = search_form.cleaned_data.get('any_data')
+                    xMin = search_form.cleaned_data.get('min_included_range')
+                    xMax = search_form.cleaned_data.get('max_included_range')
 
-                # Don't search if no input is given
-                if not (mName or mClass or mDataId or mOrigin or (xMin != 0) or (xMax != 30000)):
-                    continue
+                    # Remove 'Any' from choice field
+                    if mOrigin == 'Any':
+                        mOrigin = None
 
-                formResults = allSamples.filter()
+                    formResults = allSamples.filter()
 
-                if mName:
-                    formResults = formResults.filter(name__icontains=mName)
-                if mClass:
-                    formResults = formResults.filter(sample_class__icontains=mClass)
-                if mDataId:
-                    formResults = formResults.filter(data_id__icontains=mDataId)
-                if mOrigin:
-                    formResults = formResults.filter(origin__icontains=mOrigin)
-                if not anyData:
-                    if (xMax < 300000):
-                        formResults = formResults.filter(refl_range__1__lte=xMax)
-                    if (xMin > 0):
-                        formResults = formResults.filter(refl_range__0__gte=xMin)
-                else:
-                    formResults = formResults.filter( (Q(refl_range__1__lte=xMax) & Q(refl_range__1__gte=xMin))
-                                                    | (Q(refl_range__0__lte=xMax) & Q(refl_range__0__gte=xMin))
-                                                    | (Q(refl_range__0__lte=xMin) & Q(refl_range__1__gte=xMax)))
+                    if mName:
+                        formResults = formResults.filter(name__icontains=mName)
+                    if mClass:
+                        formResults = formResults.filter(sample_class__icontains=mClass)
+                    if mDataId:
+                        formResults = formResults.filter(data_id__icontains=mDataId)
+                    if mOrigin:
+                        formResults = formResults.filter(origin__icontains=mOrigin)
+                    if not anyData:
+                        if (xMax < 300000):
+                            formResults = formResults.filter(refl_range__1__lte=xMax)
+                        if (xMin > 0):
+                            formResults = formResults.filter(refl_range__0__gte=xMin)
+                    else:
+                        formResults = formResults.filter( (Q(refl_range__1__lte=xMax) & Q(refl_range__1__gte=xMin))
+                                                        | (Q(refl_range__0__lte=xMax) & Q(refl_range__0__gte=xMin))
+                                                        | (Q(refl_range__0__lte=xMin) & Q(refl_range__1__gte=xMax)))
 
-                results = results | formResults
+                    results = results | formResults
 
-        return render (request, 'results.html', {"results": results})
-    else:
-        dataBaseChoices = [(c, c) for c in Sample.objects.all().values_list('origin', flat=True).distinct()]
-        dataBaseChoices.insert(0, ('Any','Any'))
-        return render(request, 'search.html', {
-            'search_formset': SearchFormSet, 'database_choices': dataBaseChoices,
-            })
+            for result in results:
+                idList.append(result.data_id.strip()+",")
+
+            #Keep a string of the dataIds
+            resultsString = ''.join(idList)
+
+        # Send the paginated results
+        paginator = Paginator(results, 5)
+        pageSelected = int(request.POST.get("page_selected", 1))
+        page_results = paginator.page(pageSelected)
+        page_choices = range( min(1,pageSelected), min(pageSelected+6,paginator.num_pages+1))
+
+        return render (request, 'results.html', {"page_choices": page_choices, "results": page_results, "results_string": resultsString})
+
+def search(request):
+    SearchFormSet = formset_factory(SearchForm)
+
+    dataBaseChoices = [(c, c) for c in Sample.objects.all().values_list('origin', flat=True).distinct()]
+    dataBaseChoices.insert(0, ('Any','Any'))
+    return render(request, 'search.html', {
+        'search_formset': SearchFormSet, 'database_choices': dataBaseChoices,
+        })
 
 
 def graph(request):
