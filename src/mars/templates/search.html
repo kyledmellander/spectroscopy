@@ -38,7 +38,7 @@
 
         <!-- Add your site or application content here -->
         <div class="container section" id="content" >
-          <form method="POST">
+          <form method="POST" action="/results/">
             {% csrf_token %}
             {{search_formset.management_form}}
 
@@ -61,7 +61,7 @@
                       <div class="col s12">{{search_form.mineral_Id.errors}}
                                           {{search_form.mineral_Id.label_tag}}
                                           {{search_form.mineral_Id}}</div>
-                      <div class="col s4">
+                      <div class="col s12" style="padding: 8px 8px">
                         <div class="switch">
                           <label>
                             Exclusive Data
@@ -71,7 +71,7 @@
                           </label>
                         </div>
                       </div>
-                      <div class="col s8"><div class="slider" id="id_slider-{{forloop.counter}}" style="margin-top:15px; margin-bottom:15px"></div></div>
+                      <div class="col s12"><div class="slider" id="id_slider-{{forloop.counter}}" style="margin-top:15px; margin-bottom:15px"></div></div>
                       <div class="col s6">{{search_form.min_included_range.errors}}
                                           {{search_form.min_included_range.label_tag}}
                                           {{search_form.min_included_range}}</div>
@@ -95,7 +95,7 @@
                       <div class="btn waves-effect waves-light" id="addSearch" onclick="addInput('myList','addSearch');">
                           Add a Search +
                       </div>
-                      <button type="submit" class="btn red waves-effect waves-light"/>
+                      <button type="submit" name="action" value="search" class="btn red waves-effect waves-light"/>
                         Search
                       </button>
                   </div>
@@ -137,7 +137,17 @@
                       <div class="col s6"><label for="id_form-__prefix__-mineral_name">Mineral name:</label></th><td><input id="id_form-__prefix__-mineral_name" name="form-__prefix__-mineral_name" placeholder="e.g. Gypsum" type="text" /></div>
                       <div class="col s6"><label for="id_form-__prefix__-mineral_class">Mineral class:</label><input id="id_form-__prefix__-mineral_class" name="form-__prefix__-mineral_class" placeholder="e.g. Sulfate" type="text" /></div>
                       <div class="col s12"><label for="id_form-__prefix__-mineral_Id">Mineral id:</label><input id="id_form-__prefix__-mineral_Id" name="form-__prefix__-mineral_Id" placeholder="e.g. ASD_SUL_21" type="text" /></div>
-                      <div class="col s12"><label for="id_slider-__count__">Contained in range:</label><div class="slider" id="id_slider-__count__" style="margin-top:15px; margin-bottom:15px"></div></div>
+                      <div class="col s4">
+                        <div class="switch">
+                          <label>
+                            Exclusive Data
+                            <input id="id_form-__prefix__-any_data" name="form-__prefix__-any_data" type="checkbox" />
+                            <span class="lever"></span>
+                            Any Data
+                          </label>
+                        </div>
+                      </div>
+                      <div class="col s8"><div class="slider" id="id_slider-__count__" style="margin-top:15px; margin-bottom:15px"></div></div>
                       <div class="col s6"><label for="id_form-__prefix__-min_included_range">Min X (nm):</label><input id="id_form-__prefix__-min_included_range" name="form-__prefix__-min_included_range" type="number" /></div>
                       <div class="col s6"><label for="id_form-__prefix__-max_included_range">Max X (nm):</label><input id="id_form-__prefix__-max_included_range" name="form-__prefix__-max_included_range" type="number" /></div>
                       <div class="col s12"><label for="id_form-__prefix__-database_of_origin">Database of origin:</label> <select id="id_form-__prefix__-database_of_origin" name="form-__prefix__-database_of_origin">
