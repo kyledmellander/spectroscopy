@@ -50,27 +50,38 @@ def meta(request):
   if request.method == 'POST':
     if 'meta' in request.POST:
       selections = request.POST.getlist('selection')
-#      selections = [unicodedata.normalize('NFKD', s).encode('ascii','ignore') for s in selections]
+      prevSelectedList = request.POST.getlist("prev_selected")
+      selections = list(set(selections + prevSelectedList))
       samples = Sample.objects.filter(data_id__in=selections)
     dictionaries = [ obj.as_dict() for obj in samples]
     return render(request, 'meta.html', {"metaResults": samples,"reflectancedict":dictionaries,})
 
 def results(request):
     allSamples = Sample.objects.order_by('data_id')
+    searchResultIDList = []
+    searchResults = Sample.objects.none()
+    selectedSpectra = Sample.objects.none()
 
-    # Create the set of forms
-    SearchFormSet = formset_factory(SearchForm)
     if request.method == 'POST':
-        results = Sample.objects.none()
-
         # If using a previous search, get the saved results
-        if (request.POST.get("results_string", False)):
-            resultsString = request.POST.get("results_string")
-            idList = resultsString.split(",")
-            results = allSamples.filter(data_id__in=idList)
+        if (request.POST.get("page_selected", False)):
+            searchResultIDList = request.POST.getlist("search_results", [])
+            print("SEARCHRESULTLIST: ", searchResultIDList)
+
+            # Get any results selected via the form
+            selections = request.POST.getlist('selection')
+
+            # Get any results selected previously
+            prevSelections = request.POST.getlist('prev_selected')
+
+
+            # Join previously selected with newly selected
+            selections = list(set(selections + prevSelections))
+            selectedSpectra = allSamples.filter(data_id__in=selections)
+            searchResults = allSamples.filter()
         else:
+            SearchFormSet = formset_factory(SearchForm)
             search_formset = SearchFormSet(request.POST)
-            idList = []
             for search_form in search_formset:
                 if search_form.is_valid():
                     mName =  search_form.cleaned_data.get('mineral_name')
@@ -104,22 +115,31 @@ def results(request):
                         formResults = formResults.filter( (Q(refl_range__1__lte=xMax) & Q(refl_range__1__gte=xMin))
                                                         | (Q(refl_range__0__lte=xMax) & Q(refl_range__0__gte=xMin))
                                                         | (Q(refl_range__0__lte=xMin) & Q(refl_range__1__gte=xMax)))
+                    searchResults = searchResults | formResults
 
-                    results = results | formResults
+            for result in searchResults:
+                searchResultIDList.append(result.data_id.strip())
 
-            for result in results:
-                idList.append(result.data_id.strip()+",")
 
-            #Keep a string of the dataIds
-            resultsString = ''.join(idList)
+        # Create a new string of selected Spectra
+        selectedList = []
+        for spectra in selectedSpectra:
+            selectedList.append(spectra.data_id.strip())
+
+        #Keep a string of the selected dataIds
+        selectedString = ','.join(selectedList)
 
         # Send the paginated results
-        paginator = Paginator(results, 5)
+        paginator = Paginator(searchResults, 5)
         pageSelected = int(request.POST.get("page_selected", 1))
         page_results = paginator.page(pageSelected)
-        page_choices = range( min(1,pageSelected), min(pageSelected+6,paginator.num_pages+1))
+        page_choices = range( max(1,pageSelected-3), min(pageSelected+4,paginator.num_pages+1))
 
-        return render (request, 'results.html', {"page_choices": page_choices, "results": page_results, "results_string": resultsString})
+        page_ids=[]
+        for sample in page_results.object_list:
+            page_ids.append(sample.data_id.strip())
+        print(page_ids)
+        return render (request, 'results.html', {"page_ids": page_ids, "selected_ids":selectedList, "page_choices": page_choices, "page_results": page_results, "search_results": searchResultIDList})
 
 def search(request):
     SearchFormSet = formset_factory(SearchForm)
@@ -135,7 +155,11 @@ def graph(request):
   if request.method == 'POST':
     if 'graphForm' in request.POST:
       selections = request.POST.getlist('selection')
-      print(selections)
+
+      prevSelectedList = request.POST.getlist("prev_selected")
+      selections = list(set(selections + prevSelectedList))
+
+
       samples = Sample.objects.filter(data_id__in=selections)
       dictionaries = [ obj.as_dict() for obj in samples]
       for obj in dictionaries:
@@ -148,6 +172,9 @@ def graph(request):
 
     elif 'export' in request.POST:
       selections = request.POST.getlist('selection')
+      prevSelectedList = request.POST.getlist("prev_selected")
+      selections = list(set(selections + prevSelectedList))
+
       samples = Sample.objects.filter(data_id__in=selections)
       dictionaries = [obj.as_dict() for obj in samples]
       reflectanceDict = {}

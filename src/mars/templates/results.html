@@ -1,7 +1,7 @@
 {% extends "layouts/base.html" %}
 {% load staticfiles %}
 {% block content %}
-  {% if results %}
+  {% if search_results %}
     <div class="container section">
       <div class="card section" style="background:rgba(255,255,255,.9)">
         <form id="resultsForm" method="POST" name="resultsform">
@@ -11,9 +11,6 @@
             <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button>
             <button type="submit" name="meta" formaction="/meta/" class="btn btn-success">View Metadata</button><br>
           </div>
-
-
-
           <div class="container section">
             <input id="selectAllBox" type="checkbox" name="selection" onClick="toggle(this)"/>
             <label name="selectAllLabel" for="selectAllBox" > Select All</label>
@@ -31,12 +28,19 @@
               </tr>
             </thead>
             <tbody>
-              {% for result in results %}
+              {% for result in page_results %}
               <tr>
-                <td>
-                  <input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}}/>
-                  <label for="option{{result.data_id }}"></label>
-                </td>
+                {% if result.data_id.strip in selected_ids %}
+                  <td>
+                    <input type="checkbox" checked="checked" name="selection" id="option{{ result.data_id }}" value={{result.data_id}}/>
+                    <label for="option{{result.data_id }}"></label>
+                  </td>
+                {% else %}
+                  <td>
+                    <input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}}/>
+                    <label for="option{{result.data_id }}"></label>
+                  </td>
+                {% endif %}
                 <td><label for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
                 <td><label for="option{{ result.data_id }}"> {{ result.name | title }} </label></td>
                 <td><label for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
@@ -48,6 +52,17 @@
             </tbody>
           </table>
 
+          {% for result in search_results %}
+            <input type="hidden" name="search_results" value="{{result}}"/>
+          {% endfor %}
+
+
+          {% for id in selected_ids %}
+            {% if id not in page_ids %}
+              <input type="hidden" name="prev_selected" value="{{id}}"/>
+            {% endif %}
+          {% endfor %}
+
 
           <div class="section center-align">
             <button type="submit" name="graphForm" formaction="/graph/" class="btn btn-success">Graph</button>
@@ -56,19 +71,22 @@
           </div>
 
           {% if results_string %}
-          <input type="hidden" name="results_string" value="{{results_string}}"/>
-          {% else %}
-          <input type="hidden" name="current_query" value="None"/>
+            <input type="hidden" name="results_string" value="{{results_string}}"/>
           {% endif %}
+
+          {% if prev_selected %}
+            <input type="hidden" name="prev_selected" value="{{prev_selected}}"/>
+          {% endif %}
+
           <input id="page_selected" type="hidden" name="page_selected" value="{{results.number}}"/>
 
           <input type="hidden" name="page_number" value="{{results.number}}"/>
 
           <!-- Pagination -->
           <ul class="pagination center-align">
-            {% if results.has_previous %}
+            {% if page_results.has_previous %}
               <li class="waves-effect">
-                <a onclick="selectPage({{results.previous_page_number}});" name="action" value="results"/>
+                <a onclick="selectPage({{page_results.previous_page_number}});" name="action" value="results"/>
                 <i class="material-icons">chevron_left</i>
                 </a>
               </li>
@@ -82,10 +100,10 @@
 
             {% for page in page_choices %}
 
-            {% if results.number == page %}
+            {% if page_results.number == page %}
               <li class="active">
                 <a  name="action" value="results"/>
-                {{results.number}}
+                {{page_results.number}}
                 </a>
               </li>
             {% else %}
@@ -98,9 +116,9 @@
 
             {% endfor %}
 
-            {% if results.has_next %}
+            {% if page_results.has_next %}
               <li class="waves-effect">
-                <a onclick="selectPage({{results.next_page_number}});" name="action" value="results"/>
+                <a onclick="selectPage({{page_results.next_page_number}});" name="action" value="results"/>
                 <i class="material-icons">chevron_right</i>
                 </a>
               </li>
