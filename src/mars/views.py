@@ -130,7 +130,7 @@ def results(request):
         selectedString = ','.join(selectedList)
 
         # Send the paginated results
-        paginator = Paginator(searchResults, 5)
+        paginator = Paginator(searchResults, 50)
         pageSelected = int(request.POST.get("page_selected", 1))
         page_results = paginator.page(pageSelected)
         page_choices = range( max(1,pageSelected-3), min(pageSelected+4,paginator.num_pages+1))
