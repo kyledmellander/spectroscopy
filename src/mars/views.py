@@ -144,10 +144,9 @@ def results(request):
 def search(request):
     SearchFormSet = formset_factory(SearchForm)
     dataBaseChoices = [c.strip() for c in Sample.objects.all().values_list('origin', flat=True).distinct()]
-    dataBaseChoices = [(c.lower(), c) for c in dataBaseChoices]
-    dataBaseChoices = sorted(dataBaseChoices)
+    dataBaseChoices = sorted(set(dataBaseChoices), key=lambda s: s.lower())
+    dataBaseChoices = [(c, c) for c in dataBaseChoices]
     dataBaseChoices.insert(0, ('Any','Any'))
-    print(dataBaseChoices)
     return render(request, 'search.html', {
         'search_formset': SearchFormSet, 'database_choices': dataBaseChoices,
         })
