@@ -19,9 +19,15 @@ class SearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(SearchForm, self).__init__(*args, **kwargs)
-        self.fields['database_of_origin'].choices = [(c, c) for c in Sample.objects.all().values_list('origin', flat=True).distinct()]
-        # Allow any database to be selected
-        self.fields['database_of_origin'].choices.insert(0, ('Any','Any'))
+
+        # Due to issues with spaces, extra code has been added to reduce the list down
+        # to ignore any extra spaces due to erroneous database entries
+        dataBaseChoices = [c.strip() for c in Sample.objects.all().values_list('origin', flat=True).distinct()]
+        dataBaseChoices = sorted(set(dataBaseChoices), key=lambda s: s.lower())
+        dataBaseChoices = [(c, c) for c in dataBaseChoices]
+        dataBaseChoices.insert(0, ('Any','Any'))
+
+        self.fields['database_of_origin'].choices = dataBaseChoices
 
 class UploadFileForm(forms.Form):
     sample_class = forms.CharField(required=False,
