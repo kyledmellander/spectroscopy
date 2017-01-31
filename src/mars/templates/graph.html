@@ -27,7 +27,9 @@
 <!-- load the d3.js library -->
 	<div class="container">
 		<div class="card" style="background:rgba(255,255,255,.9)">
-  	<div class="chart-container" id="graphJtron">
+			<div class="container">
+				<div class="chart-container" id="graphJtron">
+			</div>
 		</div>
 		<div class="divider" style="margin:20px 20px"></div>
   	<div class="chart-container">
@@ -105,8 +107,8 @@
 						bottom: 20,
 						left:40,
 					},
-					width =	Math.floor(jumbowidth*.9)-margin.right,
-					height = Math.floor(width*.6)-margin.top - margin.bottom;
+					width =	Math.floor(jumbowidth*.95)-margin.right,
+					height = Math.floor(width*.65)-margin.top - margin.bottom;
 
 			//Scale the graph Y Axix based on the min and max of your graphs
 			var minX = Number.MAX_VALUE;
