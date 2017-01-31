@@ -143,9 +143,11 @@ def results(request):
 
 def search(request):
     SearchFormSet = formset_factory(SearchForm)
-
-    dataBaseChoices = [(c, c) for c in Sample.objects.all().values_list('origin', flat=True).distinct()]
+    dataBaseChoices = [c.strip() for c in Sample.objects.all().values_list('origin', flat=True).distinct()]
+    dataBaseChoices = [(c.lower(), c) for c in dataBaseChoices]
+    dataBaseChoices = sorted(dataBaseChoices)
     dataBaseChoices.insert(0, ('Any','Any'))
+    print(dataBaseChoices)
     return render(request, 'search.html', {
         'search_formset': SearchFormSet, 'database_choices': dataBaseChoices,
         })
@@ -491,21 +493,21 @@ def process_file(file):
 
 
         sample = Sample(
-            data_id=dataId,
-            sample_id=sampId,
-            origin=origin,
-            locality=collection,
-            name=name,
-            sample_desc=desc,
-            mineral_type=mineralType,
-            sample_class=sampleClass,
-            sub_class=subClass,
-            grain_size=gr,
-            view_geom=vGeo,
-            resolution=res,
+            data_id=dataId.strip(),
+            sample_id=sampId.strip(),
+            origin=origin.strip(),
+            locality=collection.strip(),
+            name=name.strip(),
+            sample_desc=desc.strip(),
+            mineral_type=mineralType.strip(),
+            sample_class=sampleClass.strip(),
+            sub_class=subClass.strip(),
+            grain_size=gr.strip(),
+            view_geom=vGeo.strip(),
+            resolution=res.strip(),
             refl_range=tempRan,
-            formula=form,
-            composition=comp,
+            formula=form.strip(),
+            composition=comp.strip(),
             reflectance=dataPoints[i],
             sample_type=sampleType)
         # Check to see if Data ID already exists #

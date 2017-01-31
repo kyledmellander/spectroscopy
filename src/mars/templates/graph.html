@@ -1,12 +1,4 @@
 <style>
-	.chart-container {
-		display:inline-block;
-		position:absolute;
-		width:100%;
-		height:100%;
-		left:10px;
-		overflow:visible;
-	}
 	.svg-content-responsive {
 		display:inline-block;
 		position:absolute;
@@ -16,6 +8,10 @@
 		right:10px;
 	}
 
+	text {
+		font: 10px sans-serif;
+	}
+
   .axis path,
   .axis line {
     fill:none;
@@ -23,34 +19,94 @@
     shape-rendering:crispEdges;
   }
 </style>
+
 {% extends "layouts/base.html" %}
 {% block content %}
 <body>
 {% if graphResults %}
 <!-- load the d3.js library -->
 	<div class="container">
-  	<div class="card chart-container center" id="graphJtron" style="background:rgba(255,255,255,.9)"></div>
+		<div class="card" style="background:rgba(255,255,255,.9)">
+  	<div class="chart-container" id="graphJtron">
+		</div>
+		<div class="divider" style="margin:20px 20px"></div>
+  	<div class="chart-container">
+			<table class="table container striped highlight">
+				<thead>
+					<tr>
+						<th></th>
+						<th>ID</th>
+						<th>Name</th>
+						<th>Class</th>
+						<th>Origin</th>
+						<th>Grain Size</th>
+						<th>Refl. Range</th>
+						<th>Color</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for result in graphResults %}
+					<tr>
+						<td>
+							<input type="checkbox" checked="checked" name="selection"
+								id="option{{ result.data_id }}" value={{result.data_id}}
+								style="color:rgb(100,20,234);"
+								background="rgba(255,243,100,.9)"
+								onclick="toggleLine(this,{{forloop.counter0}});"/>
+							<label for="option{{result.data_id }}"></label>
+						</td>
+						<td><label for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
+						<td><label for="option{{ result.data_id }}"> {{ result.name | title }} </label></td>
+						<td><label for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
+						<td><label for="option{{ result.data_id }}"> {{ result.origin }} </label></td>
+						<td><label for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
+						<td><label for="option{{ result.data_id }}"> {{ result.refl_range }} </label></td>
+						<td><p id="rect-{{result.data_id}}" style="border:1px solid gray; width:15px; height:15px;"></td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			</div>
+			<div class="section"></div>
+		</div>
+
+
+
 		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
 		<script>
-		function InitChart() {
-			//Change JSON string to object
-			var GRAPH = JSON.parse('{{graphJSON|safe}}');
 
+		var graph = JSON.parse('{{graphJSON|safe}}');
+		//Lines will hold each individual line's data
+		var lines = [];
+		var lineActive = [];
+
+		//Toggle the line based on the checkbox
+		function toggleLine(self, index) {
+			var graph = JSON.parse('{{graphJSON|safe}}');
+			var active   = this.checked ? false : true;
+			this.checked ? this.checked="" : this.checked="checked"
+			console.log(active)
+			var color = "hsl(" + ((360/graph.length+1) + (index*(360/graph.length+1)))  + ",80%,30%)"
+			var opacity = active ? 0 : 1;
+			d3.select("path#line_path"+index).style("opacity",opacity);
+			lineActive[index] = active;
+			//active ? d3.select(this).style("fill","gray") : d3.select(this).style("fill",color)
+		}
+
+		function InitChart() {
 			var color = d3.scale.category10();
 
 			var jumbowidth = document.getElementById("graphJtron").offsetWidth;
 
-			WIDTH =	Math.floor(jumbowidth*.75);
-			HEIGHT = Math.floor(WIDTH*.6);
-			MARGINS = {
-				top: 50,
-				right: 0,
-				bottom: 50,
-				left: 80
-			},
-
-			lSpace = WIDTH/GRAPH.length;
+			var margin = {
+						top: 20,
+						right: 20,
+						bottom: 20,
+						left:40,
+					},
+					width =	Math.floor(jumbowidth*.9)-margin.right,
+					height = Math.floor(width*.6)-margin.top - margin.bottom;
 
 			//Scale the graph Y Axix based on the min and max of your graphs
 			var minX = Number.MAX_VALUE;
@@ -59,7 +115,7 @@
 			var maxY = Number.MIN_VALUE;
 
 			//Update the min and maxX
-			GRAPH.forEach(function (d,i) {
+			graph.forEach(function (d,i) {
 				//Creates an array of objects with key-value pairs, sorted by keys
 				var reflectance = d3.entries(d.reflectance);
 				var curX = 0;
@@ -76,50 +132,74 @@
 				}
 			});
 
-			minX = minX *.90;
-			minY = minY *.90;
-			maxX = maxX * 1.10;
-			maxY = maxY * 1.10;
+			var xScale = d3.scale.linear().
+				range([0, width]).
+				domain([minX,maxX]);
 
-			xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([minX,maxX]).clamp(true),
-			yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([minY,maxY]).clamp(true),
-			xAxis = d3.svg.axis()
-			.orient("bottom")
-			.scale(xScale)
-			.tickFormat(d3.format("d"));
-			yAxis = d3.svg.axis()
-			.scale(yScale)
-			.orient("left");
+			var yScale = d3.scale.linear().
+					range([0, height]).
+					domain([maxY,minY]);
 
-			var vis = d3.select(".chart-container").append("svg")
-			.attr("width", '100%')
-			.attr("height", '100%')
-			.call(d3.behavior.zoom().y(yScale).x(xScale).on("zoom",zoomed))
-			.classed("svg-content-responsive",true);
+			var xAxis = d3.svg.axis().
+					orient("bottom").
+					scale(xScale).
+					tickFormat(d3.format("d"));
 
+			var yAxis = d3.svg.axis()
+				.scale(yScale)
+				.orient("left");
 
-			vis.append("svg:g")
+			var chart = d3.select(".chart-container").append("svg").
+				attr("width", width + margin.left + margin.right).
+				attr("height", height + margin.top + margin.bottom).
+				append("g").
+				call(d3.behavior.zoom().y(yScale).x(xScale).on("zoom",zoomed)).
+				attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+			// Clip the graph paths inside the clip box
+			var clip = chart.append("defs").append("svg:clipPath").
+					attr("id", "clip").
+					append("svg:rect").
+					attr("id", "clip-rect").
+					attr("x","0").
+					attr("y", "0").
+					attr("width", width).
+					attr("height", height);
+
+			var chartBody = chart.append("g").
+				attr("clip-path", "url(#clip)");
+
+			var rect = chartBody.append('svg:rect').
+					attr('width', width).
+					attr('height', height).
+					attr('fill', 'white');
+
+			// X Axis
+			chart.append("svg:g")
 			.attr("class", "x axis")
-			.attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+			.attr("transform", "translate(0," + height + ")")
 			.call(xAxis);
 
-			vis.append("svg:g")
+			// Y Axis
+			chart.append("svg:g")
 			.attr("class", "y axis")
-			.attr("transform", "translate(" + (MARGINS.left) + ",0)")
 			.call(yAxis);
 
-			vis.append("text")
-			.attr("class", "x label")
-			.style("text-anchor", "end")
-			.attr("x", WIDTH-400)
-			.attr("y", HEIGHT-10)
-			.text("Wavelength (nm)");
+			// X Axis label
+			chart.append("text")
+				.attr("class", "x label")
+				.style("text-anchor", "end")
+				.attr("x", width-20)
+				.attr("y", height-10)
+				.text("Wavelength (nm)");
 
-			vis.append("text")
-			.attr("class", "y label")
-			.style("text-anchor", "middle")
-			.attr("transform", "translate(" + 20 + "," + (HEIGHT/2) +") rotate(-90)")
-			.text("Reflectance");
+			// Y Axis label
+			chart.append("text")
+				.attr("class", "y label")
+				.style("text-anchor", "end")
+				.attr("y", 10)
+				.attr("transform", "rotate(-90)")
+				.text("Reflectance");
 
 			var lineGen = d3.svg.line()
 			.x(function(d) {
@@ -142,7 +222,7 @@
 
 
 			//Add the text and the circle from zooming
-			var focus = vis.append("g")
+			var focus = chart.append("g")
 			.attr("class", "focus")
 			.style("display","null");
 
@@ -158,9 +238,6 @@
 			.attr("dy", "1em");
 
 
-			//Lines will hold each individual line's data
-			var lines = [];
-			var lineActive = [];
 
 			//Given an array of lines, find the closest X, Y point on the graph
 			function findClosestLinePoint(lineArray, mouseX, mouseY) {
@@ -217,7 +294,7 @@
 			}
 
 
-			var drawLines = GRAPH.forEach(function(d,i) {
+			var drawLines = graph.forEach(function(d,i) {
 				//Creates an array of objects with key-value pairs, sorted by keys
 				var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
 				lines.push(reflectanceKV);
@@ -225,42 +302,45 @@
 				console.log(i);
 
 				//Append path to graph
-				vis.append('svg:path')
+				chartBody.append('svg:path')
 				.attr('d', lineGen(reflectanceKV))   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
 				.attr('stroke', function(d,j) {
-					return "hsl(" + ((360/GRAPH.length+1) + (i*(360/GRAPH.length+1)))  + ",80%,30%)";
+					return "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)";
 				})
 				.attr('stroke-width', 1.25)
-				.attr('id', 'line_mcline' + i)
+				.attr('id', 'line_path' + i)
+				.style("fill", "none")
 				.attr('fill', 'none');
 
+				document.getElementById('rect-' + d.data_id).style.backgroundColor = "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)";
 
 				// Line Disappearing nonsense
-				vis.append("text")
+				/*
+				chart.append("text")
 				.attr("x", 50)
-				.attr("y", HEIGHT+20+20*i)
+				.attr("y", height+20+20*i)
 				.style("fill", function(d,j) {
-					return "hsl(" + ((360/GRAPH.length+1) + (i*(360/GRAPH.length+1)))  + ",80%,30%)";
+					return "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)";
 				})
 				.attr("class","legiend")
 				.on('click', function() {
 					var active   = d.active ? false : true;
-					var color = "hsl(" + ((360/GRAPH.length+1) + (i*(360/GRAPH.length+1)))  + ",80%,30%)"
+					var color = "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)"
 					var opacity = active ? 0 : 1;
-					d3.select("path#line_mcline"+i).style("opacity",opacity);
+					d3.select("path#line_path"+i).style("opacity",opacity);
 					d.active = active;
 					lineActive[i] = active;
 					active ? d3.select(this).style("fill","gray") : d3.select(this).style("fill",color)
 				})
 				.text("Click to activate/deactivate: " + d.data_id + " ("+ d.name+")" );
-
+				*/
 			});
 
-			vis.append("rect")
+			chart.append("rect")
 			.attr("pointer-events", "all")
 			.attr("fill", "none")
-			.attr("width", WIDTH)
-			.attr("height", HEIGHT)
+			.attr("width", width)
+			.attr("height", height)
 			.on("mouseover", function() { focus.style("display", null);})
 			.on("mouseout", function() { focus.style("display", "none");})
 			.on("mousemove", mousemove);
@@ -277,13 +357,14 @@
 			}
 
 
+
 			function zoomed() {
-				vis.select(".x.axis").call(xAxis);
-				vis.select(".y.axis").call(yAxis);
+				chart.select(".x.axis").call(xAxis);
+				chart.select(".y.axis").call(yAxis);
 				focus.style("display","none");
-				GRAPH.forEach (function(d,i) {
+				graph.forEach (function(d,i) {
 					var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
-					d3.select("path#line_mcline"+i)
+					d3.select("path#line_path"+i)
 					.attr('d', lineGen(reflectanceKV));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
 				});
 			}
