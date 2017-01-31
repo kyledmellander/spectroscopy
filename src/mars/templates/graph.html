@@ -84,10 +84,10 @@
 		var lineActive = [];
 
 		//Toggle the line based on the checkbox
-		function toggleLine(self, index) {
+		function toggleLine(boxID, index) {
 			var graph = JSON.parse('{{graphJSON|safe}}');
-			var active   = this.checked ? false : true;
-			this.checked ? this.checked="" : this.checked="checked"
+			var active   = boxID.checked ? false : true;
+			active ? this.checked="" : this.checked="checked"
 			console.log(active)
 			var color = "hsl(" + ((360/graph.length+1) + (index*(360/graph.length+1)))  + ",80%,30%)"
 			var opacity = active ? 0 : 1;
@@ -107,7 +107,7 @@
 						bottom: 20,
 						left:40,
 					},
-					width =	Math.floor(jumbowidth*.95)-margin.right,
+					width =	Math.floor(jumbowidth)-margin.right,
 					height = Math.floor(width*.65)-margin.top - margin.bottom;
 
 			//Scale the graph Y Axix based on the min and max of your graphs
