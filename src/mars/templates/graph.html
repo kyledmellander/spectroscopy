@@ -47,8 +47,8 @@
 
 				<div class = "row">
 					<div id="x-values">
-						<div class="col s2 push-s1"><input id="min-x-input"  step="10" type="number" /></div>
-		        <div class="col s2 push-s1"><input id="max-x-input"  step="10" type="number" /></div>
+						<div class="col s2 push-s1"><input id="min-x-input"  step="20" type="number" /></div>
+		        <div class="col s2 push-s1"><input id="max-x-input"  step="20" type="number" /></div>
 					</div>
 					<div id = "y-values">
 						<div class="col s2 push-s3"><input id="min-y-input"  step = ".05" type="number" /></div>
@@ -490,13 +490,13 @@
 		}
 
 		function zoomed() {
-
-			minXInput.value = xScale.domain()[0];
-			maxXInput.value = xScale.domain()[1];
-			minYInput.value = yScale.domain()[1];
-			maxYInput.value = yScale.domain()[0];
-			ySlider.noUiSlider.set([yScale.domain()[1],yScale.domain()[0]]);
-			xSlider.noUiSlider.set(xScale.domain());
+			console.log(+(xScale.domain()[0]).toFixed(2))
+			minXInput.value = xScale.domain()[0].toFixed(2);
+			maxXInput.value = xScale.domain()[1].toFixed(2);
+			minYInput.value = yScale.domain()[1].toFixed(2);
+			maxYInput.value = yScale.domain()[0].toFixed(2);
+			ySlider.noUiSlider.set([yScale.domain()[1].toFixed(2),yScale.domain()[0].toFixed(2)]);
+			xSlider.noUiSlider.set(xScale.domain()[0].toFixed(2),xScale.domain()[1].toFixed(2));
 
 			chart.select(".x.axis").call(xAxis);
 			chart.select(".y.axis").call(yAxis);
