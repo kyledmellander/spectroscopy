@@ -21,53 +21,99 @@
 </style>
 
 {% extends "layouts/base.html" %}
+{% load staticfiles %}
 {% block content %}
-<body>
+<body onresize="redraw();">
 {% if graphResults %}
 <!-- load the d3.js library -->
 	<div class="container">
 		<div class="card" style="background:rgba(255,255,255,.9)">
 			<div class="container">
-				<div class="chart-container" id="graphJtron">
+				<div class="row">
+					<div class="col s11">
+						<div class="chart-container" id="graphJtron">
+						</div>
+					</div>
+					<div class="col s1">
+						<div class="slider" id="y-slider" style="padding-left: 0px; margin-left: 0px; margin-top: 20px"></div>
+					</div>
+				</div>
+				<div class="slider" id="x-slider" style="margin: 20px 0px 40px 40px"></div>
+
+				<div class="row">
+					<div class="col s6 center-align"><label for="x-values">X: Nanometers</label></div>
+					<div class="col s6 center-align"><label for="y-values">Y: Reflectance</label></div>
+				</div>
+
+				<div class = "row">
+					<div id="x-values">
+						<div class="col s2 push-s1"><input id="min-x-input"  step="10" type="number" /></div>
+		        <div class="col s2 push-s1"><input id="max-x-input"  step="10" type="number" /></div>
+					</div>
+					<div id = "y-values">
+						<div class="col s2 push-s3"><input id="min-y-input"  step = ".05" type="number" /></div>
+		        <div class="col s2 push-s3"><input id="max-y-input"  step=".05" type="number" /></div>
+					</div>
+				</div>
 			</div>
-		</div>
-		<div class="divider" style="margin:20px 20px"></div>
-  	<div class="chart-container">
-			<table class="table container striped highlight">
-				<thead>
-					<tr>
-						<th></th>
-						<th>ID</th>
-						<th>Name</th>
-						<th>Class</th>
-						<th>Origin</th>
-						<th>Grain Size</th>
-						<th>Refl. Range</th>
-						<th>Color</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for result in graphResults %}
-					<tr>
-						<td>
-							<input type="checkbox" checked="checked" name="selection"
-								id="option{{ result.data_id }}" value={{result.data_id}}
-								style="color:rgb(100,20,234);"
-								background="rgba(255,243,100,.9)"
-								onclick="toggleLine(this,{{forloop.counter0}});"/>
-							<label for="option{{result.data_id }}"></label>
-						</td>
-						<td><label for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
-						<td><label for="option{{ result.data_id }}"> {{ result.name | title }} </label></td>
-						<td><label for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
-						<td><label for="option{{ result.data_id }}"> {{ result.origin }} </label></td>
-						<td><label for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
-						<td><label for="option{{ result.data_id }}"> {{ result.refl_range }} </label></td>
-						<td><p id="rect-{{result.data_id}}" style="border:1px solid gray; width:15px; height:15px;"></td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
+			<!--
+			<div class="divider" style="margin:20px 20px"></div>
+
+			<div class="container section">
+				<div class="row">
+					<div class="col s6 center-align">
+						<input type="checkbox" id="vertical-line">
+							<label for="vertical-line">Add Vertical Line</label>
+						</input>
+					</div>
+
+					<div class="col s6 center-align">
+						<input type="checkbox" id="show-tics">
+							<label for="show-tics">Show Tic Marks</label>
+						</input>
+					</div>
+				</div>
+			</div> -->
+
+			<div class="divider" style="margin:20px 20px"></div>
+
+			<div class="chart-container">
+				<table class="table container striped highlight">
+					<thead>
+						<tr>
+							<th></th>
+							<th>ID</th>
+							<th>Name</th>
+							<th>Class</th>
+							<th>Origin</th>
+							<th>Grain Size</th>
+							<th>Refl. Range</th>
+							<th>Color</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for result in graphResults %}
+						<tr>
+							<td>
+								<input type="checkbox" checked="checked" name="selection"
+									id="option{{ result.data_id }}" value={{result.data_id}}
+									style="color:rgb(100,20,234);"
+									background="rgba(255,243,100,.9)"
+									onclick="toggleLine(this,{{forloop.counter0}});"/>
+								<label for="option{{result.data_id }}"></label>
+							</td>
+							<td><label for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
+							<td><label for="option{{ result.data_id }}"> {{ result.name | title }} </label></td>
+							<td><label for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
+							<td><label for="option{{ result.data_id }}"> {{ result.origin }} </label></td>
+							<td><label for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
+							<td><label for="option{{ result.data_id }}"> {{ result.refl_range }} </label></td>
+							<td><p id="rect-{{result.data_id}}" style="border:1px solid gray; width:15px; height:15px;"></td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+
 			</div>
 			<div class="section"></div>
 		</div>
@@ -75,9 +121,9 @@
 
 
 		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="{% static 'js/nouislider.min.js' %}"></script>
 
 		<script>
-
 		var graph = JSON.parse('{{graphJSON|safe}}');
 		//Lines will hold each individual line's data
 		var lines = [];
@@ -88,7 +134,6 @@
 			var graph = JSON.parse('{{graphJSON|safe}}');
 			var active   = boxID.checked ? false : true;
 			active ? this.checked="" : this.checked="checked"
-			console.log(active)
 			var color = "hsl(" + ((360/graph.length+1) + (index*(360/graph.length+1)))  + ",80%,30%)"
 			var opacity = active ? 0 : 1;
 			d3.select("path#line_path"+index).style("opacity",opacity);
@@ -96,285 +141,429 @@
 			//active ? d3.select(this).style("fill","gray") : d3.select(this).style("fill",color)
 		}
 
-		function InitChart() {
-			var color = d3.scale.category10();
 
-			var jumbowidth = document.getElementById("graphJtron").offsetWidth;
+		//Scale the graph Y Axix based on the min and max of your graphs
+		var minX = Number.MAX_VALUE;
+		var minY = Number.MAX_VALUE;
+		var maxX = Number.MIN_VALUE;
+		var maxY = Number.MIN_VALUE;
 
-			var margin = {
-						top: 20,
-						right: 20,
-						bottom: 20,
-						left:40,
-					},
-					width =	Math.floor(jumbowidth)-margin.right,
-					height = Math.floor(width*.65)-margin.top - margin.bottom;
+		//Update the min and maxX
+		graph.forEach(function (d,i) {
+			//Creates an array of objects with key-value pairs, sorted by keys
+			var reflectance = d3.entries(d.reflectance);
+			var curX = 0;
+			var cury = 0;
 
-			//Scale the graph Y Axix based on the min and max of your graphs
-			var minX = Number.MAX_VALUE;
-			var minY = Number.MAX_VALUE;
-			var maxX = Number.MIN_VALUE;
-			var maxY = Number.MIN_VALUE;
+			for (var i=reflectance.length-1; i>=0; i--) {
+				curX = parseFloat(reflectance[i].key);
+				curY = parseFloat(reflectance[i].value);
 
-			//Update the min and maxX
-			graph.forEach(function (d,i) {
-				//Creates an array of objects with key-value pairs, sorted by keys
-				var reflectance = d3.entries(d.reflectance);
-				var curX = 0;
-				var cury = 0;
-
-				for (var i=reflectance.length-1; i>=0; i--) {
-					curX = parseFloat(reflectance[i].key);
-					curY = parseFloat(reflectance[i].value);
-
-					if (curX > maxX) maxX = curX;
-					if (curX < minX) minX = curX;
-					if (curY > maxY) maxY = curY;
-					if (curY < minY) minY = curY;
-				}
-			});
-
-			var xScale = d3.scale.linear().
-				range([0, width]).
-				domain([minX,maxX]);
-
-			var yScale = d3.scale.linear().
-					range([0, height]).
-					domain([maxY,minY]);
-
-			var xAxis = d3.svg.axis().
-					orient("bottom").
-					scale(xScale).
-					tickFormat(d3.format("d"));
-
-			var yAxis = d3.svg.axis()
-				.scale(yScale)
-				.orient("left");
-
-			var chart = d3.select(".chart-container").append("svg").
-				attr("width", width + margin.left + margin.right).
-				attr("height", height + margin.top + margin.bottom).
-				append("g").
-				call(d3.behavior.zoom().y(yScale).x(xScale).on("zoom",zoomed)).
-				attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-			// Clip the graph paths inside the clip box
-			var clip = chart.append("defs").append("svg:clipPath").
-					attr("id", "clip").
-					append("svg:rect").
-					attr("id", "clip-rect").
-					attr("x","0").
-					attr("y", "0").
-					attr("width", width).
-					attr("height", height);
-
-			var chartBody = chart.append("g").
-				attr("clip-path", "url(#clip)");
-
-			var rect = chartBody.append('svg:rect').
-					attr('width', width).
-					attr('height', height).
-					attr('fill', 'white');
-
-			// X Axis
-			chart.append("svg:g")
-			.attr("class", "x axis")
-			.attr("transform", "translate(0," + height + ")")
-			.call(xAxis);
-
-			// Y Axis
-			chart.append("svg:g")
-			.attr("class", "y axis")
-			.call(yAxis);
-
-			// X Axis label
-			chart.append("text")
-				.attr("class", "x label")
-				.style("text-anchor", "end")
-				.attr("x", width-20)
-				.attr("y", height-10)
-				.text("Wavelength (nm)");
-
-			// Y Axis label
-			chart.append("text")
-				.attr("class", "y label")
-				.style("text-anchor", "end")
-				.attr("y", 10)
-				.attr("transform", "rotate(-90)")
-				.text("Reflectance");
-
-			var lineGen = d3.svg.line()
-			.x(function(d) {
-				return xScale(d.key);
-			})
-			.y(function(d) {
-				return yScale(d.value);
-			})
-			.interpolate("linear");
-
-			//Define the function that sorts the data
-			function keySort (sortfunc,field) {
-				return function (a,b) {
-					return sortfunc(parseFloat(a[field]),parseFloat(b[field]));
-				}
+				if (curX > maxX) maxX = curX;
+				if (curX < minX) minX = curX;
+				if (curY > maxY) maxY = curY;
+				if (curY < minY) minY = curY;
 			}
+		});
+		var xOff = (maxX-minX)*.05;
+		var yOff = (maxY-minY)*.05;
 
-			var zoom = d3.behavior.zoom()
-			.on("zoom",zoomed);
+		var jumbowidth = document.getElementById("graphJtron").offsetWidth;
+		var margin = {
+			top: 20,
+			right: 50,
+			bottom: 20,
+			left:40,
+		},
+		width =	Math.floor(jumbowidth)-margin.right,
+		height = Math.floor(width*.65)-margin.top - margin.bottom;
 
+		var xScale = d3.scale.linear().
+		range([0, width]).
+		domain([minX-xOff,maxX+xOff]);
 
-			//Add the text and the circle from zooming
-			var focus = chart.append("g")
-			.attr("class", "focus")
-			.style("display","null");
+		var yScale = d3.scale.linear().
+		range([0, height]).
+		domain([maxY+yOff,minY-yOff]);
 
-			focus.append("circle")
-			.attr("r", 3)
-			.attr("fill","none")
-			.attr("stroke-width",1.25)
-			.attr("stroke","gray");
+		var xAxis = d3.svg.axis().
+		orient("bottom").
+		scale(xScale).
+		tickFormat(d3.format("d"));
 
-			focus.append("text")
-			.attr("opacity",.5)
-			.attr("dx",8)
-			.attr("dy", "1em");
+		var yAxis = d3.svg.axis()
+		.scale(yScale)
+		.orient("left");
 
-
-
-			//Given an array of lines, find the closest X, Y point on the graph
-			function findClosestLinePoint(lineArray, mouseX, mouseY) {
-				var closestDistance = Number.MAX_VALUE;
-				var closestPoint = null;
-
-				lineArray.forEach(function(line,index) {
-					if (lineActive[index] == false) {
-						var point = findClosestPoint(line,mouseX);
-						var yDistance = distance(mouseX,point[1],mouseX, mouseY);
-						var xDistance = distance(point[0], mouseY, mouseX, mouseY);
-						if (xDistance < 20) {
-							if (yDistance < closestDistance) {
-								closestPoint = point;
-								closestDistance = yDistance;
-							}
-						}
-					}
-				});
-				return closestPoint;
-			}
-
-			function distance (x1,y1,x2,y2) {
-				return Math.sqrt(Math.pow((x1-x2),2) + Math.pow((y1-y2),2));
-			}
-
-			//Given a line, find the closet x point to your mouse
-			//and return the x,y coordinate
-			function findClosestPoint(line, mouseX) {
-				var min = 0,
-				max = line.length - 1,
-				mid = Math.floor((max+min)/2),
-				nearestX = line[mid].key,
-				nearestY = line[mid].value,
-				dx = Math.abs(mouseX - nearestX),
-				diff = dx;
-
-				while (diff != 0 && (max-min) > 1) {
-					if (line[mid].key > mouseX) {
-						max = mid;
-					} else {
-						min = mid;
-					}
-
-					mid = Math.floor((max+min)/2);
-					diff = (Math.abs(line[mid].key - mouseX));
-					if (diff < dx) {
-						dx = diff;
-						nearestX = line[mid].key;
-						nearestY = line[mid].value;
-					}
-				}
-				return [nearestX, nearestY];
-			}
-
-
-			var drawLines = graph.forEach(function(d,i) {
-				//Creates an array of objects with key-value pairs, sorted by keys
-				var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
-				lines.push(reflectanceKV);
-				lineActive.push(false);
-				console.log(i);
-
-				//Append path to graph
-				chartBody.append('svg:path')
-				.attr('d', lineGen(reflectanceKV))   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
-				.attr('stroke', function(d,j) {
-					return "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)";
-				})
-				.attr('stroke-width', 1.25)
-				.attr('id', 'line_path' + i)
-				.style("fill", "none")
-				.attr('fill', 'none');
-
-				document.getElementById('rect-' + d.data_id).style.backgroundColor = "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)";
-
-				// Line Disappearing nonsense
-				/*
-				chart.append("text")
-				.attr("x", 50)
-				.attr("y", height+20+20*i)
-				.style("fill", function(d,j) {
-					return "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)";
-				})
-				.attr("class","legiend")
-				.on('click', function() {
-					var active   = d.active ? false : true;
-					var color = "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)"
-					var opacity = active ? 0 : 1;
-					d3.select("path#line_path"+i).style("opacity",opacity);
-					d.active = active;
-					lineActive[i] = active;
-					active ? d3.select(this).style("fill","gray") : d3.select(this).style("fill",color)
-				})
-				.text("Click to activate/deactivate: " + d.data_id + " ("+ d.name+")" );
-				*/
-			});
-
-			chart.append("rect")
-			.attr("pointer-events", "all")
-			.attr("fill", "none")
-			.attr("width", width)
-			.attr("height", height)
-			.on("mouseover", function() { focus.style("display", null);})
-			.on("mouseout", function() { focus.style("display", "none");})
-			.on("mousemove", mousemove);
-
-			function mousemove() {
-				focus.style("display",null);
-				var mouseX = xScale.invert(d3.mouse(this)[0]);
-				var mouseY = yScale.invert(d3.mouse(this)[1]);
-				var coord = findClosestLinePoint(lines, mouseX, mouseY);
-				focus.attr("transform", "translate(" + xScale(coord[0]) +
-				"," + yScale(coord[1]) + ")");
-				focus.select("text")
-				.text(Math.round(coord[0])+", " + parseFloat(coord[1]).toFixed(3));
-			}
+		var xSlider = document.getElementById('x-slider');
+		var ySlider = document.getElementById('y-slider');
+		var minXInput = document.getElementById('min-x-input');
+		var maxXInput = document.getElementById('max-x-input');
+		var minYInput = document.getElementById('min-y-input');
+		var maxYInput = document.getElementById('max-y-input');
 
 
 
-			function zoomed() {
-				chart.select(".x.axis").call(xAxis);
-				chart.select(".y.axis").call(yAxis);
-				focus.style("display","none");
-				graph.forEach (function(d,i) {
-					var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
-					d3.select("path#line_path"+i)
-					.attr('d', lineGen(reflectanceKV));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
-				});
+		d3.select("#x-slider").style("width", width);
+		d3.select("#y-slider").style("height", height);
+
+		var zm = d3.behavior.zoom()
+			.y(yScale)
+			.x(xScale)
+			.scaleExtent([.5,Infinity])
+			.on("zoom",zoomed)
+
+
+		var svg = d3.select(".chart-container").append("svg").
+			attr("width", width + margin.left + margin.right).
+			attr("height", height + margin.top + margin.bottom);
+
+		var chart = svg.append("g").
+			call(zm).
+			attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		// Clip the graph paths inside the clip box
+		var clip = chart.append("defs").append("svg:clipPath").
+		attr("id", "clip").
+		append("svg:rect").
+		attr("id", "clip-rect").
+		attr("x","0").
+		attr("y", "0").
+		attr("width", width).
+		attr("height", height);
+
+		var chartBody = chart.append("g").
+		attr("clip-path", "url(#clip)");
+
+		var rect = chartBody.append('svg:rect')
+		.attr("pointer-events", "all")
+		.attr('width', width)
+		.attr('height', height)
+		.attr('fill', 'white')
+		.on("mouseover", function() { focus.style("display", null);})
+		.on("mouseout", function() { focus.style("display", "none");})
+		.on("mousemove", mousemove);
+
+		// X Axis
+		var xSVG = chart.append("svg:g")
+		.attr("class", "x axis")
+		.attr("transform", "translate(0," + height + ")")
+		.call(xAxis);
+
+		// Y Axis
+		var ySVG = chart.append("svg:g")
+		.attr("class", "y axis")
+		.call(yAxis);
+
+		// X Axis label
+		var xlabel = chart.append("text")
+		.attr("class", "x label")
+		.style("text-anchor", "end")
+		.attr("x", width-4)
+		.attr("y", height-2)
+		.text("Wavelength (nm)");
+
+		// Y Axis label
+		var ylabel = chart.append("text")
+		.attr("class", "y label")
+		.style("text-anchor", "end")
+		.attr("x", -4)
+		.attr("y", 10)
+		.attr("transform", "rotate(-90)")
+		.text("Reflectance");
+
+		var lineGen = d3.svg.line()
+		.x(function(d) {
+			return xScale(d.key);
+		})
+		.y(function(d) {
+			return yScale(d.value);
+		})
+		.interpolate("linear");
+
+		//Define the function that sorts the data
+		function keySort (sortfunc,field) {
+			return function (a,b) {
+				return sortfunc(parseFloat(a[field]),parseFloat(b[field]));
 			}
 		}
 
-		InitChart();
+		//Add the text and the circle from zooming
+		var focus = chart.append("g")
+		.attr("class", "focus")
+		.style("display","null");
 
+		focus.append("circle")
+		.attr("r", 3)
+		.attr("fill","none")
+		.attr("stroke-width",1.25)
+		.attr("stroke","gray");
+
+		focus.append("text")
+		.attr("opacity",.5)
+		.attr("dx",8)
+		.attr("dy", "1em");
+
+		noUiSlider.create(xSlider, {
+			start: [minX-xOff, maxX+xOff],
+			behaviour: 'tap-drag',
+			connect: true,
+			range: {
+				'min': minX-xOff,
+				'max': maxX+xOff
+			},
+			tooltips: [false,false],
+		});
+
+		noUiSlider.create(ySlider, {
+			start: [minY-yOff, maxY+yOff],
+			behaviour: 'tap-drag',
+			orientation:'vertical',
+			connect: true,
+			direction:'rtl',
+			range: {
+				'min': minY-yOff,
+				'max': maxY+yOff
+			},
+			tooltips: [false,false],
+		});
+
+
+		//Slider events
+    xSlider.noUiSlider.on('slide', function() {
+        minXInput.value = xSlider.noUiSlider.get()[0];
+        maxXInput.value = xSlider.noUiSlider.get()[1];
+
+				xScale.domain([minXInput.value,maxXInput.value]);
+				yScale.domain([maxYInput.value,minYInput.value]);
+				zm.x(xScale);
+				zm.y(yScale);
+				zoomedUI();
+		});
+
+    minXInput.addEventListener('change', function() {
+      xSlider.noUiSlider.set([this.value, null])
+
+			xScale.domain([minXInput.value,maxXInput.value]);
+			yScale.domain([maxYInput.value,minYInput.value]);
+
+			zm.x(xScale);
+			zm.y(yScale);
+			zoomedUI();
+		});
+
+    maxXInput.addEventListener('change', function() {
+      xSlider.noUiSlider.set([null, this.value])
+
+			xScale.domain([minXInput.value,maxXInput.value]);
+			yScale.domain([maxYInput.value,minYInput.value]);
+
+			zm.x(xScale);
+			zm.y(yScale);
+			zoomedUI();
+		});
+
+		//Slider events
+    ySlider.noUiSlider.on('slide', function() {
+        minYInput.value = ySlider.noUiSlider.get()[0];
+        maxYInput.value = ySlider.noUiSlider.get()[1];
+
+				xScale.domain([minXInput.value,maxXInput.value]);
+				yScale.domain([maxYInput.value,minYInput.value]);
+				zm.x(xScale);
+				zm.y(yScale);
+				zoomedUI();
+		});
+
+
+
+    minYInput.addEventListener('change', function() {
+      ySlider.noUiSlider.set([this.value, null])
+
+			xScale.domain([minXInput.value,maxXInput.value]);
+			yScale.domain([maxYInput.value,minYInput.value]);
+
+			zm.x(xScale);
+			zm.y(yScale);
+			zoomedUI();
+    });
+
+    maxYInput.addEventListener('change', function() {
+      ySlider.noUiSlider.set([null, this.value])
+
+			xScale.domain([minXInput.value,maxXInput.value]);
+			yScale.domain([maxYInput.value,minYInput.value]);
+
+			zm.x(xScale);
+			zm.y(yScale);
+			zoomedUI();
+		});
+
+    minXInput.value = xSlider.noUiSlider.get()[0];
+    maxXInput.value = xSlider.noUiSlider.get()[1];
+    minYInput.value = ySlider.noUiSlider.get()[0];
+    maxYInput.value = ySlider.noUiSlider.get()[1];
+
+
+		//Given an array of lines, find the closest X, Y point on the graph
+		function findClosestLinePoint(lineArray, mouseX, mouseY) {
+			var closestDistance = Number.MAX_VALUE;
+			var closestPoint = null;
+
+			lineArray.forEach(function(line,index) {
+				if (lineActive[index] == false) {
+					var point = findClosestPoint(line,mouseX);
+					var visableDistance = distance(xScale(mouseX), yScale(mouseY), xScale(point[0]), yScale(point[1]));
+					if (visableDistance < closestDistance) {
+						closestPoint = point;
+						closestDistance = visableDistance;
+					}
+				}
+			});
+			return closestPoint;
+		}
+
+		function distance (x1,y1,x2,y2) {
+			return Math.sqrt(Math.pow((x1-x2),2) + Math.pow((y1-y2),2));
+		}
+
+		//Given a line, find the closet x point to your mouse
+		//and return the x,y coordinate
+		function findClosestPoint(line, mouseX) {
+			var min = 0,
+			max = line.length - 1,
+			mid = Math.floor((max+min)/2),
+			nearestX = line[mid].key,
+			nearestY = line[mid].value,
+			dx = Math.abs(mouseX - nearestX),
+			diff = dx;
+
+			while (diff != 0 && (max-min) > 1) {
+				if (line[mid].key > mouseX) {
+					max = mid;
+				} else {
+					min = mid;
+				}
+
+				mid = Math.floor((max+min)/2);
+				diff = (Math.abs(line[mid].key - mouseX));
+				if (diff < dx) {
+					dx = diff;
+					nearestX = line[mid].key;
+					nearestY = line[mid].value;
+				}
+			}
+			return [nearestX, nearestY];
+		}
+
+
+		var drawLines = graph.forEach(function(d,i) {
+			//Creates an array of objects with key-value pairs, sorted by keys
+			var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
+			lines.push(reflectanceKV);
+			lineActive.push(false);
+
+			//Append path to graph
+			chartBody.append('svg:path')
+			.attr('d', lineGen(reflectanceKV))   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
+			.attr('stroke', function(d,j) {
+				return "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)";
+			})
+			.attr('stroke-width', 1.25)
+			.attr('id', 'line_path' + i)
+			.style("fill", "none")
+			.attr('fill', 'none');
+
+			document.getElementById('rect-' + d.data_id).style.backgroundColor = "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)";
+		});
+
+
+		function mousemove() {
+			focus.style("display",null);
+			var mouseX = xScale.invert(d3.mouse(this)[0]);
+			var mouseY = yScale.invert(d3.mouse(this)[1]);
+			var coord = findClosestLinePoint(lines, mouseX, mouseY);
+			focus.attr("transform", "translate(" + xScale(coord[0]) +
+			"," + yScale(coord[1]) + ")");
+			focus.select("text")
+			.text(Math.round(coord[0])+", " + parseFloat(coord[1]).toFixed(3));
+		}
+
+		function zoomed() {
+
+			minXInput.value = xScale.domain()[0];
+			maxXInput.value = xScale.domain()[1];
+			minYInput.value = yScale.domain()[1];
+			maxYInput.value = yScale.domain()[0];
+			ySlider.noUiSlider.set([yScale.domain()[1],yScale.domain()[0]]);
+			xSlider.noUiSlider.set(xScale.domain());
+
+			chart.select(".x.axis").call(xAxis);
+			chart.select(".y.axis").call(yAxis);
+			focus.style("display","none");
+			lines.forEach (function(d,i) {
+				var reflectanceKV = d;
+				d3.select("path#line_path"+i)
+				.attr('d', lineGen(reflectanceKV));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
+			});
+		}
+
+		function zoomedUI() {
+			chart.select(".x.axis").call(xAxis);
+			chart.select(".y.axis").call(yAxis);
+			focus.style("display","none");
+			lines.forEach (function(d,i) {
+				var reflectanceKV = d;
+				d3.select("path#line_path"+i)
+				.attr('d', lineGen(reflectanceKV));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
+			});
+		}
+
+		function redraw() {
+			jumbowidth = document.getElementById("graphJtron").offsetWidth;
+			width =	Math.floor(jumbowidth)-margin.right;
+			height = Math.floor(width*.65)-margin.top - margin.bottom;
+			svg.attr("width", width + margin.left + margin.right).
+			attr("height", height + margin.top + margin.bottom).
+			attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			chart.attr("width", width + margin.left + margin.right).
+			attr("height", height + margin.top + margin.bottom).
+			attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			rect.attr("width", width).
+			attr("height", height);
+			clip.attr("width", width).
+			attr("height", height);
+
+			xScale.range([0, width]);
+
+			yScale.range([0, height]);
+
+			xAxis.orient("bottom").
+			scale(xScale).
+			tickFormat(d3.format("d"));
+
+			yAxis.scale(yScale)
+			.orient("left");
+
+			// X Axis label
+			xlabel.attr("class", "x label")
+			.style("text-anchor", "end")
+			.attr("x", width-4)
+			.attr("y", height-2)
+			.text("Wavelength (nm)");
+
+			d3.select("#x-slider").style("width", width);
+			d3.select("#y-slider").style("height", height);
+
+			// X Axis
+			xSVG.attr("class", "x axis")
+			.attr("transform", "translate(0," + height + ")")
+			.call(xAxis);
+
+			zoomed()
+		}
 		</script>
+
 	</div>
 {% else%}
     <div id="meta" class="container section">
