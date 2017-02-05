@@ -141,6 +141,17 @@ def results(request):
         print(page_ids)
         return render (request, 'results.html', {"page_ids": page_ids, "selected_ids":selectedList, "page_choices": page_choices, "page_results": page_results, "search_results": searchResultIDList})
 
+def advanced(request):
+    SearchFormSet = formset_factory(SearchForm)
+    dataBaseChoices = [c.strip() for c in Sample.objects.all().values_list('origin', flat=True).distinct()]
+    dataBaseChoices = sorted(set(dataBaseChoices), key=lambda s: s.lower())
+    dataBaseChoices = [(c, c) for c in dataBaseChoices]
+    dataBaseChoices.insert(0, ('Any','Any'))
+    return render(request, 'search-advanced.html', {
+        'search_formset': SearchFormSet, 'database_choices': dataBaseChoices,
+        })
+
+
 def search(request):
     SearchFormSet = formset_factory(SearchForm)
     dataBaseChoices = [c.strip() for c in Sample.objects.all().values_list('origin', flat=True).distinct()]

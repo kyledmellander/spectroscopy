@@ -58,20 +58,15 @@
                       <div class="col s6">{{search_form.mineral_class.errors}}
                                           {{search_form.mineral_class.label_tag}}
                                           {{search_form.mineral_class}}</div>
-                      <div class="col s12">{{search_form.mineral_Id.errors}}
-                                          {{search_form.mineral_Id.label_tag}}
-                                          {{search_form.mineral_Id}}</div>
-                      <div class="col s12" style="padding: 8px 8px">
-                        <div class="switch">
-                          <label>
-                            Exclusive Data
-                            {{search_form.any_data}}
-                            <span class="lever"></span>
-                            Any Data
-                          </label>
-                        </div>
+                      <div class="col s12"><label for="checkbox-0">Only show Spectra With Data In Range:</label></div>
+
+                      <div id="checkbox-0" style="margin-top:6px" class="col s2 m1">
+                        {{search_form.any_data}}
+                        <label for="id_form-0-any_data"></label>
                       </div>
-                      <div class="col s12"><div class="slider" id="id_slider-{{forloop.counter}}" style="margin-top:15px; margin-bottom:15px"></div></div>
+
+                      <div class="col s10 m11"><div class="slider" id="id_slider-{{forloop.counter}}" style="margin-top:15px; margin-bottom:15px"></div></div>
+                      <div class="col s12"></div>
                       <div class="col s6">{{search_form.min_included_range.errors}}
                                           {{search_form.min_included_range.label_tag}}
                                           {{search_form.min_included_range}}</div>
@@ -91,10 +86,6 @@
               <li>
                 <div class="collapsible-header">
                   <div class="center-align" style="padding:20px">
-
-                      <div class="btn waves-effect waves-light" id="addSearch" onclick="addInput('myList','addSearch');">
-                          Add a Search +
-                      </div>
                       <button type="submit" name="action" value="search" class="btn red waves-effect waves-light"/>
                         Search
                       </button>
@@ -108,7 +99,7 @@
             <div class = "col s12">
               <div class = "card">
                 <div class = "card-content">
-                  <a href="https://google.com">Need Help?</a>
+                  <a href="/advanced/">Advanced Search</a>
                 </div>
               </div>
             </div>

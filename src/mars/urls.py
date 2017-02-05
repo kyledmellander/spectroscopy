@@ -15,5 +15,6 @@ urlpatterns = [
     url(r'^upload/$', views.upload_file, name="upload"),
     url(r'^logout/$', views.logout_view, name="logout"),
     url(r'^results/$', views.results, name='home'),
+    url(r'^advanced/$', views.advanced, name='advanced'),
     url(r'^$', views.search, name='home'),
 ]
