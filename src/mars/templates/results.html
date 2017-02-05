@@ -29,6 +29,8 @@
                 <th>Class</th>
                 <th>Origin</th>
                 <th>Grain Size</th>
+                <th>Mineral Type</th>
+                <th>Sample Type</th>
                 <th>Reflectance Range</th>
               </tr>
             </thead>
@@ -51,6 +53,8 @@
                 <td><label for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
                 <td><label for="option{{ result.data_id }}"> {{ result.origin }} </label></td>
                 <td><label for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
+                <td><label for="option{{ result.data_id }}"> {{ result.mineral_type }} </label></td>
+                <td><label for="option{{ result.data_id }}"> {{ result.sample_type }} </label></td>
                 <td><label for="option{{ result.data_id }}"> {{ result.refl_range }} </label></td>
               </tr>
               {% endfor %}
