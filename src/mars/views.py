@@ -106,15 +106,9 @@ def results(request):
                         formResults = formResults.filter(data_id__icontains=mDataId)
                     if mOrigin:
                         formResults = formResults.filter(origin__icontains=mOrigin)
-                    if not anyData:
-                        if (xMax < 300000):
-                            formResults = formResults.filter(refl_range__1__lte=xMax)
-                        if (xMin > 0):
-                            formResults = formResults.filter(refl_range__0__gte=xMin)
-                    else:
-                        formResults = formResults.filter( (Q(refl_range__1__lte=xMax) & Q(refl_range__1__gte=xMin))
-                                                        | (Q(refl_range__0__lte=xMax) & Q(refl_range__0__gte=xMin))
-                                                        | (Q(refl_range__0__lte=xMin) & Q(refl_range__1__gte=xMax)))
+                    if anyData:
+                            formResults = formResults.filter(refl_range__1__gte=xMax)
+                            formResults = formResults.filter(refl_range__0__lte=xMin)
                     searchResults = searchResults | formResults
 
             for result in searchResults:
@@ -158,6 +152,9 @@ def search(request):
     dataBaseChoices = sorted(set(dataBaseChoices), key=lambda s: s.lower())
     dataBaseChoices = [(c, c) for c in dataBaseChoices]
     dataBaseChoices.insert(0, ('Any','Any'))
+
+    allSampleTypes = [c.strip() for c in SampleType.objects.all().values_list('typeOfSample',flat=True).distinct()]
+
     return render(request, 'search.html', {
         'search_formset': SearchFormSet, 'database_choices': dataBaseChoices,
         })
@@ -489,9 +486,13 @@ def process_file(file):
         sampleClass = classArray[i]
         subClass = subClassArray[i]
         sampleType = SampleType()
+
         # Get or Create the sample type
         if(sampleTypeArray[i]):
-            sampleType = SampleType(typeOfSample=sampleTypeArray[i])
+            sampleType = SampleType(typeOfSample=sampleTypeArray[i].strip())
+            sampleType.save()
+        else:
+            sampleType = SampleType(typeOfSample='Mineral')
             sampleType.save()
 
         low = min([float(w) for w in dataPoints[i]])
@@ -500,7 +501,6 @@ def process_file(file):
 
         form = formArray[i]
         comp = compArray[i]
-
 
         sample = Sample(
             data_id=dataId.strip(),

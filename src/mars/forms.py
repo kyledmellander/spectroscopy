@@ -1,22 +1,8 @@
 from django import forms
 
-from .models import Sample
+from .models import Sample, SampleType
 
 class SearchForm(forms.Form):
-    mineral_name = forms.CharField(required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'e.g. Gypsum'}))
-    mineral_class = forms.CharField(required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'e.g. Sulfate'}))
-    mineral_Id= forms.CharField(required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'e.g. ASD_SUL_21'}))
-    any_data = forms.BooleanField(widget=forms.CheckboxInput())
-    min_included_range = forms.IntegerField(required = False,
-        widget = forms.NumberInput(), label='Min X (nm)')
-    max_included_range = forms.IntegerField(required = False,
-        widget = forms.NumberInput(), label='Max X (nm)')
-
-    database_of_origin = forms.ChoiceField()
-
     def __init__(self, *args, **kwargs):
         super(SearchForm, self).__init__(*args, **kwargs)
 
@@ -27,7 +13,29 @@ class SearchForm(forms.Form):
         dataBaseChoices = [(c, c) for c in dataBaseChoices]
         dataBaseChoices.insert(0, ('Any','Any'))
 
+        allSampleTypes = [(c.strip(),c.strip()) for c in SampleType.objects.all().values_list('typeOfSample',flat=True).distinct()]
+        allSampleTypes.insert(0, ('Any','Any'))
+
+        print(dataBaseChoices)
+        print(allSampleTypes)
         self.fields['database_of_origin'].choices = dataBaseChoices
+        self.fields['type_of_sample'].choices = allSampleTypes
+
+    mineral_name = forms.CharField(required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. Gypsum'}))
+    mineral_class = forms.CharField(required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. Sulfate'}))
+    mineral_Id= forms.CharField(required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. ASD_SUL_21'}))
+    any_data = forms.BooleanField(required=False, widget=forms.CheckboxInput())
+    min_included_range = forms.IntegerField(required = False,
+        widget = forms.NumberInput(), label='Min X (nm)')
+    max_included_range = forms.IntegerField(required = False,
+        widget = forms.NumberInput(), label='Max X (nm)')
+
+    database_of_origin = forms.ChoiceField()
+    type_of_sample = forms.ChoiceField()
+
 
 class UploadFileForm(forms.Form):
     sample_class = forms.CharField(required=False,

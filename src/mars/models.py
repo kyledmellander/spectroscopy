@@ -32,7 +32,7 @@ class Sample(models.Model):
     formula = models.CharField(max_length=50, null=True, blank=True)
     composition = models.CharField(max_length=1000, null=True, blank=True)
     reflectance = JSONField(default = {})
-    sample_type = models.ForeignKey(SampleType, null=True)
+    sample_type = models.ForeignKey(SampleType, null=True,)
 
     def as_dict(self):
         return {
