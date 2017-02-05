@@ -52,19 +52,21 @@
                 <div class="collapsible-body" style="background:rgba(255,255,255,0.9); ">
                   <div class="container">
                     <div class="row" style="padding: 20px">
-                      <div class="col s6">{{search_form.mineral_name.errors}}
+                      <div class="col s6 m4">{{search_form.mineral_name.errors}}
                                           {{search_form.mineral_name.label_tag}}
                                           {{search_form.mineral_name}}</div>
-                      <div class="col s6">{{search_form.mineral_class.errors}}
+                      <div class="col s6 m4">{{search_form.mineral_class.errors}}
                                           {{search_form.mineral_class.label_tag}}
                                           {{search_form.mineral_class}}</div>
+                      <div class="col s12 m4">{{search_form.mineral_Id.errors}}
+                                          {{search_form.mineral_Id.label_tag}}
+                                          {{search_form.mineral_Id}}</div>
                       <div class="col s12"><label for="checkbox-0">Only show Spectra With Data In Range:</label></div>
 
                       <div id="checkbox-0" style="margin-top:6px" class="col s2 m1">
                         {{search_form.any_data}}
                         <label for="id_form-0-any_data"></label>
                       </div>
-
                       <div class="col s10 m11"><div class="slider" id="id_slider-{{forloop.counter}}" style="margin-top:15px; margin-bottom:15px"></div></div>
                       <div class="col s12"></div>
                       <div class="col s6">{{search_form.min_included_range.errors}}
@@ -89,6 +91,10 @@
               <li>
                 <div class="collapsible-header">
                   <div class="center-align" style="padding:20px">
+
+                      <div class="btn waves-effect waves-light" id="addSearch" onclick="addInput('myList','addSearch');">
+                          Add a Search +
+                      </div>
                       <button type="submit" name="action" value="search" class="btn red waves-effect waves-light"/>
                         Search
                       </button>
@@ -102,7 +108,7 @@
             <div class = "col s12">
               <div class = "card">
                 <div class = "card-content">
-                  <a href="/advanced/">Advanced Search</a>
+                  <a href="https://google.com">Need Help?</a>
                 </div>
               </div>
             </div>
@@ -128,23 +134,29 @@
                 <div class="collapsible-body" style="background:rgba(255,255,255,0.9); ">
                   <div class="container">
                     <div class="row" style="padding: 20px">
-                      <div class="col s6"><label for="id_form-__prefix__-mineral_name">Mineral name:</label></th><td><input id="id_form-__prefix__-mineral_name" name="form-__prefix__-mineral_name" placeholder="e.g. Gypsum" type="text" /></div>
-                      <div class="col s6"><label for="id_form-__prefix__-mineral_class">Mineral class:</label><input id="id_form-__prefix__-mineral_class" name="form-__prefix__-mineral_class" placeholder="e.g. Sulfate" type="text" /></div>
-                      <div class="col s12"><label for="id_form-__prefix__-mineral_Id">Mineral id:</label><input id="id_form-__prefix__-mineral_Id" name="form-__prefix__-mineral_Id" placeholder="e.g. ASD_SUL_21" type="text" /></div>
-                      <div class="col s12">
-                        <div class="switch">
-                          <label>
-                            Exclusive Data
-                            <input id="id_form-__prefix__-any_data" name="form-__prefix__-any_data" type="checkbox" />
-                            <span class="lever"></span>
-                            Any Data
-                          </label>
-                        </div>
+                      <div class="col s6 m4"><label for="id_form-__prefix__-mineral_name">Mineral name:</label></th><td><input id="id_form-__prefix__-mineral_name" name="form-__prefix__-mineral_name" placeholder="e.g. Gypsum" type="text" /></div>
+                      <div class="col s6 m4"><label for="id_form-__prefix__-mineral_class">Mineral class:</label><input id="id_form-__prefix__-mineral_class" name="form-__prefix__-mineral_class" placeholder="e.g. Sulfate" type="text" /></div>
+                      <div class="col s12 m4"><label for="id_form-__prefix__-mineral_Id">Mineral id:</label><input id="id_form-__prefix__-mineral_Id" name="form-__prefix__-mineral_Id" placeholder="e.g. ASD_SUL_21" type="text" /></div>
+
+                      <div class="col s12"><label for="checkbox-__prefix__">Only show Spectra With Data In Range:</label></div>
+                      <div id="checkbox-__prefix__" style="margin-top:6px" class="col s2 m1">
+                        <input id="id_form-__prefix__-any_data" name="form-__prefix__-any_data" type="checkbox" />
+                        <label for="id_form-__prefix__-any_data"></label>
                       </div>
-                      <div class="col s12"><div class="slider" id="id_slider-__count__" style="margin-top:15px; margin-bottom:15px"></div></div>
+                      <div class="col s10 m11"><div class="slider" id="id_slider-__count__" style="margin-top:15px; margin-bottom:15px"></div></div>
+                      <div class="col s12"></div>
                       <div class="col s6"><label for="id_form-__prefix__-min_included_range">Min X (nm):</label><input id="id_form-__prefix__-min_included_range" name="form-__prefix__-min_included_range" type="number" /></div>
                       <div class="col s6"><label for="id_form-__prefix__-max_included_range">Max X (nm):</label><input id="id_form-__prefix__-max_included_range" name="form-__prefix__-max_included_range" type="number" /></div>
-                      <div class="col s12"><label for="id_form-__prefix__-database_of_origin">Database of origin:</label> <select id="id_form-__prefix__-database_of_origin" name="form-__prefix__-database_of_origin">
+                      <div class="col s12 m6">
+                        <label for="id_form-__prefix__-type_of_sample">Type of sample:</label>
+                        <select id="id_form-__prefix__-type_of_sample" name="form-__prefix__-type_of_sample">
+                          {% for k,v in sample_types %}
+                            <option value="{{k}}">{{v}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+
+                      <div class="col s12 m6"><label for="id_form-__prefix__-database_of_origin">Database of origin:</label> <select id="id_form-__prefix__-database_of_origin" name="form-__prefix__-database_of_origin">
                           {% for k,v in database_choices %}
                           <option value="{{k}}">{{v}}</option>
                           {% endfor %}

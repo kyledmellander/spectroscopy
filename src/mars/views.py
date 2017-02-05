@@ -89,12 +89,19 @@ def results(request):
                     mDataId = search_form.cleaned_data.get('mineral_Id')
                     mOrigin = search_form.cleaned_data.get('database_of_origin')
                     anyData = search_form.cleaned_data.get('any_data')
+                    typeOfSample = search_form.cleaned_data.get('type_of_sample')
                     xMin = search_form.cleaned_data.get('min_included_range')
                     xMax = search_form.cleaned_data.get('max_included_range')
 
                     # Remove 'Any' from choice field
                     if mOrigin == 'Any':
                         mOrigin = None
+                    if typeOfSample == 'Any':
+                        typeOfSample = None
+
+                    #else:
+                    #    sampleList = SampleType.objects.get(id=typeOfSample)
+                    #    print(sampleList)
 
                     formResults = allSamples.filter()
 
@@ -106,6 +113,8 @@ def results(request):
                         formResults = formResults.filter(data_id__icontains=mDataId)
                     if mOrigin:
                         formResults = formResults.filter(origin__icontains=mOrigin)
+                    if typeOfSample:
+                        formResults = formResults.filter(sample_type=typeOfSample)
                     if anyData:
                             formResults = formResults.filter(refl_range__1__gte=xMax)
                             formResults = formResults.filter(refl_range__0__lte=xMin)
@@ -141,8 +150,12 @@ def advanced(request):
     dataBaseChoices = sorted(set(dataBaseChoices), key=lambda s: s.lower())
     dataBaseChoices = [(c, c) for c in dataBaseChoices]
     dataBaseChoices.insert(0, ('Any','Any'))
+
+    allSampleTypes = [(c.strip(),c.strip()) for c in SampleType.objects.all().values_list('typeOfSample',flat=True).distinct()]
+    allSampleTypes.insert(0, ('Any','Any'))
+
     return render(request, 'search-advanced.html', {
-        'search_formset': SearchFormSet, 'database_choices': dataBaseChoices,
+        'search_formset': SearchFormSet, 'database_choices': dataBaseChoices, 'sample_types':allSampleTypes,
         })
 
 
