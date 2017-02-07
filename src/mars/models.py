@@ -53,3 +53,28 @@ class Sample(models.Model):
         "formula" : self.formula,
         "composition" : self.composition,
         }
+
+    class Meta:
+        verbose_name = "Sample"
+        verbose_name_plural = "Samples"
+
+    def __str__(self):
+        return self.data_id
+
+
+class Database(models.Model):
+    name = models.CharField(max_length=100)
+    url = models.URLField(blank=True)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name + ", <" + self.url + ">"
+
+    def save(self, *args, **kwargs):
+        if self.name:
+            self.name = self.name.strip()
+        if self.url:
+            self.url = self.url.strip()
+        if self.description:
+            self.description = self.description.strip()
+        super(Database, self).save(*args, **kwargs)
