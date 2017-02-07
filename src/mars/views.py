@@ -14,7 +14,7 @@ from django.template.defaulttags import register
 from django.utils.encoding import smart_str
 
 from .forms import SearchForm, UploadFileForm
-from .models import Sample,SampleType
+from .models import About, Database, Sample, SampleType, TeamMember
 from zipfile import ZipFile
 
 import re
@@ -46,15 +46,22 @@ def get_reflectance(dictionary, key):
       return ''.join(stringlist)
   return None
 
+
+def about(request):
+    databases = Database.objects.all()
+    aboutEntries = About.objects.all()
+    teamMembers = TeamMember.objects.all()
+    return render(request, 'about.html', {"databases": databases, "aboutEntries": aboutEntries, "teamMembers": teamMembers})
+
 def meta(request):
-  if request.method == 'POST':
-    if 'meta' in request.POST:
-      selections = request.POST.getlist('selection')
-      prevSelectedList = request.POST.getlist("prev_selected")
-      selections = list(set(selections + prevSelectedList))
-      samples = Sample.objects.filter(data_id__in=selections)
-    dictionaries = [ obj.as_dict() for obj in samples]
-    return render(request, 'meta.html', {"metaResults": samples,"reflectancedict":dictionaries,})
+    if request.method == 'POST':
+        if 'meta' in request.POST:
+            selections = request.POST.getlist('selection')
+            prevSelectedList = request.POST.getlist("prev_selected")
+            selections = list(set(selections + prevSelectedList))
+            samples = Sample.objects.filter(data_id__in=selections)
+        dictionaries = [ obj.as_dict() for obj in samples]
+        return render(request, 'meta.html', {"metaResults": samples,"reflectancedict":dictionaries,})
 
 def results(request):
     allSamples = Sample.objects.order_by('data_id')
@@ -143,6 +150,8 @@ def results(request):
             page_ids.append(sample.data_id.strip())
         print(page_ids)
         return render (request, 'results.html', {"page_ids": page_ids, "selected_ids":selectedList, "page_choices": page_choices, "page_results": page_results, "search_results": searchResultIDList})
+    else:
+        return render (request, 'results.html', {"page_ids": None, "selected_ids":None, "page_choices": None, "page_results": None, "search_results": None})
 
 def advanced(request):
     SearchFormSet = formset_factory(SearchForm)
@@ -171,7 +180,6 @@ def search(request):
     return render(request, 'search.html', {
         'search_formset': SearchFormSet, 'database_choices': dataBaseChoices,
         })
-
 
 def graph(request):
   if request.method == 'POST':

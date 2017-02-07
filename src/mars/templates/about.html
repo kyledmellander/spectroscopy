@@ -1,5 +1,69 @@
 {% extends "layouts/base.html" %}
-
+{% load staticfiles %}
 {% block content %}
-<p> Here is where information about the project will go. </p>
+  <div class="container section">
+      <ul class="collapsible" data-collapsible="accordion" id="myList" >
+        <li>
+          <div class="collapsible-header active center" style="background-color:White;">
+            <span class="head">About</span>
+          </div>
+          <div class="collapsible-body" style="background:rgba(255,255,255,0.9); ">
+            {% for aboutEntry in aboutEntries %}
+              {% autoescape off%}
+                {{aboutEntry.html}}
+              {% endautoescape %}
+            {% endfor %}
+          </div>
+        </li>
+        <li>
+          <div class="collapsible-header center" style="background-color:White;">
+            <span class="head">Data Sources</span>
+          </div>
+          <div class="collapsible-body" style="background:rgba(255,255,255,0.9); ">
+            {% for database in databases %} <p>{{database.name}}
+                {% if database.url %}
+                  - <a href={{database.url}}>{{database.url}}</a>
+                {% endif %}<br><br>
+                {{database.description}}</p>
+                {% if not forloop.last %}
+                  <div class="divider"></div>
+                {% endif%}
+            {% endfor %}
+          </div>
+        </li>
+        {% if teamMembers %}
+        <li>
+          <div class="collapsible-header center" style="background-color:White;">
+            <span class="head">Team Members</span>
+          </div>
+          <div class="collapsible-body" style="background:rgba(255,255,255,0.9); ">
+            {% for teamMember in teamMembers %}
+              <p><b>{{teamMember.name}}
+                {% if teamMember.role %}
+                  - {{teamMember.role}}
+                {% endif %}</b><br>
+                {% if teamMember.description %}
+                {{teamMember.description}}
+                {% endif %}</p>
+                {% if not forloop.last %}
+                  <div class="divider"></div>
+                {% endif%}
+            {% endfor %}
+          </div>
+        </li>
+        {% endif %}
+      </ul>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+  <script>window.jQuery || document.write('<script src="{% static 'js/vendor/jquery-1.12.0.min.js' %}"><\/script>')</script>
+  <script src="{% static 'js/plugins.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/materialize.min.js' %}"></script>
+
+  <script language="JavaScript">
+    $(document).ready(function() {
+        $('.collapsible').collapsible();
+    });
+  </script>
 {% endblock %}
