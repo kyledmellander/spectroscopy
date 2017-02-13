@@ -576,6 +576,8 @@
 			lines.forEach (function(d,i) {
 				d3.select("path#line_path"+i)
 				.attr('d', lineGen(d));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
+				d3.select("path#tic_path"+i)
+				.attr('d', ticMark(d));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
 			});
 		}
 
