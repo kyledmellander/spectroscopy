@@ -57,27 +57,30 @@
 				</div>
 			</div>
 
-			<div class="container section">
-				<div class="row">
-					<div class="col s6 center-align">
+			<div class="divider"></div>
 
-						<input type="checkbox" id="vertical-line">
-						</input><label for="vertical-liine"></label>
-						<label>Add Vertical Line</label>
-					</div>
+			<div class="container">
+				<div class="switch" style="padding-top:15px">
+					<label>
+						<input id="line-switch" checked type="checkbox">
+						<span class="lever" ></span>
+						Show Vertical Line
+					</label>
+				</div>
 
-					<div class="col s6 center-align">
-						<input type="checkbox" id="show-tics">
-							<label for="show-tics">Show Tic Marks</label>
-						</input>
-					</div>
+				<div class="switch" style="padding-top:15px">
+					<label>
+						<input id="point-switch" type="checkbox" onclick="togglePoints(this)">
+						<span class="lever"></span>
+						Show Data Points
+					</label>
 				</div>
 			</div>
 
 
 			<div class="divider" style="margin:20px 20px"></div>
-			<div class="chart-container" style="overflow-x:scroll">
-				<table class="table container highlight">
+			<div class="container" style="overflow-x:scroll">
+				<table class="table highlight">
 					<thead>
 						<tr>
 							<th></th>
@@ -134,14 +137,22 @@
 
 		//Toggle the line based on the checkbox
 		function toggleLine(boxID, index) {
-			var graph = JSON.parse('{{graphJSON|safe}}');
 			var active   = boxID.checked ? false : true;
 			active ? this.checked="" : this.checked="checked"
-			var color = "hsl(" + ((360/graph.length+1) + (index*(360/graph.length+1)))  + ",80%,30%)"
 			var opacity = active ? 0 : 1;
 			d3.select("path#line_path"+index).style("opacity",opacity);
+			d3.select("path#tic_path"+index).style("opacity", opacity);
 			lineActive[index] = active;
-			//active ? d3.select(this).style("fill","gray") : d3.select(this).style("fill",color)
+		}
+
+		// Toggle whether or not to show datapoint marks
+		function togglePoints(checkbox) {
+			if (checkbox.checked) {
+				$(".tic").show();
+			}
+			else {
+				$(".tic").hide();
+			}
 		}
 
 
@@ -275,13 +286,28 @@
 		.text("Reflectance");
 
 		var lineGen = d3.svg.line()
-		.x(function(d) {
-			return xScale(d.key);
-		})
-		.y(function(d) {
-			return yScale(d.value);
-		})
-		.interpolate("linear");
+			.x(function(d) {
+				return xScale(d.key);
+			})
+			.y(function(d) {
+				return yScale(d.value);
+			})
+			.interpolate("linear");
+
+		// Function for drawing tic marks
+		function ticMark (d) {
+			var size = 3;
+			var pathArray = []
+			for (var i = 0; i < d.length; i++) {
+				var x = xScale(d[i].key);
+				var y = yScale(d[i].value);
+				pathArray.push(["M", [x - size, y],
+							"L", [x + size, y],
+							"M", [x, y-size],
+							"L", [x, y+size]].join(" "));
+			}
+			return pathArray.join(" ");
+		}
 
 		//Define the function that sorts the data
 		function keySort (sortfunc,field) {
@@ -469,7 +495,6 @@
 			return [nearestX, nearestY];
 		}
 
-
 		var drawLines = graph.forEach(function(d,i) {
 			//Creates an array of objects with key-value pairs, sorted by keys
 			var reflectanceKV = d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"));
@@ -478,15 +503,29 @@
 
 			//Append path to graph
 			chartBody.append('svg:path')
-			.attr('d', lineGen(reflectanceKV))   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
-			.attr('stroke', function(d,j) {
-				return "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)";
-			})
-			.attr('stroke-width', 1.25)
-			.attr('id', 'line_path' + i)
-			.style("fill", "none")
-			.attr('fill', 'none');
+				.attr('d', lineGen(reflectanceKV))
+				.attr('stroke', function() {
+					return "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)";
+				})
+				.attr('stroke-width', 1.25)
+				.attr('id', 'line_path' + i)
+				.style("fill", "none")
+				.attr('fill', 'none');
 
+			//Append tic marks to graph
+			chartBody.append('svg:path')
+				.attr('d', ticMark(reflectanceKV))
+				.attr('stroke', function() {
+					return "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)";
+				})
+				.attr('stroke-width', 1.25)
+				.attr('class', 'tic')
+				.attr('id', 'tic_path' + i)
+				.style("fill", "none")
+				.style("display", "none")
+				.attr('fill', 'none');
+
+			 // Update the color in the table
 			document.getElementById('rect-' + d.data_id).style.backgroundColor = "hsl(" + ((360/graph.length+1) + (i*(360/graph.length+1)))  + ",80%,30%)";
 		});
 
@@ -504,7 +543,9 @@
 				.attr("x2", xScale(coord[0]));
 
 			focus.style("display",null);
-			verticalLine.style("display",null);
+			if (document.getElementById('line-switch').checked) {
+				verticalLine.style("display",null);
+			}
 		}
 
 		function zoomed() {
@@ -520,9 +561,10 @@
 			chart.select(".x.axis").call(xAxis);
 			chart.select(".y.axis").call(yAxis);
 			lines.forEach (function(d,i) {
-				var reflectanceKV = d;
 				d3.select("path#line_path"+i)
-				.attr('d', lineGen(reflectanceKV));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
+				.attr('d', lineGen(d));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
+				d3.select("path#tic_path"+i)
+				.attr('d', ticMark(d));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
 			});
 		}
 
@@ -532,9 +574,8 @@
 			chart.select(".x.axis").call(xAxis);
 			chart.select(".y.axis").call(yAxis);
 			lines.forEach (function(d,i) {
-				var reflectanceKV = d;
 				d3.select("path#line_path"+i)
-				.attr('d', lineGen(reflectanceKV));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
+				.attr('d', lineGen(d));   //d3.entries(d.reflectance).sort(keySort(d3.ascending,"key"))
 			});
 		}
 

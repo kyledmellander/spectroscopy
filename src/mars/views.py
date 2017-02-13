@@ -19,6 +19,7 @@ from zipfile import ZipFile
 
 import re
 import copy
+import datetime
 import itertools
 
 import os, sys
@@ -148,7 +149,7 @@ def results(request):
         page_ids=[]
         for sample in page_results.object_list:
             page_ids.append(sample.data_id.strip())
-        print(page_ids)
+
         return render (request, 'results.html', {"page_ids": page_ids, "selected_ids":selectedList, "page_choices": page_choices, "page_results": page_results, "search_results": searchResultIDList})
     else:
         return render (request, 'results.html', {"page_ids": None, "selected_ids":None, "page_choices": None, "page_results": None, "search_results": None})
@@ -226,19 +227,31 @@ def graph(request):
         names.append(smart_str(s.data_id.strip()))
 
         # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
-        writer.writerow([smart_str("Database of Origin"), smart_str(s.origin),])
-        writer.writerow([smart_str("Sample Description"), smart_str(s.sample_desc),])
-        writer.writerow([smart_str("Date Added"), smart_str(s.date_added),])
+        if (s.origin):
+            writer.writerow([smart_str("Database of Origin"), smart_str(s.origin),])
+        if (s.sample_desc):
+            writer.writerow([smart_str("Sample Description"), smart_str(s.sample_desc),])
+        if (s.date_added):
+            writer.writerow([smart_str("Date Added"), smart_str(s.date_added),])
         writer.writerow([])
-        writer.writerow([smart_str("Data ID"), smart_str(s.data_id),])
-        writer.writerow([smart_str("Sample ID"), smart_str(s.sample_id),])
-        writer.writerow([smart_str("Mineral Name"), smart_str(s.name),])
-        writer.writerow([smart_str("Locality"), smart_str(s.locality),])
-        writer.writerow([smart_str("Grain Size"), smart_str(s.grain_size),])
-        writer.writerow([smart_str("Viewing Geometry"), smart_str(s.view_geom),])
-        writer.writerow([smart_str("Resolution"), smart_str(s.resolution),])
-        writer.writerow([smart_str("Formula"), smart_str(s.formula),])
-        writer.writerow([smart_str("Composition"), smart_str(s.composition),])
+        if (s.data_id):
+            writer.writerow([smart_str("Data ID"), smart_str(s.data_id),])
+        if (s.sample_id):
+            writer.writerow([smart_str("Sample ID"), smart_str(s.sample_id),])
+        if (s.name):
+            writer.writerow([smart_str("Mineral Name"), smart_str(s.name),])
+        if (s.locality):
+            writer.writerow([smart_str("Locality"), smart_str(s.locality),])
+        if (s.grain_size):
+            writer.writerow([smart_str("Grain Size"), smart_str(s.grain_size),])
+        if (s.view_geom):
+            writer.writerow([smart_str("Viewing Geometry"), smart_str(s.view_geom),])
+        if (s.resolution):
+            writer.writerow([smart_str("Resolution"), smart_str(s.resolution),])
+        if (s.formula):
+            writer.writerow([smart_str("Formula"), smart_str(s.formula),])
+        if (s.composition):
+            writer.writerow([smart_str("Composition"), smart_str(s.composition),])
         writer.writerow([])
         writer.writerow([smart_str("Wavelength"),])
         refl = reflectanceDict[s.data_id].split(',')
@@ -255,8 +268,11 @@ def graph(request):
           zip.writestr(names[i]+".csv".format(i), file.read())
       zipped_file.seek(0)
 
-      response = HttpResponse(zipped_file, content_type='application/octet-stream')
-      response['Content-Disposition'] = 'attachment; filename=spectra.zip'
+      date = datetime.datetime.today().strftime('%y-%m-%d')
+      print(date);
+
+      response = HttpResponse(zipped_file, content_type='application/zip')
+      response['Content-Disposition'] = 'attachment; filename=spectra-%s.zip;'%date
 
       return response
 
