@@ -174,8 +174,34 @@
           $(document).ready(function() {
             $('select').material_select();
             $(".button-collapse").sideNav();
+            $('input.autocomplete-name').autocomplete({
+              data: {
+                {% for mineral_name in mineral_names %}
+                  '{{mineral_name}}': null,
+                {% endfor %}
+              },
+              limit:20,
+            });
 
+            $('input.autocomplete-id').autocomplete({
+              data: {
+                {% for mineral_id in mineral_ids %}
+                  '{{mineral_name}}': null,
+                {% endfor %}
+              },
+              limit:20,
+            });
+
+            $('input.autocomplete-class').autocomplete({
+              data: {
+                {% for mineral_class in mineral_classes %}
+                  '{{mineral_class}}': null,
+                {% endfor %}
+              },
+              limit:20,
+            });
           });
+
 
           var slider = document.getElementById('id_slider-1');
           var minX = document.getElementById('id_form-0-min_included_range');
@@ -208,6 +234,7 @@
           maxX.addEventListener('change', function() {
             slider.noUiSlider.set([null, this.value])
           });
+
           // Script for adding in search elements
           var limit = 10;
           function addInput(divName, elementBelow) {

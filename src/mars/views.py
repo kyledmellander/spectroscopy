@@ -177,9 +177,13 @@ def search(request):
     dataBaseChoices.insert(0, ('Any','Any'))
 
     allSampleTypes = [c.strip() for c in SampleType.objects.all().values_list('typeOfSample',flat=True).distinct()]
-
+    mineralNames = [c.strip().capitalize() for c in Sample.objects.all().values_list('name',flat=True).distinct()]
+    mineralIDs = [c.strip().capitalize() for c in Sample.objects.all().values_list('data_id',flat=True).distinct()]
+    mineralClasses = [c.strip().capitalize() for c in Sample.objects.all().values_list('sample_class',flat=True).distinct()]
     return render(request, 'search.html', {
         'search_formset': SearchFormSet, 'database_choices': dataBaseChoices,
+        'mineral_names': mineralNames, 'mineral_ids': mineralIDs,
+        'mineral_classes': mineralClasses,
         })
 
 def graph(request):
