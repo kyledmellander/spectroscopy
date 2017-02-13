@@ -12,6 +12,7 @@ Technologies Used:
    - D3.js - JavaScript Graphing Library
    - MaterializeCSS/Sass - Front end design
    - PostgreSQL - Database
+   - HTML/JavaScript/JQuery - Responsive Elements
 
 Database Setup:
    - Install postgresql if you haven't
