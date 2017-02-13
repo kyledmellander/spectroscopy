@@ -7,6 +7,12 @@ About the site:
      about the samples, including a sample description is also available to view through the site, and is included
      with the downloaded sample data. 
 
+Technologies Used:
+   - Django/Python - Web Framework
+   - D3.js - JavaScript Graphing Library
+   - MaterializeCSS/Sass - Front end design
+   - PostgreSQL - Database
+
 Database Setup:
    - Install postgresql if you haven't
       >sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib
