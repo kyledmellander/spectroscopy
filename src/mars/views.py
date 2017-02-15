@@ -65,7 +65,6 @@ def meta(request):
         return render(request, 'meta.html', {"metaResults": samples,"reflectancedict":dictionaries,})
 
 def results(request):
-    allSamples = Sample.objects.order_by('data_id')
     searchResultIDList = []
     searchResults = Sample.objects.none()
     selectedSpectra = Sample.objects.none()
@@ -73,6 +72,10 @@ def results(request):
     if request.method == 'POST':
         # If using a previous search, get the saved results
         if (request.POST.get("page_selected", False)):
+            # Get sorting params
+            sortParams = request.POST.getlist('sort-params')
+
+            allSamples = Sample.objects.order_by('data_id')
             searchResultIDList = request.POST.getlist("search_results", [])
             print("SEARCHRESULTLIST: ", searchResultIDList)
 
@@ -88,6 +91,7 @@ def results(request):
             selectedSpectra = allSamples.filter(data_id__in=selections)
             searchResults = allSamples.filter()
         else:
+            allSamples = Sample.objects.order_by('data_id')
             SearchFormSet = formset_factory(SearchForm)
             search_formset = SearchFormSet(request.POST)
             for search_form in search_formset:
@@ -141,7 +145,7 @@ def results(request):
         selectedString = ','.join(selectedList)
 
         # Send the paginated results
-        paginator = Paginator(searchResults, 50)
+        paginator = Paginator(searchResults, 10)
         pageSelected = int(request.POST.get("page_selected", 1))
         page_results = paginator.page(pageSelected)
         page_choices = range( max(1,pageSelected-3), min(pageSelected+4,paginator.num_pages+1))
