@@ -253,25 +253,19 @@
       input.type = 'hidden';
       input.name = 'sort_params';
       input.value = field;
-      console.log(sortParams.length);
 
       for (i = 0; i < sortParams.length; i++) {
         if (sortParams[i].value == field) {
           input.value = "-"+field;
           removeElement(sortParams[i]);
-          console.log("Already sorted, inverting");
         }
         else if (sortParams[i].value == "-" + field) {
           removeElement(sortParams[i]);
-          console.log("Inverted Sort, reverting.");
         }
       }
 
       //form.insertBefore(input, form.firstChild);
       form.appendChild(input);
-      for (i = 0; i < sortParams.length; i++) {
-        console.log(sortParams[i].value);
-      }
 
       document.getElementById("resultsForm").submit();
     }
