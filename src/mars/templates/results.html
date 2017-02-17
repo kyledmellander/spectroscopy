@@ -26,7 +26,7 @@
                 <th></th>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Class</th>
+                <th onclick="sortByField('sample_class')">Class</th>
                 <th>Origin</th>
                 <th>Grain Size</th>
                 <th>Mineral Type</th>
@@ -87,11 +87,14 @@
             <input type="hidden" name="prev_selected" value="{{prev_selected}}"/>
           {% endif %}
 
-          <input id="page_selected" type="hidden" name="page_selected" value="{{results.number}}"/>
+          {% for sort_param in sort_params %}
+            <input type="hidden" name="sort_params" value="{{sort_param}}"/>
+          {% endfor %}
 
-          <input type="hidden" name="page_number" value="{{results.number}}"/>
 
           <!-- Pagination -->
+          <input id="page_selected" type="hidden" name="page_selected" value="{{results.number}}"/>
+          <input type="hidden" name="page_number" value="{{results.number}}"/>
           <ul class="pagination center-align">
             {% if page_results.has_previous %}
               <li class="waves-effect">
@@ -158,6 +161,7 @@
   <script src="{% static 'js/materialize.min.js' %}"></script>
 
   <script language="JavaScript">
+    // Select all toggle
     function toggle(source){
       checkboxes = document.getElementsByName("selection");
       for(var i=0, n=checkboxes.length; i<n; i++){
@@ -165,9 +169,27 @@
       }
     }
 
+    // Pagination value. Allows user to select the next page
     function selectPage(pageNumber) {
       document.getElementById("page_selected").value = pageNumber;
       document.getElementById("resultsForm").submit();
     }
+
+    // Sort results by fields. Allows user to sort the table by clicking on table header
+    function sortByField(field) {
+      var form = document.forms['resultsForm'];
+
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'sort_params';
+      input.value = field;
+      form.appendChild(input);
+
+      var sortParams = document.getElementsByName("sort_params");
+      for (i = 0; i < sortParams.length; i++) {
+        console.log(sortParams[i].value);
+      }
+    }
+
   </script>
 {% endblock %}

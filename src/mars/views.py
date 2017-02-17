@@ -68,16 +68,14 @@ def results(request):
     searchResultIDList = []
     searchResults = Sample.objects.none()
     selectedSpectra = Sample.objects.none()
-
+    requiredFields = ["name","sample_class","data_id","origin","sample_type","refl_range"]
     if request.method == 'POST':
         # If using a previous search, get the saved results
         if (request.POST.get("page_selected", False)):
             # Get sorting params
-            sortParams = request.POST.getlist('sort-params')
-
-            allSamples = Sample.objects.order_by('data_id')
+            sortParams = request.POST.getlist('sort-params', ['data_id',])
+            allSamples = Sample.objects.only(*requiredFields).order_by(*sortParams)
             searchResultIDList = request.POST.getlist("search_results", [])
-            print("SEARCHRESULTLIST: ", searchResultIDList)
 
             # Get any results selected via the form
             selections = request.POST.getlist('selection')
@@ -91,7 +89,8 @@ def results(request):
             selectedSpectra = allSamples.filter(data_id__in=selections)
             searchResults = allSamples.filter()
         else:
-            allSamples = Sample.objects.order_by('data_id')
+            sortParams = ['data_id',]
+            allSamples = Sample.objects.only(*requiredFields).order_by(*sortParams)
             SearchFormSet = formset_factory(SearchForm)
             search_formset = SearchFormSet(request.POST)
             for search_form in search_formset:
@@ -110,10 +109,6 @@ def results(request):
                         mOrigin = None
                     if typeOfSample == 'Any':
                         typeOfSample = None
-
-                    #else:
-                    #    sampleList = SampleType.objects.get(id=typeOfSample)
-                    #    print(sampleList)
 
                     formResults = allSamples.filter()
 
@@ -145,7 +140,7 @@ def results(request):
         selectedString = ','.join(selectedList)
 
         # Send the paginated results
-        paginator = Paginator(searchResults, 10)
+        paginator = Paginator(searchResults, 50)
         pageSelected = int(request.POST.get("page_selected", 1))
         page_results = paginator.page(pageSelected)
         page_choices = range( max(1,pageSelected-3), min(pageSelected+4,paginator.num_pages+1))
@@ -154,7 +149,8 @@ def results(request):
         for sample in page_results.object_list:
             page_ids.append(sample.data_id.strip())
 
-        return render (request, 'results.html', {"page_ids": page_ids, "selected_ids":selectedList, "page_choices": page_choices, "page_results": page_results, "search_results": searchResultIDList})
+        return render (request, 'results.html', {"page_ids": page_ids, "selected_ids":selectedList, "page_choices": page_choices, "page_results": page_results, "search_results": searchResultIDList,
+                                                 "sort_params":sortParams})
     else:
         return render (request, 'results.html', {"page_ids": None, "selected_ids":None, "page_choices": None, "page_results": None, "search_results": None})
 
@@ -277,7 +273,6 @@ def graph(request):
       zipped_file.seek(0)
 
       date = datetime.datetime.today().strftime('%y-%m-%d')
-      print(date);
 
       response = HttpResponse(zipped_file, content_type='application/zip')
       response['Content-Disposition'] = 'attachment; filename=spectra-%s.zip;'%date
@@ -312,7 +307,6 @@ def hasNumbers(inputString):
     return result
 
 def process_file(file):
-    print(file)
     dataArray = [] # Array of IDs
     sampArray = [] # Sample IDs
     nameArray = [] # Mineral Names
