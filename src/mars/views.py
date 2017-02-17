@@ -64,6 +64,22 @@ def meta(request):
         dictionaries = [ obj.as_dict() for obj in samples]
         return render(request, 'meta.html', {"metaResults": samples,"reflectancedict":dictionaries,})
 
+# Custom query function.
+# fields: Sample model columns to select
+# sortParameters: Fields to sort by, in the order to sort. Preface w/ "-" to reverse
+# returns: sorted list of selected sample fields
+def getSortedSamples(fields, sortParamaters):
+    sortedSamples = Sample.objects.only(*fields)
+    for sortParam in sortParamaters:
+        if sortParam[0] == "-":
+            reverseList = True;
+            sortParam = sortParam[1:]
+            sortedSamples = sorted(sortedSamples, key = lambda x: (getattr(x,sortParam) != "", getattr(x,sortParam).lower()), reverse=reverseList);
+        else:
+            reverseList = False;
+            sortedSamples = sorted(sortedSamples, key = lambda x: (getattr(x,sortParam) == "", getattr(x,sortParam).lower()), reverse=reverseList);
+    return sortedSamples
+
 def results(request):
     searchResultIDList = []
     searchResults = Sample.objects.none()
@@ -73,8 +89,10 @@ def results(request):
         # If using a previous search, get the saved results
         if (request.POST.get("page_selected", False)):
             # Get sorting params
-            sortParams = request.POST.getlist('sort-params', ['data_id',])
-            allSamples = Sample.objects.only(*requiredFields).order_by(*sortParams)
+            sortParams = request.POST.getlist('sort_params', ['data_id',])
+
+            allSamples = getSortedSamples(requiredFields, sortParams)
+
             searchResultIDList = request.POST.getlist("search_results", [])
 
             # Get any results selected via the form
@@ -83,11 +101,10 @@ def results(request):
             # Get any results selected previously
             prevSelections = request.POST.getlist('prev_selected')
 
-
             # Join previously selected with newly selected
             selections = list(set(selections + prevSelections))
-            selectedSpectra = allSamples.filter(data_id__in=selections)
-            searchResults = allSamples.filter()
+            selectedSpectra = Sample.objects.only('data_id').filter(data_id__in=selections)
+            searchResults = allSamples
         else:
             sortParams = ['data_id',]
             allSamples = Sample.objects.only(*requiredFields).order_by(*sortParams)
@@ -136,11 +153,8 @@ def results(request):
         for spectra in selectedSpectra:
             selectedList.append(spectra.data_id.strip())
 
-        #Keep a string of the selected dataIds
-        selectedString = ','.join(selectedList)
-
         # Send the paginated results
-        paginator = Paginator(searchResults, 50)
+        paginator = Paginator(searchResults, 10)
         pageSelected = int(request.POST.get("page_selected", 1))
         page_results = paginator.page(pageSelected)
         page_choices = range( max(1,pageSelected-3), min(pageSelected+4,paginator.num_pages+1))
