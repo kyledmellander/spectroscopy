@@ -176,10 +176,10 @@ def search(request):
     dataBaseChoices = [(c, c) for c in dataBaseChoices]
     dataBaseChoices.insert(0, ('Any','Any'))
 
-    allSampleTypes = [c.strip() for c in SampleType.objects.all().values_list('typeOfSample',flat=True).distinct()]
-    mineralNames = [c.strip().capitalize() for c in Sample.objects.all().values_list('name',flat=True).distinct()]
-    mineralIDs = [c.strip().capitalize() for c in Sample.objects.all().values_list('data_id',flat=True).distinct()]
-    mineralClasses = [c.strip().capitalize() for c in Sample.objects.all().values_list('sample_class',flat=True).distinct()]
+    allSampleTypes = [c.strip() for c in SampleType.objects.only("typeOfSample").values_list('typeOfSample',flat=True).order_by("typeOfSample").distinct()]
+    mineralNames = [c.strip().capitalize() for c in Sample.objects.only("name").values_list('name',flat=True).order_by("name").distinct()]
+    mineralIDs = [c.strip().capitalize() for c in Sample.objects.only("data_id").values_list('data_id',flat=True).order_by("data_id").distinct()]
+    mineralClasses = [c.strip().capitalize() for c in Sample.objects.only("sample_class").values_list('sample_class',flat=True).order_by("sample_class").distinct()]
     return render(request, 'search.html', {
         'search_formset': SearchFormSet, 'database_choices': dataBaseChoices,
         'mineral_names': mineralNames, 'mineral_ids': mineralIDs,
