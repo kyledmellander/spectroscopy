@@ -66,10 +66,11 @@ def meta(request):
 
 # Custom query function.
 # fields: Sample model columns to select
+# ids: list of ids to select
 # sortParameters: Fields to sort by, in the order to sort. Preface w/ "-" to reverse
 # returns: sorted list of selected sample fields
-def getSortedSamples(fields, sortParamaters):
-    sortedSamples = Sample.objects.only(*fields)
+def getSortedSamples(fields, sortParamaters, ids):
+    sortedSamples = Sample.objects.only(*fields).filter(data_id__in=ids)
     for sortParam in sortParamaters:
         if sortParam[0] == "-":
             reverseList = True;
@@ -91,9 +92,9 @@ def results(request):
             # Get sorting params
             sortParams = request.POST.getlist('sort_params', ['data_id',])
 
-            allSamples = getSortedSamples(requiredFields, sortParams)
 
             searchResultIDList = request.POST.getlist("search_results", [])
+            allSamples = getSortedSamples(requiredFields, sortParams,searchResultIDList)
 
             # Get any results selected via the form
             selections = request.POST.getlist('selection')
