@@ -64,21 +64,19 @@ def meta(request):
         dictionaries = [ obj.as_dict() for obj in samples]
         return render(request, 'meta.html', {"metaResults": samples,"reflectancedict":dictionaries,})
 
-# Custom query function.
+# Custom sorting query function.
 # fields: Sample model columns to select
 # ids: list of ids to select
 # sortParameters: Fields to sort by, in the order to sort. Preface w/ "-" to reverse
-# returns: sorted list of selected sample fields
+# returns: sorted list of selected sample fields with blank sorted values always at the end
 def getSortedSamples(fields, sortParamaters, ids):
     sortedSamples = Sample.objects.only(*fields).filter(data_id__in=ids)
     for sortParam in sortParamaters:
         if sortParam[0] == "-":
-            reverseList = True;
             sortParam = sortParam[1:]
-            sortedSamples = sorted(sortedSamples, key = lambda x: (getattr(x,sortParam) != "", getattr(x,sortParam).lower()), reverse=reverseList);
+            sortedSamples = sorted(sortedSamples, key = lambda x: (getattr(x,sortParam)), reverse=True);
         else:
-            reverseList = False;
-            sortedSamples = sorted(sortedSamples, key = lambda x: (getattr(x,sortParam) == "", getattr(x,sortParam).lower()), reverse=reverseList);
+            sortedSamples = sorted(sortedSamples, key = lambda x: (getattr(x,sortParam) == "", getattr(x,sortParam)));
     return sortedSamples
 
 def results(request):
@@ -90,7 +88,7 @@ def results(request):
         # If using a previous search, get the saved results
         if (request.POST.get("page_selected", False)):
             # Get sorting params
-            sortParams = request.POST.getlist('sort_params', ['data_id',])
+            sortParams = request.POST.getlist('sort_params', [])
 
 
             searchResultIDList = request.POST.getlist("search_results", [])
@@ -107,7 +105,7 @@ def results(request):
             selectedSpectra = Sample.objects.only('data_id').filter(data_id__in=selections)
             searchResults = allSamples
         else:
-            sortParams = ['data_id',]
+            sortParams = []
             allSamples = Sample.objects.only(*requiredFields).order_by(*sortParams)
             SearchFormSet = formset_factory(SearchForm)
             search_formset = SearchFormSet(request.POST)
