@@ -22,11 +22,11 @@ class SearchForm(forms.Form):
         self.fields['type_of_sample'].choices = allSampleTypes
 
     mineral_name = forms.CharField(required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'e.g. Gypsum','class':'autocomplete-name'}))
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. Gypsum','autocomplete':'off','class':'autocomplete-name'}))
     mineral_class = forms.CharField(required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'e.g. Sulfate','class':'autocomplete-class'}))
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. Sulfate','autocomplete':'off', 'class':'autocomplete-class'}))
     mineral_Id= forms.CharField(required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'e.g. ASD_SUL_21', 'class':'autocomplete-id'}))
+        widget=forms.TextInput(attrs={'placeholder': 'e.g. ASD_SUL_21', 'autocomplete':'off', 'class':'autocomplete-id'}))
     any_data = forms.BooleanField(required=False, widget=forms.CheckboxInput())
     min_included_range = forms.IntegerField(required = False,
         widget = forms.NumberInput(), label='Min X (nm)')
