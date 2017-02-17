@@ -2924,6 +2924,8 @@ td, th {
   text-align: left;
   vertical-align: middle;
   border-radius: 2px;
+  max-width:110px;
+  white-space:nowrap;
 }
 
 @media only screen and (max-width: 992px) {
