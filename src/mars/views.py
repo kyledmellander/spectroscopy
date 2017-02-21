@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles import finders
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q,F
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response, redirect
@@ -90,9 +90,21 @@ def results(request):
             # Get sorting params
             sortParams = request.POST.getlist('sort_params', [])
 
+            emptyStringDefs = {}
+            sortParamsWithNulls = []
+            for param in sortParams:
+                if (param[0] != "-"):
+                    nullParam = "null_" + param
+                    emptyStringDefs[nullParam] = param + " = \'\'"
+                    sortParamsWithNulls.append(nullParam)
+                sortParamsWithNulls.append(param);
 
             searchResultIDList = request.POST.getlist("search_results", [])
-            allSamples = getSortedSamples(requiredFields, sortParams,searchResultIDList)
+            #searchResults = getSortedSamples(requiredFields, sortParams,searchResultIDList)
+            searchResults = Sample.objects.only(*requiredFields).filter(data_id__in=searchResultIDList)
+            searchResults = searchResults.extra(select=emptyStringDefs)
+            searchResults = searchResults.extra(order_by=sortParamsWithNulls)
+
 
             # Get any results selected via the form
             selections = request.POST.getlist('selection')
@@ -103,7 +115,6 @@ def results(request):
             # Join previously selected with newly selected
             selections = list(set(selections + prevSelections))
             selectedSpectra = Sample.objects.only('data_id').filter(data_id__in=selections)
-            searchResults = allSamples
         else:
             sortParams = []
             allSamples = Sample.objects.only(*requiredFields).order_by(*sortParams)
