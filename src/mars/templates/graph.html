@@ -556,7 +556,7 @@
 			minYInput.value = yScale.domain()[1].toFixed(2);
 			maxYInput.value = yScale.domain()[0].toFixed(2);
 			ySlider.noUiSlider.set([yScale.domain()[1].toFixed(2),yScale.domain()[0].toFixed(2)]);
-			xSlider.noUiSlider.set(xScale.domain()[0].toFixed(2),xScale.domain()[1].toFixed(2));
+			xSlider.noUiSlider.set([minXInput.value,maxXInput.value]);
 
 			chart.select(".x.axis").call(xAxis);
 			chart.select(".y.axis").call(yAxis);
