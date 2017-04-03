@@ -130,7 +130,7 @@
     <script src="{% static 'js/nouislider.min.js' %}"></script>
 
 		<script>
-		var graph = JSON.parse('{{graphJSON|safe}}');
+		var graph = JSON.parse('{{graphJSON|safe | escapejs}}');
 		//Lines will hold each individual line's data
 		var lines = [];
 		var lineActive = [];
@@ -555,7 +555,7 @@
 			maxXInput.value = xScale.domain()[1].toFixed(2);
 			minYInput.value = yScale.domain()[1].toFixed(2);
 			maxYInput.value = yScale.domain()[0].toFixed(2);
-			ySlider.noUiSlider.set([yScale.domain()[1].toFixed(2),yScale.domain()[0].toFixed(2)]);
+			ySlider.noUiSlider.set([yScale.domain()[1],yScale.domain()[0]]);
 			xSlider.noUiSlider.set([minXInput.value,maxXInput.value]);
 
 			chart.select(".x.axis").call(xAxis);
@@ -638,6 +638,16 @@
 			zoomed()
 		}
 		</script>
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-92386607-1', 'auto');
+      ga('send', 'pageview');
+  </script>
 
 	</div>
 {% else%}

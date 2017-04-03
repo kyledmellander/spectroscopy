@@ -90,6 +90,7 @@ def results(request):
             # Get sorting params
             sortParams = request.POST.getlist('sort_params', [])
 
+            # Make a field denoting empty strings
             emptyStringDefs = {}
             sortParamsWithNulls = []
             for param in sortParams:
