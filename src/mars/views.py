@@ -104,9 +104,7 @@ def results(request):
                     typeOfSample = search_form.cleaned_data.get('type_of_sample')
                     xMin = search_form.cleaned_data.get('min_included_range')
 
-                    print(xMin)
                     xMax = search_form.cleaned_data.get('max_included_range')
-                    print(xMax)
 
                     # Remove 'Any' from choice field
                     if mOrigin == 'Any':
@@ -195,6 +193,16 @@ def results(request):
                             formResults = formResults.filter(refl_range__0__lte=xMin)
                     searchResults = searchResults | formResults
 
+
+            # Get any results selected via the form
+            selections = request.GET.getlist('selection')
+
+            # Get any results selected previously
+            prevSelections = request.GET.getlist('prev_selected')
+
+            # Join previously selected with newly selected
+            selections = list(set(selections + prevSelections))
+            selectedSpectra = Sample.objects.only('data_id').filter(data_id__in=selections)
             for result in searchResults:
                 searchResultIDList.append(result.data_id.strip())
 
@@ -256,7 +264,6 @@ def graph(request):
   if request.method == 'GET':
     if 'graphForm' in request.GET:
       selections = request.GET.getlist('selection')
-
       prevSelectedList = request.GET.getlist("prev_selected")
       selections = list(set(selections + prevSelectedList))
 
@@ -271,7 +278,7 @@ def graph(request):
             del obj["reflectance"][key]
       json_string = json.dumps(dictionaries)
 
-      return render(request, 'graph.html', {"graphResults": samples,"graphJSON":json_string, "search_formset":search_formset})
+      return render(request, 'graph.html', {"selected_ids":selections,"graphResults": samples,"graphJSON":json_string, "search_formset":search_formset})
 
     elif 'export' in request.GET:
       selections = request.GET.getlist('selection')
