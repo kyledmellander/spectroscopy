@@ -39,8 +39,7 @@
 
         <!-- Add your site or application content here -->
         <div class="container section" id="content" >
-          <form method="POST" action="/results/">
-            {% csrf_token %}
+          <form method="GET" action="/results/">
             {{search_formset.management_form}}
 
             <!--- Search Forms --->

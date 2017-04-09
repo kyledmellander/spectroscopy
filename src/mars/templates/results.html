@@ -4,8 +4,7 @@
   {% if search_results %}
     <div class="container section">
       <div class="card section" style="background:rgba(255,255,255,.9)">
-        <form id="resultsForm" method="POST" name="resultsform">
-          {% csrf_token %}
+        <form id="resultsForm" method="GET" name="resultsform">
           <div class="section center-align">
             <button type="submit" name="graphForm" formaction="/graph/" class="btn btn-success">Graph</button>
             <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button>
@@ -20,9 +19,9 @@
             <input id="selectAllBox" type="checkbox" name="selection" onClick="toggle(this)"/>
             <label name="selectAllLabel" for="selectAllBox" > Select All</label>
           </div>
-          <div style="padding-left: 10px; padding-right: 10px; overflow-x:scroll">
-            <table class="table highlight" >
-              <thead>
+          <div style="padding-left: 10px; padding-right: 10px; overflow-x:auto">
+            <table class="scroll table highlight">
+              <thead style="display:block">
                 <tr>
                   <th></th>
                   <th onclick="sortByField('data_id')">
@@ -112,13 +111,13 @@
                       <label for="option{{result.data_id }}"></label>
                     </td>
                   {% endif %}
-                  <td><label for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
-                  <td><label for="option{{ result.data_id }}"> {{ result.name | title }} </label></td>
-                  <td><label for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
+                  <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
+                  <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.name | title }} </label></td>
+                  <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
                   <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.origin }} </label></td>
-                  <td><label for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
-                  <td><label for="option{{ result.data_id }}"> {{ result.mineral_type }} </label></td>
-                  <td><label for="option{{ result.data_id }}"> {{ result.sample_type }} </label></td>
+                  <td><label class="truncate" for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
+                  <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.mineral_type }} </label></td>
+                  <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.sample_type }} </label></td>
                   <td><label for="option{{ result.data_id }}"> {{ result.refl_range }} </label></td>
                 </tr>
                 {% endfor %}
@@ -126,9 +125,20 @@
             </table>
           </div>
 
-          {% for result in search_results %}
-            <input type="hidden" name="search_results" value="{{result}}"/>
-          {% endfor %}
+            {{search_formset.management_form}}
+
+            <!--- Search Forms --->
+            <div style="display:None">
+              {% for search_form in search_formset.forms %}
+                {{search_form.mineral_name}}
+                {{search_form.mineral_class}}
+                {{search_form.any_data}}
+                {{search_form.min_included_range}}
+                {{search_form.max_included_range}}
+                {{search_form.type_of_sample}}
+                {{search_form.database_of_origin}}
+              {% endfor %}
+            </div>
 
 
           {% for id in selected_ids %}

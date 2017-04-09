@@ -14,8 +14,40 @@
         <link rel="stylesheet" href="{% static 'css/main.css' %}">
         <link rel="stylesheet" href="{% static 'css/materialize.css' %}">
         <link rel="stylesheet" href="{% static 'css/nouislider.css' %}">
+        <style>
+          .scroll {
+            border: 0;
+            border-collapse: collapse;
+          }
+
+          .scroll tr {
+            display: flex;
+          }
+
+          .scroll td {
+            flex: 1;
+          }
+
+          .scroll thead tr:after {
+            overflow-y: auto;
+            visibility: hidden;
+            height: 0;
+          }
+
+          .scroll thead th {
+            flex: 1;
+            display: block;
+          }
+
+          .scroll tbody {
+            display:block;
+            overflow-y: auto;
+            height: calc(80vh - 100px);
+          }
+        </style>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <script src="{% static 'js/vendor/modernizr-2.8.3.min.js' %}"></script>
+
     </head>
     <body>
       <!-- Navbar -->

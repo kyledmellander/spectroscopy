@@ -55,10 +55,10 @@ def about(request):
     return render(request, 'about.html', {"databases": databases, "aboutEntries": aboutEntries, "teamMembers": teamMembers})
 
 def meta(request):
-    if request.method == 'POST':
-        if 'meta' in request.POST:
-            selections = request.POST.getlist('selection')
-            prevSelectedList = request.POST.getlist("prev_selected")
+    if request.method == 'GET':
+        if 'meta' in request.GET:
+            selections = request.GET.getlist('selection')
+            prevSelectedList = request.GET.getlist("prev_selected")
             selections = list(set(selections + prevSelectedList))
             samples = Sample.objects.filter(data_id__in=selections)
         dictionaries = [ obj.as_dict() for obj in samples]
@@ -83,12 +83,53 @@ def results(request):
     searchResultIDList = []
     searchResults = Sample.objects.none()
     selectedSpectra = Sample.objects.none()
+    search_formset = None
     requiredFields = ["name","sample_class","data_id","origin","sample_type","refl_range"]
-    if request.method == 'POST':
+    if request.method == 'GET':
         # If using a previous search, get the saved results
-        if (request.POST.get("page_selected", False)):
+        if (request.GET.get("page_selected", False)):
             # Get sorting params
-            sortParams = request.POST.getlist('sort_params', [])
+            sortParams = request.GET.getlist('sort_params', [])
+            allSamples = Sample.objects.only(*requiredFields).order_by(*sortParams)
+
+            SearchFormSet = formset_factory(SearchForm)
+            search_formset = SearchFormSet(request.GET)
+            for search_form in search_formset:
+                if search_form.is_valid():
+                    mName =  search_form.cleaned_data.get('mineral_name')
+                    mClass = search_form.cleaned_data.get('mineral_class')
+                    mDataId = search_form.cleaned_data.get('mineral_Id')
+                    mOrigin = search_form.cleaned_data.get('database_of_origin')
+                    anyData = search_form.cleaned_data.get('any_data')
+                    typeOfSample = search_form.cleaned_data.get('type_of_sample')
+                    xMin = search_form.cleaned_data.get('min_included_range')
+
+                    print(xMin)
+                    xMax = search_form.cleaned_data.get('max_included_range')
+                    print(xMax)
+
+                    # Remove 'Any' from choice field
+                    if mOrigin == 'Any':
+                        mOrigin = None
+                    if typeOfSample == 'Any':
+                        typeOfSample = None
+
+                    formResults = allSamples.filter()
+
+                    if mName:
+                        formResults = formResults.filter(name__icontains=mName)
+                    if mClass:
+                        formResults = formResults.filter(sample_class__icontains=mClass)
+                    if mDataId:
+                        formResults = formResults.filter(data_id__icontains=mDataId)
+                    if mOrigin:
+                        formResults = formResults.filter(origin__icontains=mOrigin)
+                    if typeOfSample:
+                        formResults = formResults.filter(sample_type=typeOfSample)
+                    if anyData:
+                            formResults = formResults.filter(refl_range__1__gte=xMax)
+                            formResults = formResults.filter(refl_range__0__lte=xMin)
+                    searchResults = searchResults | formResults
 
             # Make a field denoting empty strings
             emptyStringDefs = {}
@@ -100,18 +141,17 @@ def results(request):
                     sortParamsWithNulls.append(nullParam)
                 sortParamsWithNulls.append(param);
 
-            searchResultIDList = request.POST.getlist("search_results", [])
-            #searchResults = getSortedSamples(requiredFields, sortParams,searchResultIDList)
-            searchResults = Sample.objects.only(*requiredFields).filter(data_id__in=searchResultIDList)
             searchResults = searchResults.extra(select=emptyStringDefs)
             searchResults = searchResults.extra(order_by=sortParamsWithNulls)
 
+            for result in searchResults:
+                searchResultIDList.append(result.data_id.strip())
 
             # Get any results selected via the form
-            selections = request.POST.getlist('selection')
+            selections = request.GET.getlist('selection')
 
             # Get any results selected previously
-            prevSelections = request.POST.getlist('prev_selected')
+            prevSelections = request.GET.getlist('prev_selected')
 
             # Join previously selected with newly selected
             selections = list(set(selections + prevSelections))
@@ -120,7 +160,7 @@ def results(request):
             sortParams = []
             allSamples = Sample.objects.only(*requiredFields).order_by(*sortParams)
             SearchFormSet = formset_factory(SearchForm)
-            search_formset = SearchFormSet(request.POST)
+            search_formset = SearchFormSet(request.GET)
             for search_form in search_formset:
                 if search_form.is_valid():
                     mName =  search_form.cleaned_data.get('mineral_name')
@@ -166,7 +206,7 @@ def results(request):
 
         # Send the paginated results
         paginator = Paginator(searchResults, 50)
-        pageSelected = int(request.POST.get("page_selected", 1))
+        pageSelected = int(request.GET.get("page_selected", 1))
         page_results = paginator.page(pageSelected)
         page_choices = range( max(1,pageSelected-3), min(pageSelected+4,paginator.num_pages+1))
 
@@ -174,8 +214,9 @@ def results(request):
         for sample in page_results.object_list:
             page_ids.append(sample.data_id.strip())
 
-        return render (request, 'results.html', {"page_ids": page_ids, "selected_ids":selectedList, "page_choices": page_choices, "page_results": page_results, "search_results": searchResultIDList,
-                                                 "sort_params":sortParams})
+        return render (request, 'results.html', {"search_formset":search_formset,"page_ids": page_ids,
+            "selected_ids":selectedList, "page_choices": page_choices, "page_results": page_results,
+            "search_results": searchResultIDList, "sort_params":sortParams})
     else:
         return render (request, 'results.html', {"page_ids": None, "selected_ids":None, "page_choices": None, "page_results": None, "search_results": None})
 
@@ -212,13 +253,15 @@ def search(request):
         })
 
 def graph(request):
-  if request.method == 'POST':
-    if 'graphForm' in request.POST:
-      selections = request.POST.getlist('selection')
+  if request.method == 'GET':
+    if 'graphForm' in request.GET:
+      selections = request.GET.getlist('selection')
 
-      prevSelectedList = request.POST.getlist("prev_selected")
+      prevSelectedList = request.GET.getlist("prev_selected")
       selections = list(set(selections + prevSelectedList))
 
+      SearchFormSet = formset_factory(SearchForm)
+      search_formset = SearchFormSet(request.GET)
 
       samples = Sample.objects.filter(data_id__in=selections)
       dictionaries = [ obj.as_dict() for obj in samples]
@@ -228,11 +271,11 @@ def graph(request):
             del obj["reflectance"][key]
       json_string = json.dumps(dictionaries)
 
-      return render(request, 'graph.html', {"graphResults": samples,"graphJSON":json_string})
+      return render(request, 'graph.html', {"graphResults": samples,"graphJSON":json_string, "search_formset":search_formset})
 
-    elif 'export' in request.POST:
-      selections = request.POST.getlist('selection')
-      prevSelectedList = request.POST.getlist("prev_selected")
+    elif 'export' in request.GET:
+      selections = request.GET.getlist('selection')
+      prevSelectedList = request.GET.getlist("prev_selected")
       selections = list(set(selections + prevSelectedList))
 
       samples = Sample.objects.filter(data_id__in=selections)
