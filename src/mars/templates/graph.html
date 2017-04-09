@@ -36,6 +36,10 @@
 	          <button type="submit" name="meta" formaction="/meta/" class="btn btn-success">View Metadata</button><br>
 	        </div>
 
+          {% for id in selected_ids %}
+              <input type="hidden" name="selection" value="{{id}}"/>
+          {% endfor %}
+
           {{search_formset.management_form}}
 
           <!--- Search Forms --->
