@@ -61,7 +61,6 @@ class Sample(models.Model):
     sample_desc = models.TextField(null=True, blank=True)
     mineral_type = models.CharField(max_length=50, null=True, blank=True)
     sample_class = models.CharField(max_length=50, null=True, blank=True)
-    sub_class = models.CharField(max_length=50, null=True, blank=True)
     grain_size = models.CharField(max_length=50, null=True, blank=True)
     view_geom = models.CharField(max_length=50, null=True, blank=True)
     resolution = models.CharField(max_length=30, null=True, blank=True)

@@ -102,12 +102,12 @@
                 <tr>
                   {% if result.data_id.strip in selected_ids %}
                     <td>
-                      <input type="checkbox" checked="checked" name="selection" id="option{{ result.data_id }}" value={{result.data_id}}/>
+                      <input type="checkbox" checked="checked" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} />
                       <label for="option{{result.data_id }}"></label>
                     </td>
                   {% else %}
                     <td>
-                      <input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}}/>
+                      <input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} />
                       <label for="option{{result.data_id }}"></label>
                     </td>
                   {% endif %}

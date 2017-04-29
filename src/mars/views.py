@@ -266,9 +266,12 @@ def graph(request):
       selections = request.GET.getlist('selection')
       prevSelectedList = request.GET.getlist("prev_selected")
       selections = list(set(selections + prevSelectedList))
+      print(selections)
 
       SearchFormSet = formset_factory(SearchForm)
       search_formset = SearchFormSet(request.GET)
+        
+      print(selections)
 
       samples = Sample.objects.filter(data_id__in=selections)
       dictionaries = [ obj.as_dict() for obj in samples]
@@ -277,6 +280,9 @@ def graph(request):
           if (obj["reflectance"][key] == "NULL"):
             del obj["reflectance"][key]
       json_string = json.dumps(dictionaries)
+      
+      print("We're Here")
+      print(samples)
 
       return render(request, 'graph.html', {"selected_ids":selections,"graphResults": samples,"graphJSON":json_string, "search_formset":search_formset})
 
