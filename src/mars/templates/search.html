@@ -58,7 +58,7 @@
                       <div class="col s6">{{search_form.mineral_class.errors}}
                                           {{search_form.mineral_class.label_tag}}
                                           {{search_form.mineral_class}}</div>
-                      <div class="col s12"><label for="checkbox-0">Only show Spectra With Data In Range:</label></div>
+                      <div class="col s12"><label for="checkbox-0">Only show spectra With data in range:</label></div>
 
                       <div id="checkbox-0" style="margin-top:6px" class="col s2 m1">
                         {{search_form.any_data}}
@@ -142,8 +142,8 @@
                         </div>
                       </div>
                       <div class="col s12"><div class="slider" id="id_slider-__count__" style="margin-top:15px; margin-bottom:15px"></div></div>
-                      <div class="col s6"><label for="id_form-__prefix__-min_included_range">Min X (nm):</label><input id="id_form-__prefix__-min_included_range" name="form-__prefix__-min_included_range" type="number" /></div>
-                      <div class="col s6"><label for="id_form-__prefix__-max_included_range">Max X (nm):</label><input id="id_form-__prefix__-max_included_range" name="form-__prefix__-max_included_range" type="number" /></div>
+                      <div class="col s6"><label for="id_form-__prefix__-min_included_range">Minimum wavelength (nm):</label><input id="id_form-__prefix__-min_included_range" name="form-__prefix__-min_included_range" type="number" /></div>
+                      <div class="col s6"><label for="id_form-__prefix__-max_included_range">Maximum wavelength (nm):</label><input id="id_form-__prefix__-max_included_range" name="form-__prefix__-max_included_range" type="number" /></div>
                       <div class="col s12"><label for="id_form-__prefix__-database_of_origin">Database of origin:</label> <select id="id_form-__prefix__-database_of_origin" name="form-__prefix__-database_of_origin">
                           {% for k,v in database_choices %}
                           <option value="{{k}}">{{v}}</option>
