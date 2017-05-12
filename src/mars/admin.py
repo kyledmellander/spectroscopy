@@ -6,7 +6,40 @@ from .models import About, Database, Sample, SampleType, TeamMember
 def MarkAsMineralType(modelAdmin, request, queryset):
     queryset.update(sample_type=SampleType.objects.get(pk='Mineral'))
 
+def MarkAsMixtureType(modelAdmin, request, queryset):
+    queryset.update(sample_type=SampleType.objects.get(pk='Mixture'))
+    
+def MarkAsCoatingType(modelAdmin, request, queryset):
+    queryset.update(sample_type=SampleType.objects.get(pk='Coating'))
+    
+def MarkAsVolatileType(modelAdmin, request, queryset):
+    queryset.update(sample_type=SampleType.objects.get(pk='Volatile'))
+
+def MarkAsRockType(modelAdmin, request, queryset):
+    queryset.update(sample_type=SampleType.objects.get(pk='Rock'))
+
+def MarkAsDustCoatingType(modelAdmin, request, queryset):
+    queryset.update(sample_type=SampleType.objects.get(pk='Dust Coating'))
+    
+def MarkAsMeteoriteType(modelAdmin, request, queryset):
+    queryset.update(sample_type=SampleType.objects.get(pk='Meteorite'))
+
+def MarkAsWholeRockType(modelAdmin, request, queryset):
+    queryset.update(sample_type=SampleType.objects.get(pk='Whole Rock'))
+    
+def MarkAsOtherType(modelAdmin, request, queryset):
+    queryset.update(sample_type=SampleType.objects.get(pk='Other'))
+
+MarkAsMixtureType.short_description = "Mark selected samples as Mixture"
 MarkAsMineralType.short_description = "Mark selected samples as Minerals"
+MarkAsCoatingType.short_description = "Mark selected samples as Coating"
+MarkAsVolatileType.short_description = "Mark selected samples as Volatile"
+MarkAsRockType.short_description = "Mark selected samples as Rock"
+MarkAsDustCoatingType.short_description = "Mark selected samples as Dust Coating"
+MarkAsMeteoriteType.short_description = "Mark selected samples as Meteorite"
+MarkAsWholeRockType.short_description = "Mark selected samples as Whole Rock"
+MarkAsOtherType.short_description = "Mark selected samples as Other"
+
 
 class AboutAdmin(admin.ModelAdmin):
     list_display = ('position_display',)
@@ -19,7 +52,7 @@ class SampleTypeAdmin(admin.ModelAdmin):
     list_display = ('typeOfSample',)
 
 class SampleAdmin(admin.ModelAdmin):
-    actions = [MarkAsMineralType];
+    actions = [MarkAsMineralType, MarkAsMixtureType, MarkAsCoatingType, MarkAsVolatileType, MarkAsRockType, MarkAsDustCoatingType, MarkAsMeteoriteType, MarkAsWholeRockType, MarkAsOtherType];
     list_display = ('data_id','sample_id','name','date_added','origin','sample_class','grain_size', 'refl_range')
     readonly_fields = ('date_added',)
     search_fields = ('data_id', 'sample_id', 'name', 'origin', 'sample_class', 'refl_range')
