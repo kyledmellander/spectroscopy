@@ -270,7 +270,7 @@ def graph(request):
 
       SearchFormSet = formset_factory(SearchForm)
       search_formset = SearchFormSet(request.GET)
-        
+
       print(selections)
 
       samples = Sample.objects.filter(data_id__in=selections)
@@ -280,85 +280,85 @@ def graph(request):
           if (obj["reflectance"][key] == "NULL"):
             del obj["reflectance"][key]
       json_string = json.dumps(dictionaries)
-      
+
       print("We're Here")
       print(samples)
 
       return render(request, 'graph.html', {"selected_ids":selections,"graphResults": samples,"graphJSON":json_string, "search_formset":search_formset})
 
-    elif 'export' in request.GET:
-      selections = request.GET.getlist('selection')
-      prevSelectedList = request.GET.getlist("prev_selected")
-      selections = list(set(selections + prevSelectedList))
+  elif 'export' in request.POST:
+    selections = request.POST.getlist('selection')
+    prevSelectedList = request.GET.getlist("prev_selected")
+    selections = list(set(selections + prevSelectedList))
 
-      samples = Sample.objects.filter(data_id__in=selections)
-      dictionaries = [obj.as_dict() for obj in samples]
-      reflectanceDict = {}
-      for item in dictionaries:
-        sortedList = sorted(item["reflectance"].iteritems(), key = lambda x:float(x[0]))
-        stringlist = []
-        for key,value in sortedList:
-          stringlist.append(str(key) + ":" +  str(value) + ",")
+    samples = Sample.objects.filter(data_id__in=selections)
+    dictionaries = [obj.as_dict() for obj in samples]
+    reflectanceDict = {}
+    for item in dictionaries:
+      sortedList = sorted(item["reflectance"].iteritems(), key = lambda x:float(x[0]))
+      stringlist = []
+      for key,value in sortedList:
+        stringlist.append(str(key) + ":" +  str(value) + ",")
 
-        reflectanceDict[item["data_id"]] =  ''.join(stringlist)
+      reflectanceDict[item["data_id"]] =  ''.join(stringlist)
 
-      files = []
-      names = []
-      count = 0
-      for s in samples:
-        # Create the HttpResponse object with the appropriate CSV header
-        file = StringIO.StringIO()
-        writer = csv.writer(file)
-        names.append(smart_str(s.data_id.strip()))
+    files = []
+    names = []
+    count = 0
+    for s in samples:
+      # Create the HttpResponse object with the appropriate CSV header
+      file = StringIO.StringIO()
+      writer = csv.writer(file)
+      names.append(smart_str(s.data_id.strip()))
 
-        # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
-        if (s.origin):
-            writer.writerow([smart_str("Database of Origin"), smart_str(s.origin),])
-        if (s.sample_desc):
-            writer.writerow([smart_str("Sample Description"), smart_str(s.sample_desc),])
-        if (s.date_added):
-            writer.writerow([smart_str("Date Added"), smart_str(s.date_added),])
-        writer.writerow([])
-        if (s.data_id):
-            writer.writerow([smart_str("Data ID"), smart_str(s.data_id),])
-        if (s.sample_id):
-            writer.writerow([smart_str("Sample ID"), smart_str(s.sample_id),])
-        if (s.name):
-            writer.writerow([smart_str("Mineral Name"), smart_str(s.name),])
-        if (s.locality):
-            writer.writerow([smart_str("Locality"), smart_str(s.locality),])
-        if (s.grain_size):
-            writer.writerow([smart_str("Grain Size"), smart_str(s.grain_size),])
-        if (s.view_geom):
-            writer.writerow([smart_str("Viewing Geometry"), smart_str(s.view_geom),])
-        if (s.resolution):
-            writer.writerow([smart_str("Resolution"), smart_str(s.resolution),])
-        if (s.formula):
-            writer.writerow([smart_str("Formula"), smart_str(s.formula),])
-        if (s.composition):
-            writer.writerow([smart_str("Composition"), smart_str(s.composition),])
-        writer.writerow([])
-        writer.writerow([smart_str("Wavelength"),])
-        refl = reflectanceDict[s.data_id].split(',')
-        count = count + 1
-        for r in range(0,len(refl)-1):
-          line = refl[r].split(':')
-          writer.writerow([line[0], line[1],])
+      # Make sure whatever text reader you open this csv file with is set to Unicode (UTF-8)
+      if (s.origin):
+        writer.writerow([smart_str("Database of Origin"), smart_str(s.origin),])
+      if (s.sample_desc):
+        writer.writerow([smart_str("Sample Description"), smart_str(s.sample_desc),])
+      if (s.date_added):
+        writer.writerow([smart_str("Date Added"), smart_str(s.date_added),])
+      writer.writerow([])
+      if (s.data_id):
+        writer.writerow([smart_str("Data ID"), smart_str(s.data_id),])
+      if (s.sample_id):
+        writer.writerow([smart_str("Sample ID"), smart_str(s.sample_id),])
+      if (s.name):
+        writer.writerow([smart_str("Mineral Name"), smart_str(s.name),])
+      if (s.locality):
+        writer.writerow([smart_str("Locality"), smart_str(s.locality),])
+      if (s.grain_size):
+        writer.writerow([smart_str("Grain Size"), smart_str(s.grain_size),])
+      if (s.view_geom):
+        writer.writerow([smart_str("Viewing Geometry"), smart_str(s.view_geom),])
+      if (s.resolution):
+        writer.writerow([smart_str("Resolution"), smart_str(s.resolution),])
+      if (s.formula):
+        writer.writerow([smart_str("Formula"), smart_str(s.formula),])
+      if (s.composition):
+        writer.writerow([smart_str("Composition"), smart_str(s.composition),])
+      writer.writerow([])
+      writer.writerow([smart_str("Wavelength"),])
+      refl = reflectanceDict[s.data_id].split(',')
+      count = count + 1
+      for r in range(0,len(refl)-1):
+        line = refl[r].split(':')
+        writer.writerow([line[0], line[1],])
+      file.seek(0)
+      files.append(file)
+    zipped_file = StringIO.StringIO()
+    with zipfile.ZipFile(zipped_file, 'w') as zip:
+      for i, file in enumerate(files):
         file.seek(0)
-        files.append(file)
-      zipped_file = StringIO.StringIO()
-      with zipfile.ZipFile(zipped_file, 'w') as zip:
-        for i, file in enumerate(files):
-          file.seek(0)
-          zip.writestr(names[i]+".csv".format(i), file.read())
-      zipped_file.seek(0)
+        zip.writestr(names[i]+".csv".format(i), file.read())
+    zipped_file.seek(0)
 
-      date = datetime.datetime.today().strftime('%y-%m-%d')
+    date = datetime.datetime.today().strftime('%y-%m-%d')
 
-      response = HttpResponse(zipped_file, content_type='application/zip')
-      response['Content-Disposition'] = 'attachment; filename=spectra-%s.zip;'%date
+    response = HttpResponse(zipped_file, content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename=spectra-%s.zip;'%date
 
-      return response
+    return response
 
 
 @login_required(login_url='/admin/login/')
