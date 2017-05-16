@@ -81,7 +81,6 @@ class Sample(models.Model):
         "sample_desc" : self.sample_desc,
         "mineral_type" : self.mineral_type,
         "sample_class" : self.sample_class,
-        "sub_class" : self.sub_class,
         "grain_size" : self.grain_size,
         "view_geom" : self.view_geom,
         "resolution" : self.resolution,
