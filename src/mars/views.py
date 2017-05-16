@@ -59,10 +59,14 @@ def meta(request):
         if 'meta' in request.GET:
             selections = request.GET.getlist('selection')
             prevSelectedList = request.GET.getlist("prev_selected")
+
+            SearchFormSet = formset_factory(SearchForm)
+            search_formset = SearchFormSet(request.GET)
+
             selections = list(set(selections + prevSelectedList))
             samples = Sample.objects.filter(data_id__in=selections)
         dictionaries = [ obj.as_dict() for obj in samples]
-        return render(request, 'meta.html', {"metaResults": samples,"reflectancedict":dictionaries,})
+        return render(request, 'meta.html', {"search_formset":search_formset, "metaResults": samples, "reflectancedict":dictionaries,})
 
 # Custom sorting query function.
 # fields: Sample model columns to select

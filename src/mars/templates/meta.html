@@ -19,6 +19,21 @@
               <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button>
             </div>
 
+            {{search_formset.management_form}}
+
+            <!--- Search Forms --->
+            <div style="display:None">
+              {% for search_form in search_formset.forms %}
+                {{search_form.mineral_name}}
+                {{search_form.mineral_class}}
+                {{search_form.any_data}}
+                {{search_form.min_included_range}}
+                {{search_form.max_included_range}}
+                {{search_form.type_of_sample}}
+                {{search_form.database_of_origin}}
+              {% endfor %}
+            </div>
+
             <div class="container section">
               <input id="selectAllBox" type="checkbox" name="selection" onClick="toggle(this)"/>
               <label name="selectAllLabel" for="selectAllBox" > Select All</label>
