@@ -2,8 +2,9 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib.staticfiles import finders
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
 from django.db.models import Q,F
 from django.forms.formsets import formset_factory
@@ -13,7 +14,7 @@ from django.template import RequestContext
 from django.template.defaulttags import register
 from django.utils.encoding import smart_str
 
-from .forms import SearchForm, UploadFileForm
+from .forms import SearchForm, UploadFileForm, contactForm
 from .models import About, Database, Sample, SampleType, TeamMember
 from zipfile import ZipFile
 
@@ -21,6 +22,7 @@ import re
 import copy
 import datetime
 import itertools
+import urllib, urllib2
 
 import os, sys
 #import unicodedata
@@ -53,6 +55,53 @@ def about(request):
     aboutEntries = About.objects.all()
     teamMembers = TeamMember.objects.all()
     return render(request, 'about.html', {"databases": databases, "aboutEntries": aboutEntries, "teamMembers": teamMembers})
+
+def contact(request):
+    if request.method == 'GET':
+        form_class = contactForm
+
+        return render(request, 'contact.html', {'form': form_class})
+    if request.method == 'POST':
+        # Send an email
+        form = contactForm(request.POST)
+        if form.is_valid():
+            returnEmail = form.cleaned_data.get("returnEmail")
+            body = form.cleaned_data.get("body")
+            body = "Respond To: " + returnEmail + "\n\n" + "Message:\n\n" + body
+
+            # Get user emails
+            usersWithEmails = User.objects.exclude(email__isnull=True)
+            toEmail = []
+            for user in usersWithEmails:
+                toEmail.append(user.email)
+
+            ''' Begin reCAPTCHA validation '''
+            recaptcha_response = request.POST.get('g-recaptcha-response')
+            url = 'https://www.google.com/recaptcha/api/siteverify'
+            values = {
+                'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                'response': recaptcha_response
+            }
+
+            data = urllib.urlencode(values)
+            req = urllib2.Request(url, data)
+            response = urllib2.urlopen(req)
+            result = json.load(response)
+            ''' End reCAPTCHA validation '''
+
+            if result['success']:
+                try:
+                    msg = EmailMessage('Spectroscopy Contact Form',
+                        body,
+                        to=toEmail)
+                    msg.send()
+                except BadHeaderError:
+                    return HttpResponse('Invalid header found.')
+                messages.success(request, 'Your message was sent. We\'ll get back as quickly as we can!')
+            else:
+                messages.error(request, 'Invalid reCAPTCHA. Please try again.')
+
+            return render(request, 'contact.html', {'form_submitted':True})
 
 def meta(request):
     if request.method == 'GET':

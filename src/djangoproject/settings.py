@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+from sensitive import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -83,20 +84,6 @@ WSGI_APPLICATION = 'djangoproject.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'spectrodb',
-
-        #These settings are specific to postgresql
-        'USER':'myprojectuser',
-        'PASSWORD':'password',
-        'HOST':'localhost',
-        'PORT':'',
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
 
@@ -144,10 +131,3 @@ STATICFILES_DIRS = [
 # This is for uploaded files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_in_env", "media_root")
-
-EMAIL_PORT = 587
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'testing@example.com'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

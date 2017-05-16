@@ -2,6 +2,15 @@ from django import forms
 
 from .models import Sample, SampleType
 
+class contactForm(forms.Form):
+    returnEmail = forms.EmailField(max_length = 200,
+            label = 'Your email address')
+    body = forms.CharField(required=True,
+            label = 'Your message',
+            widget=forms.Textarea(attrs={'class':'materialize-textarea'}))
+
+
+
 class SearchForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(SearchForm, self).__init__(*args, **kwargs)

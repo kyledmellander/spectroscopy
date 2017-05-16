@@ -1,16 +1,25 @@
 {% extends 'layouts/base.html' %}
-{% block title %}<h1>Questions? Comments? Contact us!</h1>{% endblock %}
 
 {% block content %}
-<form role="form" action="" method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Submit</button>
-</form>
 
-<!-- Or just display a simple html page by uncommenting section below
-and changing the href of contact on base.html to 'contact.html' -->
 
-<!-- <p> Email: spectroscopy@wwu.edu </p> -->
-
+<div id="meta" class="container section">
+  <div class="card-panel" style="background:rgba(255,255,255,.8)">
+    {% if form_submitted %}
+      <h5>Thanks!</h5>
+      <p> We have received your message. We will get back to you when we can!</p>
+    {% else %}
+      <h5> Contact Us</h5>
+      <form role="form" action="/contact/" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="g-recaptcha" data-sitekey="6LdObh0UAAAAANsDAT4IPHE-ncbKywGPZOuQVQvV"></div>
+        <p></p>
+        <button type="submit" name="action" value="search" class="btn red waves-effect waves-light"/>
+          Search
+        </button>
+      </form>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

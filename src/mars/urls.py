@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^login/$', views.login),
     url(r'^results/$', views.results, name='home'),
     url(r'^advanced/$', views.advanced, name='advanced'),
-    url(r'^about/$', views.about, name='advanced'),
+    url(r'^about/$', views.about, name='about'),
+    url(r'^contact/$', views.contact, name='contact'),
     url(r'^$', views.search, name='home'),
 ]
