@@ -13,8 +13,7 @@
     <div id="meta2">
       <div class = "container section">
         <div class = "card section">
-          <form method="POST" name="resultsform">
-            {% csrf_token %}
+          <form method="GET" name="resultsform">
             <div id="meta" class = "section center-align">
               <button type="submit" name="graphForm" formaction="/graph/" class="btn btn-success">Graph</button>
               <button type="submit" name="export" formaction="/export/" class="btn btn-success">Export</button>
