@@ -69,6 +69,9 @@ class Sample(models.Model):
     composition = models.CharField(max_length=1000, null=True, blank=True)
     reflectance = JSONField(default = {})
     sample_type = models.ForeignKey(SampleType, null=True,)
+    references = models.TextField(null=True, blank=True)
+    other = models.TextField(null=True, blank=True)
+    flagged = models.PositiveIntegerField(default=0, blank=True, null=True)
 
     def as_dict(self):
         return {
@@ -87,6 +90,8 @@ class Sample(models.Model):
         "refl_range" : self.refl_range,
         "formula" : self.formula,
         "composition" : self.composition,
+        "references" : self.references,
+        "other" : self.other,
         }
 
     class Meta:

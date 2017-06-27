@@ -369,6 +369,10 @@ def graph(request):
             writer.writerow([smart_str("Database of Origin"), smart_str(s.origin),])
         if (s.sample_desc):
             writer.writerow([smart_str("Sample Description"), smart_str(s.sample_desc),])
+        if (s.references):
+            writer.writerow([smart_str("References"), smart_str(s.references),])
+        if (s.other):
+            writer.writerow([smart_str("Other"), smart_str(s.other),])
         if (s.date_added):
             writer.writerow([smart_str("Date Added"), smart_str(s.date_added),])
         writer.writerow([])
@@ -468,6 +472,8 @@ def process_file(file):
         # HEADER Section
         origin = None
         desc = None
+        references = None
+        other = None
         header_line = reader.next()
         while len(header_line) > 0 and header_line[0] != '':
 
@@ -482,6 +488,19 @@ def process_file(file):
                 for col in header_line[1:]:
                     if col != '':
                       desc = col
+            
+            # References
+            elif 'references' in header_line[0].lower():
+                for col in header_line[1:]:
+                    if col != '':
+                      references = col
+                    
+            # Other
+            elif 'other' in header_line[0].lower():
+                for col in header_line[1:]:
+                    if col != '':
+                      other = col
+
 
             else:
                 warning_messages.append("\"" + header_line[0] + "\" does not contain a known key. Row ignored.")
@@ -678,13 +697,14 @@ def process_file(file):
         sample = Sample(
             data_id=dataId.strip(),
             sample_id=sampId.strip(),
+            references=references.strip(),
+            other=other.strip(),
             origin=origin.strip(),
             locality=collection.strip(),
             name=name.strip(),
             sample_desc=desc.strip(),
             mineral_type=mineralType.strip(),
             sample_class=sampleClass.strip(),
-            sub_class=subClass.strip(),
             grain_size=gr.strip(),
             view_geom=vGeo.strip(),
             resolution=res.strip(),
@@ -693,6 +713,7 @@ def process_file(file):
             composition=comp.strip(),
             reflectance=dataPoints[i],
             sample_type=sampleType)
+
         # Check to see if Data ID already exists #
         if Sample.objects.filter(data_id=dataId).exists():
             conflictingIds.append(dataId)
