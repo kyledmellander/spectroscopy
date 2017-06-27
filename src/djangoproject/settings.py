@@ -131,3 +131,7 @@ STATICFILES_DIRS = [
 # This is for uploaded files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_in_env", "media_root")
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
