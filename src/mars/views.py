@@ -418,7 +418,6 @@ def graph(request):
 
       return response
 
-
 @login_required(login_url='/admin/login/')
 def upload_file(request):
     if request.method == 'POST':
@@ -519,7 +518,7 @@ def process_file(file):
             return error_messages, warning_messages, conflictingIds, conflictingSamples
 
         start = 1
-        while dataIDs[start] == '':
+        while dataIDs[start] == '' and start < 100:
             start += 1
 
         c = start
@@ -638,7 +637,7 @@ def process_file(file):
                     if row[column] == '':
                       continue
 
-                    if float(row[column]) > 1.0:
+                    if float(row[column]) >= 1.0:
                         dataPoints[column-c][str(float(row[0]) * factor)] = str(float(row[column]) / 100.)
 
                     # Check for invalid datapoints #
