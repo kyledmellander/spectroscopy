@@ -54,6 +54,7 @@ def about(request):
     databases = Database.objects.all()
     aboutEntries = About.objects.all()
     teamMembers = TeamMember.objects.all()
+    print(teamMembers[0].image)
     return render(request, 'about.html', {"databases": databases, "aboutEntries": aboutEntries, "teamMembers": teamMembers})
 
 def contact(request):
