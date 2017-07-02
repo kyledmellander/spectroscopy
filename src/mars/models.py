@@ -106,6 +106,7 @@ class TeamMember(models.Model):
     role = models.CharField(max_length=30, blank=True)
     description = models.TextField(blank=True)
     position = models.IntegerField(default=1)
+    image = models.ImageField(upload_to = 'pic_folder/', blank=True)
 
     class Meta:
         ordering = ['position','name']

@@ -472,8 +472,8 @@ def process_file(file):
         # HEADER Section
         origin = None
         desc = None
-        references = None
-        other = None
+        references = ''
+        other = ''
         header_line = reader.next()
         while len(header_line) > 0 and header_line[0] != '':
 
@@ -488,13 +488,13 @@ def process_file(file):
                 for col in header_line[1:]:
                     if col != '':
                       desc = col
-            
+
             # References
             elif 'references' in header_line[0].lower():
                 for col in header_line[1:]:
                     if col != '':
                       references = col
-                    
+
             # Other
             elif 'other' in header_line[0].lower():
                 for col in header_line[1:]:
