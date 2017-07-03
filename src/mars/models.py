@@ -73,6 +73,33 @@ class Sample(models.Model):
     other = models.TextField(null=True, blank=True)
     flagged = models.PositiveIntegerField(default=0, blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        if float(self.refl_range[0]) < 0:
+            minReflectance = float('inf')
+            maxReflectance = -1.0
+            invalid = list()
+
+            for (key, value) in self.reflectance.iteritems():
+                print(key, value)
+
+                if (float(key) < 0 or float(value) < 0):
+                    invalid.append(key)
+                else:
+                    if (float(key) < minReflectance):
+                        minReflectance = float(key)
+                    if (float(key) > maxReflectance):
+                        maxReflectance = float(key);
+
+            # Remove invalid values
+            for (key) in invalid:
+                self.reflectance.pop(key)
+
+            # Update refl_range
+            self.refl_range[0] = minReflectance
+            self.refl_range[1] = maxReflectance
+
+        super(Sample, self).save(*args, **kwargs)
+
     def as_dict(self):
         return {
         "data_id": self.data_id,

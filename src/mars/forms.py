@@ -25,8 +25,6 @@ class SearchForm(forms.Form):
         allSampleTypes = [(c.strip(),c.strip()) for c in SampleType.objects.all().values_list('typeOfSample',flat=True).distinct()]
         allSampleTypes.insert(0, ('Any','Any'))
 
-        print(dataBaseChoices)
-        print(allSampleTypes)
         self.fields['database_of_origin'].choices = dataBaseChoices
         self.fields['type_of_sample'].choices = allSampleTypes
 

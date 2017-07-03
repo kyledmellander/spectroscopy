@@ -54,7 +54,6 @@ def about(request):
     databases = Database.objects.all()
     aboutEntries = About.objects.all()
     teamMembers = TeamMember.objects.all()
-    print(teamMembers[0].image)
     return render(request, 'about.html', {"databases": databases, "aboutEntries": aboutEntries, "teamMembers": teamMembers})
 
 def contact(request):
@@ -320,24 +319,18 @@ def graph(request):
       selections = request.GET.getlist('selection')
       prevSelectedList = request.GET.getlist("prev_selected")
       selections = list(set(selections + prevSelectedList))
-      print(selections)
 
       SearchFormSet = formset_factory(SearchForm)
       search_formset = SearchFormSet(request.GET)
-
-      print(selections)
 
       samples = Sample.objects.filter(data_id__in=selections)
       dictionaries = [ obj.as_dict() for obj in samples]
       for obj in dictionaries:
         for key in obj["reflectance"].keys():
-          if (obj["reflectance"][key] == "NULL"):
+          if (obj["reflectance"][key] == "NULL" or float(obj['reflectance'][key]) < 0 or float(key) < 0):
             del obj["reflectance"][key]
+
       json_string = json.dumps(dictionaries)
-
-      print("We're Here")
-      print(samples)
-
       return render(request, 'graph.html', {"selected_ids":selections,"graphResults": samples,"graphJSON":json_string, "search_formset":search_formset})
 
     elif 'export' in request.GET:
@@ -632,7 +625,7 @@ def process_file(file):
             dataPoints.append({})
 
         for row in reader:
-            if hasNumbers(row[0]) == True:
+            if hasNumbers(row[0]) and float(row[0]) > 0:
                 for column in xrange(c,row_len):
                     if row[column] == '':
                       continue
