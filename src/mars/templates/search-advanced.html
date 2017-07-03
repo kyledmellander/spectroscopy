@@ -26,8 +26,8 @@
             <li class="left"><a href="/about">About</a></li>
           </ul>
           <ul id="nav-mobile" class="right hide-on-small-and-down">
-              <li><a href="/upload">Upload</a></li>
               {% if user.is_authenticated %}
+                <li><a href="/upload">Upload</a></li>
                 <li><a href="/admin/login">Admin</a></li>
                 <li><a href="/logout">Log Out</a>
               {% else %}
