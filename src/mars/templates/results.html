@@ -102,6 +102,7 @@
                   <tr>
                     {% if result.data_id.strip in selected_ids %}
                       <td>
+
                         <div style="position: relative">
                           <input type="checkbox" checked="checked" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} />
                           <label for="option{{result.data_id }}"></label>
@@ -119,9 +120,9 @@
                     <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.name | title }} </label></td>
                     <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
                     <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.origin }} </label></td>
-                    <td><label class="truncate" for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
-                    <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.mineral_type }} </label></td>
                     <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.sample_type }} </label></td>
+                    <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.mineral_type }} </label></td>
+                    <td><label class="truncate" for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
                     <td><label for="option{{ result.data_id }}"> {{ result.refl_range }} </label></td>
                   </tr>
                   {% endfor %}
