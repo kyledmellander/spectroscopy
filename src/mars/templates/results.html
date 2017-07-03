@@ -19,14 +19,13 @@
             <input id="selectAllBox" type="checkbox" name="selection" onClick="toggle(this)"/>
             <label name="selectAllLabel" for="selectAllBox" > Select All</label>
           </div>
-          <div style="padding-left: 10px; padding-right: 10px; overflow-x:auto">
-            <div class='scroll'>
-              <table class="table highlight">
-                <thead style="display:block">
+          <div style="padding-left: 10px; padding-right: 10px;">
+              <table class="scroll">
+                <thead>
                   <tr>
                     <th></th>
-                    <th onclick="sortByField('data_id')">
-                      <label><a>
+                    <th style="width: 20%" onclick="sortByField('data_id')">
+                      <label class="truncate"><a>
                         ID
                         {% if "data_id" in sort_params %}
                           <i style="vertical-align: bottom;" class="material-icons">arrow_drop_up</i>
@@ -36,7 +35,7 @@
                       </a></label>
                     </th>
                     <th onclick="sortByField('name')">
-                      <label><a>
+                      <label class="truncate"><a>
                         Name
                         {% if "name" in sort_params %}
                           <i style="vertical-align: bottom;" class="material-icons align-vertical">arrow_drop_up</i>
@@ -46,7 +45,7 @@
                       </a></label>
                     </th>
                     <th onclick="sortByField('sample_class')">
-                      <label><a>
+                      <label class="truncate"><a>
                         Class
                         {% if "sample_class" in sort_params %}
                           <i style="vertical-align: bottom;" class="material-icons align-vertical">arrow_drop_up</i>
@@ -56,7 +55,7 @@
                       </a></label>
                     </th>
                     <th onclick="sortByField('origin')">
-                      <label><a>
+                      <label class="truncate"><a>
                         Origin
                         {% if "origin" in sort_params %}
                           <i style="vertical-align: bottom;" class="material-icons align-vertical">arrow_drop_up</i>
@@ -66,7 +65,7 @@
                       </a></label>
                     </th>
                     <th onclick="sortByField('grain_size')">
-                      <label><a>
+                      <label class="truncate"><a>
                         Grain Size
                         {% if "grain_size" in sort_params %}
                           <i style="vertical-align: bottom;" class="material-icons align-vertical">arrow_drop_up</i>
@@ -76,7 +75,7 @@
                       </a></label>
                     </th>
                     <th onclick="sortByField('mineral_type')">
-                      <label><a>
+                      <label class="truncate"><a>
                         Mineral Type
                         {% if "mineral_type" in sort_params %}
                           <i style="vertical-align: bottom;" class="material-icons align-vertical">arrow_drop_up</i>
@@ -86,7 +85,7 @@
                       </a></label>
                     </th>
                     <th onclick="sortByField('sample_type')">
-                      <label><a>
+                      <label class="truncate"><a>
                         Sample Type
                         {% if "sample_type" in sort_params %}
                           <i style="vertical-align: bottom;" class="material-icons align-vertical">arrow_drop_down</i>
@@ -95,24 +94,28 @@
                         {% endif %}
                       </a></label>
                     </th>
-                    <th><label>Reflectance Range</label></th>
+                    <th><label class="truncate">Reflectance Range</label></th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody style='height: 200px, overflow-y: auto'>
                   {% for result in page_results %}
                   <tr>
                     {% if result.data_id.strip in selected_ids %}
                       <td>
-                        <input type="checkbox" checked="checked" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} />
-                        <label for="option{{result.data_id }}"></label>
+                        <div style="position: relative">
+                          <input type="checkbox" checked="checked" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} />
+                          <label for="option{{result.data_id }}"></label>
+                        </div>
                       </td>
                     {% else %}
                       <td>
-                        <input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} />
-                        <label for="option{{result.data_id }}"></label>
+                        <div style="position: relative">
+                          <input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} />
+                          <label for="option{{result.data_id }}"></label>
+                        </div>
                       </td>
                     {% endif %}
-                    <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
+                    <td style="width: 20%"><label class="truncate" for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
                     <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.name | title }} </label></td>
                     <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
                     <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.origin }} </label></td>
@@ -124,7 +127,6 @@
                   {% endfor %}
                 </tbody>
               </table>
-            </div>
           </div>
 
             {{search_formset.management_form}}

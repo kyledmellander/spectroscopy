@@ -15,7 +15,7 @@
         <link rel="stylesheet" href="{% static 'css/materialize.css' %}">
         <link rel="stylesheet" href="{% static 'css/nouislider.css' %}">
         <style>
-          .scroll {
+          .scroll table{
             border: 0;
             border-collapse: collapse;
           }
@@ -24,19 +24,16 @@
             display: flex;
           }
 
-          .scroll td {
-            flex: 1;
+          .scroll td, th {
+              width: 10%;
+            align-self: flex-start;
+            display: block;
           }
 
           .scroll thead tr:after {
             overflow-y: auto;
             visibility: hidden;
             height: 0;
-          }
-
-          .scroll thead th {
-            flex: 1;
-            display: block;
           }
 
           .scroll tbody {
