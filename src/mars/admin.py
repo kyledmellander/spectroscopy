@@ -26,7 +26,6 @@ def MarkAsMeteoriteType(modelAdmin, request, queryset):
 
 def Update(modelAdmin, request, queryset):
     for sample in queryset:
-        print(sample)
         sample.save()
 
 def MarkAsWholeRockType(modelAdmin, request, queryset):
@@ -61,7 +60,7 @@ class SampleAdmin(admin.ModelAdmin):
     actions = [Update,MarkAsMineralType, MarkAsMixtureType, MarkAsCoatingType, MarkAsVolatileType, MarkAsRockType, MarkAsDustCoatingType, MarkAsMeteoriteType, MarkAsWholeRockType, MarkAsOtherType];
     list_display = ('data_id','sample_id','name','date_added','sample_type','origin','sample_class','grain_size', 'refl_range')
     readonly_fields = ('date_added',)
-    search_fields = ('data_id', 'sample_id', 'name', 'origin','sample_type','sample_class', 'refl_range')
+    search_fields = ('data_id', 'sample_id', 'name', 'origin','sample_type__typeOfSample','sample_class', 'refl_range')
 
 class TeamMemberAdmin(admin.ModelAdmin):
     list_display = ('name','role', 'position_display',)
