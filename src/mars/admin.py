@@ -8,10 +8,10 @@ def MarkAsMineralType(modelAdmin, request, queryset):
 
 def MarkAsMixtureType(modelAdmin, request, queryset):
     queryset.update(sample_type=SampleType.objects.get(pk='Mixture'))
-    
+
 def MarkAsCoatingType(modelAdmin, request, queryset):
     queryset.update(sample_type=SampleType.objects.get(pk='Coating'))
-    
+
 def MarkAsVolatileType(modelAdmin, request, queryset):
     queryset.update(sample_type=SampleType.objects.get(pk='Volatile'))
 
@@ -20,13 +20,18 @@ def MarkAsRockType(modelAdmin, request, queryset):
 
 def MarkAsDustCoatingType(modelAdmin, request, queryset):
     queryset.update(sample_type=SampleType.objects.get(pk='Dust Coating'))
-    
+
 def MarkAsMeteoriteType(modelAdmin, request, queryset):
     queryset.update(sample_type=SampleType.objects.get(pk='Meteorite'))
 
+def Update(modelAdmin, request, queryset):
+    for sample in queryset:
+        print(sample)
+        sample.save()
+
 def MarkAsWholeRockType(modelAdmin, request, queryset):
     queryset.update(sample_type=SampleType.objects.get(pk='Whole Rock'))
-    
+
 def MarkAsOtherType(modelAdmin, request, queryset):
     queryset.update(sample_type=SampleType.objects.get(pk='Other'))
 
@@ -39,6 +44,7 @@ MarkAsDustCoatingType.short_description = "Mark selected samples as Dust Coating
 MarkAsMeteoriteType.short_description = "Mark selected samples as Meteorite"
 MarkAsWholeRockType.short_description = "Mark selected samples as Whole Rock"
 MarkAsOtherType.short_description = "Mark selected samples as Other"
+Update.short_description = "Resave / auto format data"
 
 
 class AboutAdmin(admin.ModelAdmin):
@@ -52,10 +58,10 @@ class SampleTypeAdmin(admin.ModelAdmin):
     list_display = ('typeOfSample',)
 
 class SampleAdmin(admin.ModelAdmin):
-    actions = [MarkAsMineralType, MarkAsMixtureType, MarkAsCoatingType, MarkAsVolatileType, MarkAsRockType, MarkAsDustCoatingType, MarkAsMeteoriteType, MarkAsWholeRockType, MarkAsOtherType];
-    list_display = ('data_id','sample_id','name','date_added','origin','sample_class','grain_size', 'refl_range')
+    actions = [Update,MarkAsMineralType, MarkAsMixtureType, MarkAsCoatingType, MarkAsVolatileType, MarkAsRockType, MarkAsDustCoatingType, MarkAsMeteoriteType, MarkAsWholeRockType, MarkAsOtherType];
+    list_display = ('data_id','sample_id','name','date_added','sample_type','origin','sample_class','grain_size', 'refl_range')
     readonly_fields = ('date_added',)
-    search_fields = ('data_id', 'sample_id', 'name', 'origin', 'sample_class', 'refl_range')
+    search_fields = ('data_id', 'sample_id', 'name', 'origin','sample_type','sample_class', 'refl_range')
 
 class TeamMemberAdmin(admin.ModelAdmin):
     list_display = ('name','role', 'position_display',)
