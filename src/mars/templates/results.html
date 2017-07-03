@@ -19,10 +19,9 @@
             <input id="selectAllBox" type="checkbox" name="selection" onClick="toggle(this)"/>
             <label name="selectAllLabel" for="selectAllBox" > Select All</label>
           </div>
-          <div style="padding-left: 10px; padding-right: 10px; overflow-x:auto">
-            <div class='scroll'>
-              <table class="table highlight">
-                <thead style="display:block">
+          <div style="padding-left: 10px; padding-right: 10px;">
+              <table class="scroll">
+                <thead>
                   <tr>
                     <th></th>
                     <th onclick="sortByField('data_id')">
@@ -98,33 +97,37 @@
                     <th><label>Reflectance Range</label></th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody style='height: 200px, overflow-y: auto'>
                   {% for result in page_results %}
                   <tr>
                     {% if result.data_id.strip in selected_ids %}
                       <td>
-                        <input type="checkbox" checked="checked" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} />
-                        <label for="option{{result.data_id }}"></label>
+
+                        <div style="position: relative">
+                          <input type="checkbox" checked="checked" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} />
+                          <label for="option{{result.data_id }}"></label>
+                        </div>
                       </td>
                     {% else %}
                       <td>
-                        <input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} />
-                        <label for="option{{result.data_id }}"></label>
+                        <div style="position: relative">
+                          <input type="checkbox" name="selection" id="option{{ result.data_id }}" value={{result.data_id}} />
+                          <label for="option{{result.data_id }}"></label>
+                        </div>
                       </td>
                     {% endif %}
-                    <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
-                    <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.name | title }} </label></td>
-                    <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
-                    <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.origin }} </label></td>
-                    <td><label class="truncate" for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
-                    <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.mineral_type }} </label></td>
-                    <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.sample_type }} </label></td>
+                    <td> {{ result.data_id }}</td>
+                    <td> {{ result.name | title }} </td>
+                    <td> {{ result.sample_class }} </td>
+                    <td> {{ result.origin }} </td>
+                    <td>{{ result.grain_size }} </td>
+                    <td> {{ result.mineral_type }} </td>
+                    <td> {{ result.sample_type }} </td>
                     <td><label for="option{{ result.data_id }}"> {{ result.refl_range }} </label></td>
                   </tr>
                   {% endfor %}
                 </tbody>
               </table>
-            </div>
           </div>
 
             {{search_formset.management_form}}
