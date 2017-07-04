@@ -58,7 +58,7 @@ class SampleTypeAdmin(admin.ModelAdmin):
 
 class SampleAdmin(admin.ModelAdmin):
     actions = [Update,MarkAsMineralType, MarkAsMixtureType, MarkAsCoatingType, MarkAsVolatileType, MarkAsRockType, MarkAsDustCoatingType, MarkAsMeteoriteType, MarkAsWholeRockType, MarkAsOtherType];
-    list_display = ('data_id','sample_id','name','date_added','sample_type','origin','sample_class','grain_size', 'refl_range')
+    list_display = ('data_id','sample_id','name','date_added','flagged','sample_type','origin','sample_class','grain_size', 'refl_range')
     readonly_fields = ('date_added',)
     search_fields = ('data_id', 'sample_id', 'name', 'origin','sample_type__typeOfSample','sample_class', 'refl_range')
 

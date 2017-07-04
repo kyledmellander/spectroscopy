@@ -19,5 +19,6 @@ urlpatterns = [
     url(r'^advanced/$', views.advanced, name='advanced'),
     url(r'^about/$', views.about, name='about'),
     url(r'^contact/$', views.contact, name='contact'),
+    url(r'^ajax/flagSample/$', views.flagSample, name='flagSample'),
     url(r'^$', views.search, name='home'),
 ]

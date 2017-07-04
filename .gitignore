@@ -92,4 +92,5 @@ db.sqlite3
 ProgressBlog/
 static_in_env/
 testData/
+migrations/
 sensitive.py

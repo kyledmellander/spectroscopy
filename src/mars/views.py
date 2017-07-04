@@ -8,7 +8,7 @@ from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
 from django.db.models import Q,F
 from django.forms.formsets import formset_factory
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import render, render_to_response, redirect
 from django.template import RequestContext
 from django.template.defaulttags import register
@@ -102,6 +102,14 @@ def contact(request):
                 messages.error(request, 'Invalid reCAPTCHA. Please try again.')
 
             return render(request, 'contact.html', {'form_submitted':True})
+
+def flagSample(request):
+  sampleID = request.POST.get('flagID', None);
+  sampleObj = Sample.objects.get(pk=sampleID);
+  sampleObj.flagged += 1;
+  sampleObj.save();
+
+  return JsonResponse({ 'flagged': True });
 
 def meta(request):
     if request.method == 'GET':
@@ -366,7 +374,7 @@ def graph(request):
         if (s.references):
             writer.writerow([smart_str("References"), smart_str(s.references),])
         if (s.other):
-            writer.writerow([smart_str("Other"), smart_str(s.other),])
+            writer.writerow([smart_str("Other Information"), smart_str(s.other),])
         if (s.date_added):
             writer.writerow([smart_str("Date Added"), smart_str(s.date_added),])
         writer.writerow([])
@@ -452,6 +460,8 @@ def process_file(file):
     sampleTypeArray = [] #Sample Type: e.g. Mineral, Coating, Volatile, ...
     mineralTypeArray = [] # Mineral Type: e.g. Tectosilicate
     dataPoints = [] # Samples graph data
+    referencesArray = [] # Mineral Type: e.g. Tectosilicate
+    otherArray = [] # Mineral Type: e.g. Tectosilicate
 
     error_messages = ''
     warning_messages = []
@@ -465,8 +475,6 @@ def process_file(file):
         # HEADER Section
         origin = None
         desc = None
-        references = ''
-        other = ''
         header_line = reader.next()
         while len(header_line) > 0 and header_line[0] != '':
 
@@ -481,18 +489,6 @@ def process_file(file):
                 for col in header_line[1:]:
                     if col != '':
                       desc = col
-
-            # References
-            elif 'references' in header_line[0].lower():
-                for col in header_line[1:]:
-                    if col != '':
-                      references = col
-
-            # Other
-            elif 'other' in header_line[0].lower():
-                for col in header_line[1:]:
-                    if col != '':
-                      other = col
 
 
             else:
@@ -596,6 +592,18 @@ def process_file(file):
                     sampleTypeArray.append(meta_line[c])
                     c+=1
 
+            # References
+            elif 'references' in meta_line[0].lower():
+                while c < len(meta_line):
+                    referencesArray.append(meta_line[c])
+                    c+=1
+
+            # Other
+            elif 'other' in meta_line[0].lower():
+                while c < len(meta_line):
+                    otherArray.append(meta_line[c])
+                    c+=1
+
             # New metadata fields here
 
             else:
@@ -633,10 +641,6 @@ def process_file(file):
                     if float(row[column]) >= 1.0:
                         dataPoints[column-c][str(float(row[0]) * factor)] = str(float(row[column]) / 100.)
 
-                    # Check for invalid datapoints #
-                    elif float(row[column]) < 0.0:
-                        continue
-
                     else:
                         dataPoints[column-c][str(float(row[0]) * factor)] = row[column]
 
@@ -658,6 +662,8 @@ def process_file(file):
     classArray += [''] * (size - len(classArray))
     subClassArray += [''] * (size - len(subClassArray))
     sampleTypeArray += [''] * (size - len(sampleTypeArray))
+    referencesArray += [''] * (size - len(referencesArray))
+    otherArray += [''] * (size - len(otherArray))
 
     for i in range(size):
         dataId = dataArray[i]
@@ -670,6 +676,9 @@ def process_file(file):
         mineralType = mineralTypeArray[i]
         sampleClass = classArray[i]
         subClass = subClassArray[i]
+        other = otherArray[i]
+        references = referencesArray[i]
+
         sampleType = SampleType()
 
         # Get or Create the sample type

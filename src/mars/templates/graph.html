@@ -24,9 +24,52 @@
 {% load staticfiles %}
 {% block content %}
 <body onresize="redraw();">
+  {% csrf_token %}
+<div id="modal1" class="modal" style="z-index: 200; position: 'relative'">
+  <div class="modal-content">
+		<div class="container">
+			<h4>Flag Sample</h4>
+			<p id='flagDescription'></p>
+		</div>
+		<div class="container" style='margin-top: 50px'>
+        <a href="#!" class="modal-action modal-close waves-effect waves-light red btn-large">Cancel</a>
+        <a
+          id='flagSampleButton'
+          onclick="flagSample(this)"
+          class="modal-action modal-close waves-effect waves-light btn-large"
+          href="#!"
+          style="margin-left: 50px"
+          value="data_id_example"
+        >
+          Confirm
+        </a>
+          {{search_formset.management_form}}
+
+          {% for id in selected_ids %}
+              <input type="hidden" name="selection" value="{{id}}"/>
+          {% endfor %}
+          <!--- Search Forms --->
+          <div style="display:None">
+            {% for search_form in search_formset.forms %}
+              {{search_form.mineral_name}}
+              {{search_form.mineral_class}}
+              {{search_form.any_data}}
+              {{search_form.min_included_range}}
+              {{search_form.max_included_range}}
+              {{search_form.type_of_sample}}
+              {{search_form.database_of_origin}}
+            {% endfor %}
+          </div>
+			</form>
+		</div>
+
+  </div>
+</div>
+
+<!-- Modal Structure -->
 {% if graphResults %}
 <!-- load the d3.js library -->
-	<div class="container">
+	<div style="margin-left: 40px; margin-right: 40px">
 		<div class="card" style="background:rgba(255,255,255,.9)">
 			<div class="container">
         <form id="resultsForm" method="GET" name="resultsform">
@@ -55,6 +98,7 @@
             {% endfor %}
           </div>
 				</form>
+
 
 				<div class="row">
 					<div class="col s11">
@@ -87,76 +131,131 @@
 			<div class="divider"></div>
 
 			<div class="container">
-				<div class="switch" style="padding-top:15px">
-					<label>
-						<input id="line-switch" checked type="checkbox">
-						<span class="lever" ></span>
-						Show Vertical Line
-					</label>
-				</div>
+				<div class="row valign-wrapper" style="margin-top: 30px; margin-bottom: 30px">
+					<div class="col s4">
+						<div class="switch">
+							<label>
+								<input id="line-switch" checked type="checkbox">
+								<span class="lever" ></span>
+								Show Vertical Line
+							</label>
+						</div>
+					</div>
 
-				<div class="switch" style="padding-top:15px">
-					<label>
-						<input id="point-switch" type="checkbox" onclick="togglePoints(this)">
-						<span class="lever"></span>
-						Show Data Points
-					</label>
+					<div class="col s4">
+						<div class="switch">
+							<label>
+								<input id="point-switch" type="checkbox" onclick="togglePoints(this)">
+								<span class="lever"></span>
+								Show Data Points
+							</label>
+						</div>
+					</div>
+
+					<!-- Modal Trigger -->
+					<div class="col s4">
+					  <a class="waves-effect waves-light btn" href="#modal1">Modal</a>
+					</div>
 				</div>
 			</div>
 
-
 			<div class="divider" style="margin:20px 20px"></div>
-			<div class="container" style="overflow-x:scroll">
-				<table class="table highlight">
+				<div style="padding: 20px; overflow: auto">
+				<table class="scroll">
 					<thead>
 						<tr>
 							<th></th>
 							<th><label>ID</label></th>
-                            <th><label>Color</label></th>
+              <th><label>Color</label></th>
 							<th><label>Name</label></th>
 							<th><label>Class</label></th>
 							<th><label>Origin</label></th>
 							<th><label>Grain Size</label></th>
-              <th><label>Mineral Type</label></th>
-              <th><label>Sample Type</label></th>
 							<th><label>Refl. Range</label></th>
+              <th><label>Flag Sample</label></th>
 						</tr>
 					</thead>
 					<tbody>
 						{% for result in graphResults %}
 						<tr>
 							<td>
-								<input type="checkbox" checked="checked" name="selection"
-									id="option{{ result.data_id }}" value={{result.data_id}}
-									style="color:rgb(100,20,234);"
-									background="rgba(255,243,100,.9)"
-									onclick="toggleLine(this,{{forloop.counter0}});"/>
-								<label for="option{{result.data_id }}"></label>
+								<div style="position: relative">
+									<input type="checkbox" checked="checked" name="selection"
+										id="option{{ result.data_id }}" value={{result.data_id}}
+										onclick="toggleLine(this,{{forloop.counter0}});"/>
+									<label for="option{{result.data_id }}"></label>
+								</div>
 							</td>
-							<td><label for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
-                            <td><p id="rect-{{result.data_id}}" style="border:1px solid gray; width:15px; height:15px;"></td>
-							<td><label for="option{{ result.data_id }}"> {{ result.name | title }} </label></td>
-							<td><label for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
+							<td><label class="truncate" for="option{{ result.data_id }}"> {{ result.data_id }}</label></td>
+              <td><div id="rect-{{result.data_id}}" style="border:1px solid gray; width:15px; height:15px;"/></td>
+							<td><label class="truncate" for="option{{ result.data_id }}"> {{ result.name | title }} </label></td>
+							<td><label class="truncate" for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
 							<td><label class="truncate" for="option{{ result.data_id }}"> {{ result.origin }} </label></td>
-							<td><label for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
-              <td><label for="option{{ result.data_id }}"> {{ result.mineral_type }} </label></td>
-              <td><label for="option{{ result.data_id }}"> {{ result.sample_type }} </label></td>
-							<td><label for="option{{ result.data_id }}"> {{ result.refl_range }} </label></td>
+							<td><label class="truncate" for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
+							<td><label class="truncate" for="option{{ result.data_id }}"> {{ result.refl_range }} </label></td>
+							<td>
+                <a class="label" href="#modal1">
+                  <label style="color: #FF0000" onclick="openFlagModal('{{ result.data_id }}')" class="truncate">Flag</label>
+                </a>
+              </td>
 						</tr>
 						{% endfor %}
 					</tbody>
 				</table>
-
 			</div>
 			<div class="section"></div>
 		</div>
 
-
-
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
 		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	  <script src="{% static 'js/materialize.min.js' %}"></script>
     <script src="{% static 'js/nouislider.min.js' %}"></script>
 
 		<script>
+			$('.modal').modal({
+				dismissible: true, // Modal can be dismissed by clicking outside of the modal
+				opacity: .8, // Opacity of modal background
+				inDuration: 300, // Transition in duration
+				outDuration: 200, // Transition out duration
+				startingTop: '4%', // Starting top style attribute
+				endingTop: '10%', // Ending top style attribute
+			});
+
+      $("#flagID").change(function () {
+        console.log( $(this).val() );
+      });
+
+      function openFlagModal(dataID) {
+        console.log('flagging Sample', dataID);
+        $('#flagSampleButton').attr('value', dataID);
+        $('#flagDescription').text(
+          `You are about to flag ${dataID}
+           for review due to it being of poor quality, rendering
+           incorrectly, etc.
+          `);
+      }
+
+			function flagSample(data) {
+        console.log(data, data.value);
+        const sample_id = console.log(data.getAttribute('value'));
+        $.ajax({
+          url: '/ajax/flagSample/',
+          data: {
+            'flagID': data.getAttribute('value'),
+            'csrfmiddlewaretoken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+          },
+          dataType: 'json',
+          type: "POST",
+          success: function (data) {
+            console.log(data);
+          }
+        });
+			}
+
+		</script>
+
+		<script>
+
 		var graph = JSON.parse('{{graphJSON|safe | escapejs}}');
 		//Lines will hold each individual line's data
 		var lines = [];
@@ -674,7 +773,10 @@
 
       ga('create', 'UA-92386607-1', 'auto');
       ga('send', 'pageview');
-  </script>
+	  </script>
+
+		<script>
+		</script>
 
 	</div>
 {% else%}
@@ -703,6 +805,7 @@
 				<p>Please select a sample to graph.</p>
       </div>
     </div>
+
 {% endif %}
 </body>
 {% endblock %}

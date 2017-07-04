@@ -15,9 +15,20 @@
         <link rel="stylesheet" href="{% static 'css/materialize.css' %}">
         <link rel="stylesheet" href="{% static 'css/nouislider.css' %}">
         <style>
-          .scroll table{
+          .scroll {
+            width: 100%
             border: 0;
             border-collapse: collapse;
+            overflow-x: auto;
+            overflow-y: hidden;
+          }
+
+          .scroll table{
+            width: 100%
+            border: 0;
+            border-collapse: collapse;
+            overflow-x: auto;
+            overflow-y: hidden;
           }
 
           .scroll tr {
@@ -25,21 +36,20 @@
           }
 
           .scroll td, th {
-              width: 10%;
+            flex-grow: 1;
+            flex-shrink: 1;
             align-self: flex-start;
             display: block;
           }
 
-          .scroll thead tr:after {
-            overflow-y: auto;
-            visibility: hidden;
-            height: 0;
-          }
-
           .scroll tbody {
+            width: 100%;
             display:block;
             overflow-y: auto;
             height: calc(80vh - 100px);
+          }
+          .scroll th {
+            width: 100%
           }
 
           .imgContainer {
@@ -84,9 +94,19 @@
     <div id="title">
       {% block title %}{% endblock %}
     </div>
-    <div id="content">
       {% block content %}{% endblock %}
-    </div>
+
+
+      <div id="modal1" class="modal" style="z-index: -200; position: 'relative'">
+        <div class="modal-content">
+          <h4>Modal Header</h4>
+          <p>A bunch of text</p>
+        </div>
+        <div class="modal-footer">
+          <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+        </div>
+      </div>
+
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
@@ -98,7 +118,6 @@
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="{% static 'js/ie10-viewport-bug-workaround.js' %}"></script>
 
