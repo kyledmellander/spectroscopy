@@ -1,6 +1,6 @@
 from django.contrib import admin
 # Register your models here.
-from .models import About, Database, Sample, SampleType, TeamMember
+from .models import About, Database, File, Sample, SampleType, TeamMember
 
 # Allow Admin Users to set the type of multiple Samples at once
 def MarkAsMineralType(modelAdmin, request, queryset):
@@ -53,6 +53,9 @@ class DatabaseAdmin(admin.ModelAdmin):
     list_display = ('name','url')
     search_fields = ('name', 'url')
 
+class FileAdmin(admin.ModelAdmin):
+    list_display = ('name', 'date_uploaded')
+
 class SampleTypeAdmin(admin.ModelAdmin):
     list_display = ('typeOfSample',)
 
@@ -65,9 +68,10 @@ class SampleAdmin(admin.ModelAdmin):
 class TeamMemberAdmin(admin.ModelAdmin):
     list_display = ('name','role', 'position_display',)
 
+
 admin.site.register(About, AboutAdmin)
 admin.site.register(Database,DatabaseAdmin)
 admin.site.register(SampleType,SampleTypeAdmin)
 admin.site.register(Sample,SampleAdmin)
+admin.site.register(File, FileAdmin)
 admin.site.register(TeamMember,TeamMemberAdmin)
-#admin.site.register(DataFile)

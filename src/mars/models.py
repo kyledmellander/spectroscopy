@@ -51,6 +51,12 @@ class SampleType(models.Model):
     def __str__(self):
         return self.typeOfSample
 
+class File(models.Model):
+    name = models.CharField(max_length=100, blank=True)
+    description = models.CharField(max_length=255, blank=True)
+    document = models.FileField(upload_to='documents/')
+    date_uploaded = models.DateTimeField(auto_now_add=True)
+
 class Sample(models.Model):
     data_id = models.CharField(max_length=20, unique=True, primary_key=True)
     sample_id = models.CharField(max_length=30)

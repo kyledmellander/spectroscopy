@@ -15,7 +15,7 @@ from django.template.defaulttags import register
 from django.utils.encoding import smart_str
 
 from .forms import SearchForm, UploadFileForm, contactForm
-from .models import About, Database, Sample, SampleType, TeamMember
+from .models import About, Database, File, Sample, SampleType, TeamMember
 from zipfile import ZipFile
 
 import re
@@ -51,10 +51,16 @@ def get_reflectance(dictionary, key):
 
 
 def about(request):
+    try:
+        CSVFormat = File.objects.get(name='CSVFormat')
+    except File.DoesNotExist:
+        CSVFormat = None
+
+    print(CSVFormat);
     databases = Database.objects.all()
     aboutEntries = About.objects.all()
     teamMembers = TeamMember.objects.all()
-    return render(request, 'about.html', {"databases": databases, "aboutEntries": aboutEntries, "teamMembers": teamMembers})
+    return render(request, 'about.html', {"CSVFormat": CSVFormat, "databases": databases, "aboutEntries": aboutEntries, "teamMembers": teamMembers})
 
 def contact(request):
     if request.method == 'GET':

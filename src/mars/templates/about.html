@@ -13,6 +13,11 @@
                 {{aboutEntry.html}}
               {% endautoescape %}
             {% endfor %}
+            {% if CSVFormat %}
+              <p>
+                Want to contribute? <a href="{{CSVFormat.document.url}}">Format your data</a>, and <a href='/contact'>contact us.</a>
+              </p>
+            {% endif %}
           </div>
         </li>
         <li>
