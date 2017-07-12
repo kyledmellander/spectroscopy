@@ -74,16 +74,6 @@
                         {% endif %}
                       </a></label>
                     </th>
-                    <th onclick="sortByField('mineral_type')">
-                      <label class="truncate"><a>
-                        Mineral Type
-                        {% if "mineral_type" in sort_params %}
-                          <i style="vertical-align: bottom;" class="material-icons align-vertical">arrow_drop_up</i>
-                        {% elif "-mineral_type" in sort_params %}
-                          <i style="vertical-align: bottom;" class="material-icons align-vertical">arrow_drop_down</i>
-                        {% endif %}
-                      </a></label>
-                    </th>
                     <th onclick="sortByField('sample_type')">
                       <label class="truncate"><a>
                         Sample Type
@@ -120,9 +110,8 @@
                     <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.name | title }} </label></td>
                     <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.sample_class }} </label></td>
                     <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.origin }} </label></td>
-                    <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.sample_type }} </label></td>
-                    <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.mineral_type }} </label></td>
                     <td><label class="truncate" for="option{{ result.data_id }}">{{ result.grain_size }} </label></td>
+                    <td><label class="truncate" for="option{{ result.data_id }}"> {{ result.sample_type }} </label></td>
                     <td><label for="option{{ result.data_id }}"> {{ result.refl_range }} </label></td>
                   </tr>
                   {% endfor %}
